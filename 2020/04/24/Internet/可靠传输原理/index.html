@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wayne-98.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="可靠传输原理流水线可靠数据传输协议 增加序号范围 协议的发送方和接收方两端需要缓存分组。(发送方最低限度应当能缓冲那些已经发送但是没有被确认的分组，接收方需要缓存那些已正确接收的分组)  回退N步(GBN)滑动窗口协议 GBN 发送方需要响应的三种类型的事件： 上层的调用: 发送方需要检查发送窗口是否已满，既是否有 N 个已发送但未被确认的分组。 收到一个 ACK: GBN 协议中，对序号为N的分">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Internet&#x2F;可靠传输原理">
+<meta property="og:url" content="http://wayne-98.github.io/2020/04/24/Internet/%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="Wayne98">
+<meta property="og:description" content="可靠传输原理流水线可靠数据传输协议 增加序号范围 协议的发送方和接收方两端需要缓存分组。(发送方最低限度应当能缓冲那些已经发送但是没有被确认的分组，接收方需要缓存那些已正确接收的分组)  回退N步(GBN)滑动窗口协议 GBN 发送方需要响应的三种类型的事件： 上层的调用: 发送方需要检查发送窗口是否已满，既是否有 N 个已发送但未被确认的分组。 收到一个 ACK: GBN 协议中，对序号为N的分">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-24T14:24:30.717Z">
+<meta property="article:modified_time" content="2020-04-24T06:27:15.969Z">
+<meta property="article:author" content="Wayne">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://wayne-98.github.io/2020/04/24/Internet/%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Internet/可靠传输原理 | Wayne98</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Wayne98</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/04/24/Internet/%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="记录成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne98">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Internet/可靠传输原理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-04-24 22:24:30 / 修改时间：14:27:15" itemprop="dateCreated datePublished" datetime="2020-04-24T22:24:30+08:00">2020-04-24</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="可靠传输原理"><a href="#可靠传输原理" class="headerlink" title="可靠传输原理"></a>可靠传输原理</h2><h3 id="流水线可靠数据传输协议"><a href="#流水线可靠数据传输协议" class="headerlink" title="流水线可靠数据传输协议"></a>流水线可靠数据传输协议</h3><ul>
+<li>增加序号范围</li>
+<li>协议的发送方和接收方两端需要缓存分组。(发送方最低限度应当能缓冲那些已经发送但是没有被确认的分组，接收方需要缓存那些已正确接收的分组)</li>
+</ul>
+<h3 id="回退N步-GBN-滑动窗口协议"><a href="#回退N步-GBN-滑动窗口协议" class="headerlink" title="回退N步(GBN)滑动窗口协议"></a>回退N步(GBN)滑动窗口协议</h3><ul>
+<li>GBN 发送方需要响应的三种类型的事件：<ol>
+<li>上层的调用: 发送方需要检查发送窗口是否已满，既是否有 N 个已发送但未被确认的分组。</li>
+<li>收到一个 ACK: GBN 协议中，对序号为N的分组的确认采取<strong>累积确认</strong>的方式，表明接收方已正确接收到序号为 N 的以前且包括 N 在内的所有的分组</li>
+<li>超时事件: 如果出现超时，发送方重传所有已发送但还未被确认过的分组。(只采用了一个定时器，在 base 处)</li>
+</ol>
+</li>
+<li>GBN 接收方：<br>如果一个序号为 N 的分组被正确接收，并且按序(既上一次交付给上层的数据是序号为 N - 1 的分组),则接收方为分组 N 发送一个 ACK ，并将该分组中的数据部分交付给上层。在所有其他情况下，接收方丢弃该分组，并为最近按序接收的分组重新发送 ACK 。<br>(接收方不需要缓存任何失序分组。因为发送方会重传所有已发送但还未被确认过的分组)</li>
+</ul>
+<h3 id="选择重传-SR"><a href="#选择重传-SR" class="headerlink" title="选择重传(SR)"></a>选择重传(SR)</h3><p>当窗口长度和时延带宽积都很大的时候，在流水线中会有很多分组更是如此。单个分组的差错就能够引起 GBN 重传大量分组，很多分组根本没必要重传。<br>选择重传协议通过让发送方仅重传那些它怀疑在接收方出错的分组而避免了不必要的重传。</p>
+<ul>
+<li>SR 发送方的事件和动作：</li>
+</ul>
+<ol>
+<li>从上层收到数据：发送方需要检查发送窗口是否已满，既是否有N个已发送但未被确认的分组。</li>
+<li>收到 ACK : 如果收到 ACK ，倘若该分组序号在窗口内，则 SR 发送方将那个被确认的分组标记为已接受。如果该分组的序号等于 send_base ，则窗口基序号向前移动到具有最小序号的未确认分组处。</li>
+<li>超时事件：每个分组都必须拥有其自己的逻辑定时器。</li>
+</ol>
+<ul>
+<li>SR接收方的事件和动作：</li>
+</ul>
+<ol>
+<li>序号在 [ rcv_base, rcv_base + N - 1 ] 内的分组被正确接受。在此情况下，收到的分组落在接收方的窗口内，一个选择 ACK 被回送给发送方。如果该分组以前没收到过，则缓存该分组。如果该分组的序号等于接受窗口的基序号，则该分组以及以前缓存的序号连续的分组交付给上层。然后接受窗口按向前移动分组的编号向上交付这些分组。</li>
+<li>序号在 [ rcv_base - N, rcv_base - 1 ] 内的分组被正确接收到。在此情况下，必须产生一个 ACK ，即使该分组是接收方以前已确认过的分组。</li>
+<li>其他情况，忽略该分组。</li>
+</ol>
+<ul>
+<li>窗口长度必须小于等于序号空间大小的一半</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/24/Internet/HTTP/" rel="prev" title="Internet/HTTP">
+      <i class="fa fa-chevron-left"></i> Internet/HTTP
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/24/Java%20Concurrent/Condition/" rel="next" title="Java Concurrent/Condition">
+      Java Concurrent/Condition <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#可靠传输原理"><span class="nav-number">1.</span> <span class="nav-text">可靠传输原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#流水线可靠数据传输协议"><span class="nav-number">1.1.</span> <span class="nav-text">流水线可靠数据传输协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#回退N步-GBN-滑动窗口协议"><span class="nav-number">1.2.</span> <span class="nav-text">回退N步(GBN)滑动窗口协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#选择重传-SR"><span class="nav-number">1.3.</span> <span class="nav-text">选择重传(SR)</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Wayne</p>
+  <div class="site-description" itemprop="description">记录成长</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wayne</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

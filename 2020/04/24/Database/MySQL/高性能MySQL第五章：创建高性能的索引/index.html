@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wayne-98.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="索引基础MySQL的索引是在存储引擎层实现的 索引的类型 B+Tree索引   B+Tree索引有不同的实现方式，各有优劣。  MyISAM使用前缀压缩技术使得索引更小，但InnoDB则按照原数据格式进行存储 MyISAM索引通过数据的物理位置引用被索引的行，而InnoDB则根据主键引用被索引的行   可以使用B+Tree索引的类型  B+Tree索引适合于全键值、键值范围或键前缀查找(根据最左前">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Database&#x2F;MySQL&#x2F;高性能MySQL第五章：创建高性能的索引">
+<meta property="og:url" content="http://wayne-98.github.io/2020/04/24/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E4%BA%94%E7%AB%A0%EF%BC%9A%E5%88%9B%E5%BB%BA%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E7%B4%A2%E5%BC%95/index.html">
+<meta property="og:site_name" content="Wayne98">
+<meta property="og:description" content="索引基础MySQL的索引是在存储引擎层实现的 索引的类型 B+Tree索引   B+Tree索引有不同的实现方式，各有优劣。  MyISAM使用前缀压缩技术使得索引更小，但InnoDB则按照原数据格式进行存储 MyISAM索引通过数据的物理位置引用被索引的行，而InnoDB则根据主键引用被索引的行   可以使用B+Tree索引的类型  B+Tree索引适合于全键值、键值范围或键前缀查找(根据最左前">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-24T14:24:30.687Z">
+<meta property="article:modified_time" content="2020-04-24T11:08:54.850Z">
+<meta property="article:author" content="Wayne">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://wayne-98.github.io/2020/04/24/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E4%BA%94%E7%AB%A0%EF%BC%9A%E5%88%9B%E5%BB%BA%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E7%B4%A2%E5%BC%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Database/MySQL/高性能MySQL第五章：创建高性能的索引 | Wayne98</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Wayne98</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/04/24/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E4%BA%94%E7%AB%A0%EF%BC%9A%E5%88%9B%E5%BB%BA%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E7%B4%A2%E5%BC%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="记录成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne98">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Database/MySQL/高性能MySQL第五章：创建高性能的索引
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-04-24 22:24:30 / 修改时间：19:08:54" itemprop="dateCreated datePublished" datetime="2020-04-24T22:24:30+08:00">2020-04-24</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="索引基础"><a href="#索引基础" class="headerlink" title="索引基础"></a>索引基础</h1><p>MySQL的索引是在存储引擎层实现的</p>
+<h2 id="索引的类型"><a href="#索引的类型" class="headerlink" title="索引的类型"></a>索引的类型</h2><ol>
+<li>B+Tree索引</li>
+</ol>
+<ul>
+<li><p>B+Tree索引有不同的<strong>实现方式</strong>，各有优劣。</p>
+<ul>
+<li>MyISAM使用前缀压缩技术使得索引更小，但InnoDB则按照原数据格式进行存储</li>
+<li>MyISAM索引通过数据的物理位置引用被索引的行，而InnoDB则根据主键引用被索引的行</li>
+</ul>
+</li>
+<li><p>可以使用B+Tree索引的类型</p>
+<ul>
+<li>B+Tree索引适合于全键值、键值范围或键前缀查找(根据最左前缀的查找)<br>  <strong>B+Tree索引的有效查询类型</strong>：<ul>
+<li>全值匹配</li>
+<li>匹配最左前缀</li>
+<li>匹配列前缀</li>
+<li>匹配范围值</li>
+<li>精确匹配某一列并范围匹配另一列</li>
+<li>只访问索引的查询</li>
+<li>如果orderby子句满足前面列出的几种查询类型，则这个索引也可以满足对应的排序需求</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>B+Tree索引的一些<strong>限制</strong></p>
+<ul>
+<li>如果不是从索引的最左列开始查找，则无法使用索引</li>
+<li>不能跳过索引中的列（比如说我查询第一列和第三列，则索引只能使用第一列）</li>
+<li>如果查询中有某个列的范围查询，则其右边所有列都无法使用索引优化查找</li>
+</ul>
+</li>
+</ul>
+<h1 id="索引的优点"><a href="#索引的优点" class="headerlink" title="索引的优点"></a>索引的优点</h1><ul>
+<li>索引大大减少了服务器需要扫描的数据量</li>
+<li>索引帮助服务器避免排序和临时表</li>
+<li>索引可以将随机I/O变为顺序I/O</li>
+</ul>
+<h1 id="高性能索引策略"><a href="#高性能索引策略" class="headerlink" title="高性能索引策略"></a>高性能索引策略</h1><h2 id="独立的列"><a href="#独立的列" class="headerlink" title="独立的列"></a>独立的列</h2><p>指索引列不能是表达式的一部分，也不能是函数的参数</p>
+<h2 id="前缀索引和索引选择性"><a href="#前缀索引和索引选择性" class="headerlink" title="前缀索引和索引选择性"></a>前缀索引和索引选择性</h2><ul>
+<li>索引很长的字符串，需要使用前缀索引，这样可以大大减少索引空间，从而提升索引效率。但是会降低索引的选择性。（BLOB，TEXT必须使用前缀索引）</li>
+<li>索引的选择性是指，不重复的索引值和数据表记录总数的比值。</li>
+<li>MySQL无法使用前缀索引做 order by和 group by，也无法使用前缀索引做覆盖扫描。</li>
+</ul>
+<h2 id="多列索引"><a href="#多列索引" class="headerlink" title="多列索引"></a>多列索引</h2><p>为每一个列创建单独的索引，或者按照错误的顺序创建多列索引，是错误的。</p>
+<h2 id="选择合适的索引列顺序"><a href="#选择合适的索引列顺序" class="headerlink" title="选择合适的索引列顺序"></a>选择合适的索引列顺序</h2><ul>
+<li>当不需要考虑排序和分组的时候，将选择性最高的列放到前面通常是很好的。这时索引的作用是优化where条件的查找</li>
+<li>将选择性最高的列放在索引的最前列，在某些场景可能有帮助，但通常不如避免随机I/O和排序那么重要，考虑问题需要全面。</li>
+</ul>
+<h2 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h2><p>聚簇索引并不是一种单独的索引类型，而是一种数据存储方式。<br>数据行实际存放在索引的叶子页中，“聚簇”表示数据行和相邻的键值紧凑的存储在一起。</p>
+<h3 id="聚簇索引的优点"><a href="#聚簇索引的优点" class="headerlink" title="聚簇索引的优点"></a>聚簇索引的优点</h3><ul>
+<li>可以把相关的数据保存在一起</li>
+<li>因为聚簇索引把索引和数据保存在同一个B+Tree中，所以数据访问更快</li>
+<li>使用覆盖索引扫描的查询可以直接使用页节点中的主键值</li>
+<li>使用主键值当作指针会让二级索引占用更多的空间，换来的好处是，InnoDB在移动行的时候无须更新二级索引中这个“指针”</li>
+</ul>
+<h3 id="聚簇索引的缺点"><a href="#聚簇索引的缺点" class="headerlink" title="聚簇索引的缺点"></a>聚簇索引的缺点</h3><ul>
+<li>聚簇索引最大限度的提高了 I/O 密集型应用的提升，如果数据全部在内存中，则访问的顺序就没有那么重要了，聚簇索引的优势也就没了。</li>
+<li>插入速度严重依赖于插入顺序。按照主键的顺序插入是加载数据到 InnoDB 表中速度最快的方式。如果不是，插入完成后最好使用 OPTIMIZE TABLE 命令重新组织一下表</li>
+<li>更新聚簇索引的代价很高，因为会强制 InnoDB 将每个被更新的行移动到新的位置</li>
+<li>基于聚簇索引的表在插入新行或者主键被更新导致需要移动行的时候，可能面临“页分裂”的问题。<ul>
+<li>当行的主键值要求必须将这一行插入到某个已满的页中，存储引擎会将该页分裂成两个页面来容纳该行，这就是一项页分裂的操作。页分裂会导致占用更多的磁盘空间</li>
+</ul>
+</li>
+<li>聚簇索引可能会导致全表扫描变慢，尤其是行比较稀疏，或者由于页分裂导致数据存储不连续的时候</li>
+<li>二级索引(非聚簇索引)可能比想象的要更大，因为在二级索引的叶子节点包含了引用行的主键列。</li>
+<li>二级索引访问需要两次索引查找，而不是一次<ul>
+<li>二级索引叶子结点保存的不是指向行物理位置的指针，而是行的主键值</li>
+<li>存储引擎需要找到二级索引的叶子结点获得对应的主键值，然后根据这个值去聚簇索引中查找到对应的行  </li>
+</ul>
+</li>
+</ul>
+<h3 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h3><p>如果一个索引包含所有需要查询的值，我们就称之为覆盖索引。</p>
+<ul>
+<li>覆盖索引的优点：<ol>
+<li>索引条目通常远小于数据行的大小，如果只需要读取索引，MySQL就会极大地减少数据访问量。</li>
+<li>因为索引是按照列值顺序存储的，所以对于 I/O 密集型的范围查询会比随机磁盘读取每一行的数据的 I/O 要少得多。</li>
+<li>因为 InnoDB 的聚簇索引，覆盖索引可以避免回表查询。</li>
+</ol>
+</li>
+</ul>
+<p>当发起一个被索引覆盖的查询的时，在 explain 的 Extra 列可以看到 “Using index” 的信息。</p>
+<h3 id="使用索引扫描来排序"><a href="#使用索引扫描来排序" class="headerlink" title="使用索引扫描来排序"></a>使用索引扫描来排序</h3><p>EXPLAIN 出来的列的 type 列的值为 “index” ，则说明MySQL使用了索引扫描来做排序。</p>
+<p>MySQL使用索引来对结果做排序的一些限制：</p>
+<pre><code>1. 只有当索引列的顺序和 ORDER BY 子句的顺序完全一致，并且所有列的排序方向都一样时
+ 2. 如果需要关联多张表，则只有当 ORDER BY 子句引用的字段全部为第一个表时
+ 3. 其他查找型的限制(最左前缀优先等等)</code></pre>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/24/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9AMySQL%E6%9E%B6%E6%9E%84/" rel="prev" title="Database/MySQL/高性能MySQL第一章：MySQL架构">
+      <i class="fa fa-chevron-left"></i> Database/MySQL/高性能MySQL第一章：MySQL架构
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/24/Git/Git%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="next" title="Git/Git 学习笔记">
+      Git/Git 学习笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#索引基础"><span class="nav-number">1.</span> <span class="nav-text">索引基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#索引的类型"><span class="nav-number">1.1.</span> <span class="nav-text">索引的类型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#索引的优点"><span class="nav-number">2.</span> <span class="nav-text">索引的优点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#高性能索引策略"><span class="nav-number">3.</span> <span class="nav-text">高性能索引策略</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#独立的列"><span class="nav-number">3.1.</span> <span class="nav-text">独立的列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前缀索引和索引选择性"><span class="nav-number">3.2.</span> <span class="nav-text">前缀索引和索引选择性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多列索引"><span class="nav-number">3.3.</span> <span class="nav-text">多列索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#选择合适的索引列顺序"><span class="nav-number">3.4.</span> <span class="nav-text">选择合适的索引列顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#聚簇索引"><span class="nav-number">3.5.</span> <span class="nav-text">聚簇索引</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#聚簇索引的优点"><span class="nav-number">3.5.1.</span> <span class="nav-text">聚簇索引的优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#聚簇索引的缺点"><span class="nav-number">3.5.2.</span> <span class="nav-text">聚簇索引的缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#覆盖索引"><span class="nav-number">3.5.3.</span> <span class="nav-text">覆盖索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用索引扫描来排序"><span class="nav-number">3.5.4.</span> <span class="nav-text">使用索引扫描来排序</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Wayne</p>
+  <div class="site-description" itemprop="description">记录成长</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wayne</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

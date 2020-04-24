@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wayne-98.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="4月刷题记录4月11日刷题记录1. 连续子数组的最大和  dp问题很容易就看出需要用dp来解，但是没有想出来状态转移方程。因为没有考虑到最后一步的解和前一步的解，他们之间的关系  2. 两数相加  链表 初始想法拿到题目先想到遍历链表取出值，然后得到和，在new一个新链表返回。但是int会溢出 别人的解因为链表记录的数字是反序的，正好和10进制相加进位相同，所以直接相加并记录进位就可以  3.无重">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Algorithms&#x2F;April&#x2F;4月刷题记录">
+<meta property="og:url" content="http://wayne-98.github.io/2020/04/24/Algorithms/April/4%E6%9C%88%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/index.html">
+<meta property="og:site_name" content="Wayne98">
+<meta property="og:description" content="4月刷题记录4月11日刷题记录1. 连续子数组的最大和  dp问题很容易就看出需要用dp来解，但是没有想出来状态转移方程。因为没有考虑到最后一步的解和前一步的解，他们之间的关系  2. 两数相加  链表 初始想法拿到题目先想到遍历链表取出值，然后得到和，在new一个新链表返回。但是int会溢出 别人的解因为链表记录的数字是反序的，正好和10进制相加进位相同，所以直接相加并记录进位就可以  3.无重">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="en-resource://database/1323:1">
+<meta property="article:published_time" content="2020-04-24T14:24:30.664Z">
+<meta property="article:modified_time" content="2020-04-24T13:14:43.637Z">
+<meta property="article:author" content="Wayne">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="en-resource://database/1323:1">
+
+<link rel="canonical" href="http://wayne-98.github.io/2020/04/24/Algorithms/April/4%E6%9C%88%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Algorithms/April/4月刷题记录 | Wayne98</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Wayne98</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/04/24/Algorithms/April/4%E6%9C%88%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="记录成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne98">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Algorithms/April/4月刷题记录
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-04-24 22:24:30 / 修改时间：21:14:43" itemprop="dateCreated datePublished" datetime="2020-04-24T22:24:30+08:00">2020-04-24</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="4月刷题记录"><a href="#4月刷题记录" class="headerlink" title="4月刷题记录"></a>4月刷题记录</h1><h2 id="4月11日刷题记录"><a href="#4月11日刷题记录" class="headerlink" title="4月11日刷题记录"></a>4月11日刷题记录</h2><p><strong>1. <a href="https://leetcode-cn.com/problems/lian-xu-zi-shu-zu-de-zui-da-he-lcof/" target="_blank" rel="noopener">连续子数组的最大和</a></strong></p>
+<ul>
+<li>dp问题<br>很容易就看出需要用dp来解，但是没有想出来状态转移方程。因为没有考虑到最后一步的解和前一步的解，他们之间的关系</li>
+</ul>
+<p><strong>2. <a href="https://leetcode-cn.com/problems/add-two-numbers/" target="_blank" rel="noopener">两数相加</a></strong></p>
+<ul>
+<li>链表</li>
+<li>初始想法<br>拿到题目先想到遍历链表取出值，然后得到和，在new一个新链表返回。但是int会溢出</li>
+<li>别人的解<br>因为链表记录的数字是反序的，正好和10进制相加进位相同，所以直接相加并记录进位就可以</li>
+</ul>
+<p><strong>3.<a href="https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/" target="_blank" rel="noopener">无重复字符的最长子串</a></strong></p>
+<ul>
+<li>滑动窗口<br>  每次前进一位向前看有没有重复字符，选择方式有：遍历，用一个Set记录，用HashMap，key记录用来记录字符有没有重复，value用来保存下标，如果重复直接更新下标值就可以</li>
+<li>之前做过所以知道用HashMap来存储下标索引</li>
+</ul>
+<hr>
+<h2 id="4月12日刷题记录"><a href="#4月12日刷题记录" class="headerlink" title="4月12日刷题记录"></a>4月12日刷题记录</h2><ol>
+<li><strong><a href="https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array/" target="_blank" rel="noopener">在排序数组中查找元素的第一个和最后一个位置</a></strong></li>
+</ol>
+<ul>
+<li>二分查找，找左右端点问题，之前做过，复习一下。顺利写出</li>
+</ul>
+<ol start="2">
+<li><strong><a href="https://leetcode-cn.com/problems/median-of-two-sorted-arrays/" target="_blank" rel="noopener">寻找两个有序数组的中位数</a></strong></li>
+</ol>
+<ul>
+<li>二分查找<ul>
+<li>大概思想看懂了，很多细节真看不懂。日后再看看吧，花了很多时间</li>
+</ul>
+</li>
+</ul>
+<ol start="3">
+<li><strong><a href="https://leetcode-cn.com/problems/longest-palindromic-substring/" target="_blank" rel="noopener">最长回文子串</a></strong></li>
+</ol>
+<ul>
+<li><p>中心扩展法</p>
+<ul>
+<li>拿到题没有想法，看解析看了这种解法比较容易接受。</li>
+</ul>
+<hr>
+</li>
+</ul>
+<h2 id="4月13日刷题记录"><a href="#4月13日刷题记录" class="headerlink" title="4月13日刷题记录"></a>4月13日刷题记录</h2><ol>
+<li><strong><a href="https://leetcode-cn.com/problems/container-with-most-water/" target="_blank" rel="noopener">盛最多水的容器</a></strong></li>
+</ol>
+<ul>
+<li>看解析</li>
+</ul>
+<ol start="2">
+<li><strong><a href="https://leetcode-cn.com/problems/3sum/" target="_blank" rel="noopener">三数之和</a></strong></li>
+</ol>
+<ul>
+<li>看解析<ul>
+<li><strong><a href="https://leetcode-cn.com/problems/two-sum/" target="_blank" rel="noopener">两数之和</a></strong></li>
+<li>拿到题想到暴力解法，但是没想到如何优化。这种需要考虑数组下标的，很好的优化方法是利用哈希表存储下标。</li>
+</ul>
+</li>
+</ul>
+<ol start="3">
+<li><strong><a href="https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/" target="_blank" rel="noopener">电话号码的字母组合</a></strong></li>
+</ol>
+<ul>
+<li>字符串</li>
+<li>回溯<br>  暴力dfs搜索</li>
+</ul>
+<hr>
+<h2 id="4月14日刷题记录"><a href="#4月14日刷题记录" class="headerlink" title="4月14日刷题记录"></a>4月14日刷题记录</h2><ol>
+<li><strong><a href="https://leetcode-cn.com/problems/valid-parentheses/" target="_blank" rel="noopener">有效的括号</a></strong></li>
+</ol>
+<ul>
+<li>考研的时候做过，AC</li>
+</ul>
+<ol start="2">
+<li><strong><a href="https://leetcode-cn.com/problems/merge-two-sorted-lists/" target="_blank" rel="noopener">合并两个有序链表</a></strong></li>
+</ol>
+<ul>
+<li>考研的时候做过，AC</li>
+</ul>
+<ol start="3">
+<li><strong><a href="https://leetcode-cn.com/problems/maximum-subarray/" target="_blank" rel="noopener">最大子序和</a></strong></li>
+</ol>
+<ul>
+<li>dp解法之前写过，AC</li>
+<li>分治法没咋看懂，不看了</li>
+<li>贪心算法(再看一下吧)</li>
+</ul>
+<ol start="4">
+<li><strong><a href="https://leetcode-cn.com/problems/climbing-stairs/" target="_blank" rel="noopener">爬楼梯</a></strong></li>
+</ol>
+<ul>
+<li>斐波那契数列</li>
+<li>dp</li>
+</ul>
+<ol start="5">
+<li><strong><a href=""></a></strong><h2 id="4月15刷题记录"><a href="#4月15刷题记录" class="headerlink" title="4月15刷题记录"></a>4月15刷题记录</h2></li>
+<li><a href="https://leetcode-cn.com/problems/longest-substring-with-at-least-k-repeating-characters/" target="_blank" rel="noopener">至少有K个重复字符的最长子串</a></li>
+</ol>
+<ul>
+<li>拿到题目没有思路，看了大佬的分治法看懂了。</li>
+</ul>
+<ol start="2">
+<li><a href="https://leetcode-cn.com/problems/longest-common-prefix/" target="_blank" rel="noopener">最长公共前缀</a></li>
+</ol>
+<ul>
+<li>暴力解法，优化的答案没咋看懂，而且优化的答案时间复杂度也不低</li>
+</ul>
+<ol start="3">
+<li><a href="https://leetcode-cn.com/problems/permutation-in-string/" target="_blank" rel="noopener">字符串的排列</a></li>
+</ol>
+<ul>
+<li>问题转化能力，将题目的抽象转化为算法容易实现的点</li>
+<li>滑动窗口<h2 id="4月16刷题记录"><a href="#4月16刷题记录" class="headerlink" title="4月16刷题记录"></a>4月16刷题记录</h2></li>
+</ul>
+<ol>
+<li><a href="https://leetcode-cn.com/problems/multiply-strings/submissions/" target="_blank" rel="noopener">字符串相乘</a></li>
+</ol>
+<ul>
+<li>模拟乘法<br><img src="en-resource://database/1323:1" alt="6a3cc30cec8ae4c92137eaacce74582d.png"></li>
+</ul>
+<ol start="2">
+<li><a href="https://leetcode-cn.com/problems/reverse-words-in-a-string/" target="_blank" rel="noopener">翻转字符串里的单词</a></li>
+</ol>
+<ul>
+<li>正则表达式，调API AC</li>
+</ul>
+<ol start="3">
+<li><a href="https://leetcode-cn.com/problems/simplify-path/" target="_blank" rel="noopener">简化路径</a></li>
+</ol>
+<ul>
+<li>每一次出现“..”都要考虑上一次的内容，所以可以采用栈这个数据结构存储上次的结果</li>
+<li>直接从后往前遍历，然后用一个count记录“..”的出现次数</li>
+</ul>
+<ol start="4">
+<li><a href="https://leetcode-cn.com/problems/restore-ip-addresses/" target="_blank" rel="noopener">复原IP地址</a></li>
+</ol>
+<ul>
+<li>回溯</li>
+</ul>
+<h2 id="4月17刷题记录"><a href="#4月17刷题记录" class="headerlink" title="4月17刷题记录"></a>4月17刷题记录</h2><ul>
+<li>复习<br>[]在排序数组中查找元素的第一个和最后一个位置<br>[]三数之和 两数之和<br>[]电话号码的字母组合<br>[]至少有K个重复字符的最长子串<br>[]字符串相乘<br>[]复原IP地址</li>
+</ul>
+<h2 id="4月18刷题记录"><a href="#4月18刷题记录" class="headerlink" title="4月18刷题记录"></a>4月18刷题记录</h2><ol>
+<li><a href="https://leetcode-cn.com/problems/restore-ip-addresses/" target="_blank" rel="noopener">复原IP地址</a><ul>
+<li>重新写了一次</li>
+</ul>
+</li>
+<li><a href="https://leetcode-cn.com/problems/sort-list/" target="_blank" rel="noopener">排序链表</a><ul>
+<li>思路是对的，实现的细节和数组归并还是有差别。需要好好感悟一下<ol start="3">
+<li><a href="https://leetcode-cn.com/problems/reverse-linked-list/" target="_blank" rel="noopener">反转链表</a></li>
+</ol>
+</li>
+<li>AC</li>
+</ul>
+</li>
+<li><a href="https://leetcode-cn.com/problems/intersection-of-two-linked-lists/" target="_blank" rel="noopener">相交链表</a><ul>
+<li>之前写过，但是有细节没有把握好</li>
+</ul>
+</li>
+<li><a href="https://leetcode-cn.com/problems/linked-list-cycle/" target="_blank" rel="noopener">环形链表</a><ul>
+<li>还是有挺多细节要注意</li>
+</ul>
+</li>
+<li><a href="https://leetcode-cn.com/problems/linked-list-cycle-ii/" target="_blank" rel="noopener">环形链表 II</a><ul>
+<li>AC(细节要注意)<h2 id="4月19刷题记录"><a href="#4月19刷题记录" class="headerlink" title="4月19刷题记录"></a>4月19刷题记录</h2></li>
+</ul>
+</li>
+<li><a href="https://leetcode-cn.com/problems/merge-k-sorted-lists/" target="_blank" rel="noopener">合并K个排序链表</a></li>
+</ol>
+<ul>
+<li>拿到手的思路是两两排序，看了大佬的归并解法，理解并实现</li>
+</ul>
+<ol start="2">
+<li><a href="https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/" target="_blank" rel="noopener">二叉树的最近公共祖先</a></li>
+</ol>
+<ul>
+<li>AC</li>
+</ul>
+<ol start="3">
+<li><a href="https://leetcode-cn.com/problems/binary-tree-zigzag-level-order-traversal/submissions/" target="_blank" rel="noopener">二叉树的锯齿形层次遍历</a></li>
+</ol>
+<ul>
+<li>AC</li>
+</ul>
+<ol start="4">
+<li><a href="https://leetcode-cn.com/problems/validate-binary-search-tree/" target="_blank" rel="noopener">验证二叉搜索树</a></li>
+</ol>
+<ul>
+<li>中序遍历保存二叉搜索树的值，访问</li>
+<li>在前序遍历方法中加上参数</li>
+</ul>
+<ol start="5">
+<li><a href="https://leetcode-cn.com/problems/binary-tree-preorder-traversal/submissions/" target="_blank" rel="noopener">二叉树的前序遍历</a></li>
+</ol>
+<ul>
+<li>非递归</li>
+</ul>
+<ol start="6">
+<li><a href="https://leetcode-cn.com/problems/binary-tree-inorder-traversal/" target="_blank" rel="noopener">二叉树的中序遍历</a></li>
+<li><a href="https://leetcode-cn.com/problems/binary-tree-postorder-traversal/submissions/" target="_blank" rel="noopener">二叉树的后序遍历</a><h2 id="4月20刷题记录"><a href="#4月20刷题记录" class="headerlink" title="4月20刷题记录"></a>4月20刷题记录</h2></li>
+<li><a href="https://leetcode-cn.com/problems/string-to-integer-atoi/" target="_blank" rel="noopener">字符串转整数</a></li>
+</ol>
+<ul>
+<li>太多细节</li>
+</ul>
+<h2 id="4月21刷题记录"><a href="#4月21刷题记录" class="headerlink" title="4月21刷题记录"></a>4月21刷题记录</h2><ol>
+<li><a href="https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array/" target="_blank" rel="noopener">寻找旋转排序数组中的最小值</a></li>
+<li><a href="https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array-ii/" target="_blank" rel="noopener">寻找旋转排序数组中的最小值 II</a></li>
+<li><a href="https://leetcode-cn.com/problems/search-in-rotated-sorted-array/" target="_blank" rel="noopener">搜索旋转排序数组</a></li>
+<li><a href="https://leetcode-cn.com/problems/validate-binary-search-tree/" target="_blank" rel="noopener">验证二叉搜索树</a></li>
+</ol>
+<ul>
+<li>非递归又写了一下</li>
+</ul>
+<ol start="5">
+<li><a href="https://leetcode-cn.com/problems/count-complete-tree-nodes/" target="_blank" rel="noopener">完全二叉树的节点个数</a></li>
+</ol>
+<ul>
+<li>很巧妙的解法：二分查找</li>
+</ul>
+<h2 id="4月23日上午"><a href="#4月23日上午" class="headerlink" title="4月23日上午"></a>4月23日上午</h2><ol>
+<li><a href="https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/" target="_blank" rel="noopener">买卖股票的最佳时机</a></li>
+<li><a href="https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/" target="_blank" rel="noopener">买卖股票的最佳时机 II</a></li>
+<li><a href="https://leetcode-cn.com/problems/shu-zu-zhong-zhong-fu-de-shu-zi-lcof/" target="_blank" rel="noopener">数组中重复的数字</a></li>
+<li><a href="https://leetcode-cn.com/problems/xuan-zhuan-shu-zu-de-zui-xiao-shu-zi-lcof/" target="_blank" rel="noopener">旋转数组的最小数字</a></li>
+<li><a href="https://leetcode-cn.com/problems/ju-zhen-zhong-de-lu-jing-lcof/" target="_blank" rel="noopener">矩阵中的路径</a></li>
+</ol>
+<h2 id="4月24日"><a href="#4月24日" class="headerlink" title="4月24日"></a>4月24日</h2><ol>
+<li><p><a href="https://leetcode-cn.com/problems/shu-zu-zhong-de-ni-xu-dui-lcof/" target="_blank" rel="noopener">数组中的逆序对</a></p>
+<ul>
+<li>AC</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> count;</span><br><span class="line">    <span class="keyword">int</span>[] t;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">reversePairs</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(nums.length &lt; <span class="number">2</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        t = <span class="keyword">new</span> <span class="keyword">int</span>[nums.length];</span><br><span class="line">        sort(nums);</span><br><span class="line">        <span class="keyword">return</span> count;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(<span class="keyword">int</span>[] nums)</span></span>&#123;</span><br><span class="line">        sort(nums,<span class="number">0</span>,nums.length-<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> left, <span class="keyword">int</span> right)</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(left &gt;= right) <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">int</span> mid = left + ((right - left) &gt;&gt; <span class="number">1</span>);</span><br><span class="line">        sort(nums,left,mid);</span><br><span class="line">        sort(nums,mid+<span class="number">1</span>,right);</span><br><span class="line">        merge(nums,left,mid,right);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">merge</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> left, <span class="keyword">int</span> mid, <span class="keyword">int</span> right)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> L = left, R = mid+<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> index = left;</span><br><span class="line">        <span class="keyword">while</span>(L &lt;= mid &amp;&amp; R &lt;= right) &#123;</span><br><span class="line">            <span class="keyword">if</span>(nums[L] &lt;= nums[R]) t[index++] = nums[L++];</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                t[index++] = nums[R++];</span><br><span class="line">                count += (mid - L + <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span>(L &lt;= mid) t[index++] = nums[L++];</span><br><span class="line">        <span class="keyword">while</span>(R &lt;= right) t[index++] = nums[R++];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = left; i &lt;= right; i++)&#123;</span><br><span class="line">            nums[i] = t[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><a href="https://leetcode-cn.com/problems/sort-list/" target="_blank" rel="noopener">排序链表</a></p>
+<ul>
+<li>每日一题是数组归并，所以想起来之前自己写的一道链表归并</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Definition for singly-linked list.</span></span><br><span class="line"><span class="comment"> * public class ListNode &#123;</span></span><br><span class="line"><span class="comment"> *     int val;</span></span><br><span class="line"><span class="comment"> *     ListNode next;</span></span><br><span class="line"><span class="comment"> *     ListNode(int x) &#123; val = x; &#125;</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">sortList</span><span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sort(head);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function">ListNode <span class="title">sort</span><span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(head == <span class="keyword">null</span> || head.next == <span class="keyword">null</span>) <span class="keyword">return</span> head;</span><br><span class="line">        ListNode t = getMid(head);</span><br><span class="line">        ListNode mid = t.next;</span><br><span class="line">        t.next = <span class="keyword">null</span>;</span><br><span class="line">        ListNode left = sort(head);</span><br><span class="line">        ListNode right = sort(mid);</span><br><span class="line">        <span class="keyword">return</span> merge(left,right);</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">//返回的是mid节点的前一个节点</span></span><br><span class="line">    <span class="comment">//是为了方便置链表的尾节点为空</span></span><br><span class="line">    <span class="function">ListNode <span class="title">getMid</span><span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(head == <span class="keyword">null</span> || head.next == <span class="keyword">null</span>) <span class="keyword">return</span> head;</span><br><span class="line">        ListNode t = head;</span><br><span class="line">        ListNode slow = head;</span><br><span class="line">        ListNode fast = head;</span><br><span class="line">        <span class="keyword">while</span>(fast != <span class="keyword">null</span> &amp;&amp; fast.next != <span class="keyword">null</span>) &#123;</span><br><span class="line">            t = slow;</span><br><span class="line">            slow = slow.next;</span><br><span class="line">            fast = fast.next.next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> t;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">ListNode <span class="title">merge</span><span class="params">(ListNode p1, ListNode p2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(p1 == <span class="keyword">null</span>) <span class="keyword">return</span> p2;</span><br><span class="line">        <span class="keyword">if</span>(p2 == <span class="keyword">null</span>) <span class="keyword">return</span> p1;</span><br><span class="line">        ListNode newHead = <span class="keyword">new</span> ListNode(-<span class="number">1</span>);</span><br><span class="line">        ListNode p = newHead;</span><br><span class="line">        <span class="keyword">while</span>(p1 != <span class="keyword">null</span> &amp;&amp; p2 != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span>(p1.val &lt; p2.val)&#123;</span><br><span class="line">                p.next = p1;</span><br><span class="line">                p = p.next;</span><br><span class="line">                p1 = p1.next;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                p.next = p2;</span><br><span class="line">                p = p.next;</span><br><span class="line">                p2 = p2.next;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span>(p1 != <span class="keyword">null</span>)&#123;</span><br><span class="line">             p.next = p1;</span><br><span class="line">                p = p.next;</span><br><span class="line">                p1 = p1.next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span>(p2 != <span class="keyword">null</span>)&#123;</span><br><span class="line">            p.next = p2;</span><br><span class="line">            p = p.next;</span><br><span class="line">            p2 = p2.next;</span><br><span class="line">        &#125;</span><br><span class="line">        p.next = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">return</span> newHead.next;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<ol start="3">
+<li><p><a href="https://leetcode-cn.com/problems/generate-parentheses/" target="_blank" rel="noopener">括号生成</a></p>
+<ul>
+<li><p>拿到题目后，第一想法是暴力枚举所有可能的序列，然后用 isValid 函数判定，但是总是有个 bug，也没搞明白为什么，放弃</p>
+</li>
+<li><p>括号匹配，可以转化问题为 –&gt; 左括号的数目和右括号的数目 –&gt; 左括号可以使用的数目要大于0 –&gt; 每次使用一个右括号，那么必须先使用一次左括号 –&gt; 左括号可以使用的数目恒小于右括号可以使用的数目</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    List&lt;String&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    StringBuilder path = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">generateParenthesis</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(n == <span class="number">0</span>) <span class="keyword">return</span> res;</span><br><span class="line">        dfs(n,n);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> left 当前左括号还有几个可以使用</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> right 同上</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">dfs</span><span class="params">(<span class="keyword">int</span> left, <span class="keyword">int</span> right)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(left == <span class="number">0</span> &amp;&amp; right == <span class="number">0</span>)&#123;</span><br><span class="line">            res.add(path.toString());</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(left &gt; right) <span class="keyword">return</span>; <span class="comment">// 左括号可以使用的个数严格小于右括号可以使用的个数</span></span><br><span class="line">        <span class="keyword">if</span>(left &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            path.append(<span class="string">"("</span>);</span><br><span class="line">            dfs(left - <span class="number">1</span>, right);</span><br><span class="line">            path.deleteCharAt(path.length() - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(right &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            path.append(<span class="string">")"</span>);</span><br><span class="line">            dfs(left,right-<span class="number">1</span>);</span><br><span class="line">            path.deleteCharAt(path.length() - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+</li>
+</ol>
+<ol start="4">
+<li><p><a href="https://leetcode-cn.com/problems/merge-k-sorted-lists/" target="_blank" rel="noopener">合并K个排序链表</a></p>
+<ul>
+<li>归并排序 AC</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Definition for singly-linked list.</span></span><br><span class="line"><span class="comment"> * public class ListNode &#123;</span></span><br><span class="line"><span class="comment"> *     int val;</span></span><br><span class="line"><span class="comment"> *     ListNode next;</span></span><br><span class="line"><span class="comment"> *     ListNode(int x) &#123; val = x; &#125;</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">mergeKLists</span><span class="params">(ListNode[] lists)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mergeSort(lists,<span class="number">0</span>,lists.length-<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">ListNode <span class="title">mergeSort</span><span class="params">(ListNode[] lists, <span class="keyword">int</span> left, <span class="keyword">int</span> right)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(left &gt;= right) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">int</span> mid = left + ((right - left) &gt;&gt; <span class="number">1</span>);</span><br><span class="line">        ListNode L =  mergeSort(lists, left, mid);</span><br><span class="line">        ListNode R =  mergeSort(lists, mid + <span class="number">1</span>, right);</span><br><span class="line">        <span class="keyword">return</span> mergeTwoLists(L,R);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 合并两个有序链表的API</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">mergeTwoLists</span><span class="params">(ListNode l1, ListNode l2)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span>(l1 == <span class="keyword">null</span> &amp;&amp; l2 == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">if</span>(l1 == <span class="keyword">null</span>) <span class="keyword">return</span> l2;</span><br><span class="line">            <span class="keyword">if</span>(l2 == <span class="keyword">null</span>) <span class="keyword">return</span> l1;</span><br><span class="line">            ListNode newHead = <span class="keyword">new</span> ListNode(-<span class="number">1</span>);</span><br><span class="line">            ListNode p = newHead;</span><br><span class="line">            <span class="keyword">while</span>(l1 != <span class="keyword">null</span> &amp;&amp; l2 != <span class="keyword">null</span>)&#123;</span><br><span class="line">                <span class="keyword">if</span>(l1.val &lt; l2.val) &#123;</span><br><span class="line">                    p.next = l1;</span><br><span class="line">                    p = p.next;</span><br><span class="line">                    l1 = l1.next;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    p.next = l2;</span><br><span class="line">                    p = p.next;</span><br><span class="line">                    l2 = l2.next;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">while</span>(l1 != <span class="keyword">null</span>) &#123;</span><br><span class="line">                p.next = l1;</span><br><span class="line">                p = p.next;</span><br><span class="line">                l1 = l1.next;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">while</span>(l2 != <span class="keyword">null</span>) &#123;</span><br><span class="line">                p.next = l2;</span><br><span class="line">                p = p.next;</span><br><span class="line">                l2 = l2.next;</span><br><span class="line">            &#125;</span><br><span class="line">            p.next = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">return</span> newHead.next;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>看题解还可以使用堆解决，所以复习一下堆排序。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 手写堆排序</span></span><br><span class="line"><span class="keyword">package</span> LeetCode;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HeapSort</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] n = &#123;<span class="number">0</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">7</span>, <span class="number">15</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">11</span>, <span class="number">12</span>, <span class="number">20</span>, <span class="number">19</span>&#125;;</span><br><span class="line">        heapSort(n);</span><br><span class="line">        System.out.println(Arrays.toString(n));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">heapSort</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        buildMaxHeap(nums);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = nums.length - <span class="number">1</span>; i &gt; <span class="number">1</span>; i--) &#123;</span><br><span class="line">            swap(nums, i, <span class="number">1</span>);</span><br><span class="line">            adjustDown(nums, <span class="number">1</span>, i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">buildMaxHeap</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = nums.length / <span class="number">2</span>; i &gt; <span class="number">0</span>; i--)</span><br><span class="line">            adjustDown(nums, i, nums.length);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">adjustDown</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> k, <span class="keyword">int</span> len)</span> </span>&#123;</span><br><span class="line">        nums[<span class="number">0</span>] = nums[k];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = k * <span class="number">2</span>; i &lt; len; i *= <span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (i &lt; len - <span class="number">1</span> &amp;&amp; nums[i] &lt; nums[i + <span class="number">1</span>]) i++;</span><br><span class="line">            <span class="keyword">if</span> (nums[i] &lt;= nums[<span class="number">0</span>]) <span class="keyword">break</span>;<span class="comment">//每次比较的时候，都是与哨兵比较</span></span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                nums[k] = nums[i];</span><br><span class="line">                k = i;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        nums[k] = nums[<span class="number">0</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> i, <span class="keyword">int</span> j)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> t = nums[i];</span><br><span class="line">        nums[i] = nums[j];</span><br><span class="line">        nums[j] = t;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<ol start="5">
+<li><p><a href="https://leetcode-cn.com/problems/zui-xiao-de-kge-shu-lcof/" target="_blank" rel="noopener">最小的k个数</a></p>
+<ul>
+<li>手写最小堆 AC</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] getLeastNumbers(<span class="keyword">int</span>[] arr, <span class="keyword">int</span> k) &#123;</span><br><span class="line">    <span class="keyword">if</span>(arr.length == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">int</span>[] res = <span class="keyword">new</span> <span class="keyword">int</span>[k];</span><br><span class="line">        <span class="keyword">int</span> index = <span class="number">0</span>;</span><br><span class="line">        buildMinHeap(arr);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = arr.length - <span class="number">1</span>; i &gt; arr.length - <span class="number">1</span> - k; i--) &#123;</span><br><span class="line">            res[index++] = arr[<span class="number">0</span>];</span><br><span class="line">            swap(arr, i, <span class="number">0</span>);</span><br><span class="line">            adjustDown(arr, <span class="number">0</span>, i);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">buildMinHeap</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = nums.length / <span class="number">2</span>; i &gt;= <span class="number">0</span>; i--)</span><br><span class="line">            adjustDown(nums, i, nums.length);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">adjustDown</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> k, <span class="keyword">int</span> len)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> t = nums[k];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = k * <span class="number">2</span>; i &lt; len; i *= <span class="number">2</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (i &lt; len - <span class="number">1</span> &amp;&amp; nums[i] &gt; nums[i + <span class="number">1</span>]) i++;</span><br><span class="line">            <span class="keyword">if</span> (nums[i] &gt;= t) <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                nums[k] = nums[i];</span><br><span class="line">                k = i;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        nums[k] = t;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> i, <span class="keyword">int</span> j)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> t = nums[i];</span><br><span class="line">        nums[i] = nums[j];</span><br><span class="line">        nums[j] = t;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<p>6. </p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/04/24/README/" rel="prev" title="学习记录">
+      <i class="fa fa-chevron-left"></i> 学习记录
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/24/Algorithms/April/%E5%AD%90%E4%B8%B0%E5%93%A5%E5%88%B7%E9%A2%98%E7%BB%8F%E9%AA%8C/" rel="next" title="Algorithms/April/子丰哥刷题经验">
+      Algorithms/April/子丰哥刷题经验 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#4月刷题记录"><span class="nav-number">1.</span> <span class="nav-text">4月刷题记录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4月11日刷题记录"><span class="nav-number">1.1.</span> <span class="nav-text">4月11日刷题记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4月12日刷题记录"><span class="nav-number">1.2.</span> <span class="nav-text">4月12日刷题记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4月13日刷题记录"><span class="nav-number">1.3.</span> <span class="nav-text">4月13日刷题记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4月14日刷题记录"><span class="nav-number">1.4.</span> <span class="nav-text">4月14日刷题记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4月15刷题记录"><span class="nav-number">1.5.</span> <span class="nav-text">4月15刷题记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4月16刷题记录"><span class="nav-number">1.6.</span> <span class="nav-text">4月16刷题记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4月17刷题记录"><span class="nav-number">1.7.</span> <span class="nav-text">4月17刷题记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4月18刷题记录"><span class="nav-number">1.8.</span> <span class="nav-text">4月18刷题记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4月19刷题记录"><span class="nav-number">1.9.</span> <span class="nav-text">4月19刷题记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4月20刷题记录"><span class="nav-number">1.10.</span> <span class="nav-text">4月20刷题记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4月21刷题记录"><span class="nav-number">1.11.</span> <span class="nav-text">4月21刷题记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4月23日上午"><span class="nav-number">1.12.</span> <span class="nav-text">4月23日上午</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4月24日"><span class="nav-number">1.13.</span> <span class="nav-text">4月24日</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Wayne</p>
+  <div class="site-description" itemprop="description">记录成长</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wayne</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
