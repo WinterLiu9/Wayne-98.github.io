@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wayne-98.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前端编译与优化Java中即时编译器在运行期的优化过程对于程序运行来说更重要，而前端编译器在编译期的优化过程对于程序编码来说关系更加密切。 Javac编译器解析与填充符号表过程 词法，语法分析   词法分析是将源代码的字符流转变为标记(Token)集合，单个字符是程序编写过程的最小元素，而标记则是编译过程中的最小元素  语法分析是根据Token序列构造抽象语法树的过程 抽象语法树是一种用来描述程序代">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解Java虚拟机第四部分：程序编译与代码优化">
+<meta property="og:url" content="http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E5%9B%9B%E9%83%A8%E5%88%86%EF%BC%9A%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/index.html">
+<meta property="og:site_name" content="Wayne">
+<meta property="og:description" content="前端编译与优化Java中即时编译器在运行期的优化过程对于程序运行来说更重要，而前端编译器在编译期的优化过程对于程序编码来说关系更加密切。 Javac编译器解析与填充符号表过程 词法，语法分析   词法分析是将源代码的字符流转变为标记(Token)集合，单个字符是程序编写过程的最小元素，而标记则是编译过程中的最小元素  语法分析是根据Token序列构造抽象语法树的过程 抽象语法树是一种用来描述程序代">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-05-10T13:39:10.563Z">
+<meta property="article:modified_time" content="2020-05-10T14:13:59.999Z">
+<meta property="article:author" content="Wayne">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E5%9B%9B%E9%83%A8%E5%88%86%EF%BC%9A%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>深入理解Java虚拟机第四部分：程序编译与代码优化 | Wayne</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Wayne</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E5%9B%9B%E9%83%A8%E5%88%86%EF%BC%9A%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="记录成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          深入理解Java虚拟机第四部分：程序编译与代码优化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:13:59" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="前端编译与优化"><a href="#前端编译与优化" class="headerlink" title="前端编译与优化"></a>前端编译与优化</h1><p>Java中即时编译器在运行期的优化过程对于程序运行来说更重要，而前端编译器在编译期的优化过程对于程序编码来说关系更加密切。</p>
+<h2 id="Javac编译器"><a href="#Javac编译器" class="headerlink" title="Javac编译器"></a>Javac编译器</h2><h3 id="解析与填充符号表过程"><a href="#解析与填充符号表过程" class="headerlink" title="解析与填充符号表过程"></a>解析与填充符号表过程</h3><ol>
+<li>词法，语法分析</li>
+</ol>
+<ul>
+<li><p>词法分析是将源代码的字符流转变为标记(Token)集合，单个字符是程序编写过程的最小元素，而标记则是编译过程中的最小元素</p>
+</li>
+<li><p>语法分析是根据Token序列构造抽象语法树的过程</p>
+<p>抽象语法树是一种用来描述程序代码语法结构的树形表示方式，语法树的每一个节点都代表着程序代码中的一个语法结构，例如包、类型、修饰符、运算符、接口、返回值甚至代码注释等都可以是一个语法结构    </p>
+</li>
+<li><p>经过这个步骤之后，编译器就基本不会再対源码文件进行操作了，后续的操作都基于抽象语法树    </p>
+</li>
+</ul>
+<ol start="2">
+<li>填充符号表</li>
+</ol>
+<p>符号表是由一组符号地址和符号信息构成的表格，符号表中所登记的信息在编译的不同阶段都要用到。</p>
+<p>在语义分析中，符号表所登记的内容将用于语义检查和产生中间代码。</p>
+<p>在目标代码生成阶段，当对符号名进行地址分配时，符号表是地址分配的依据。</p>
+<h2 id="注解处理器"><a href="#注解处理器" class="headerlink" title="注解处理器"></a>注解处理器</h2><h2 id="语义分析与字节码生成"><a href="#语义分析与字节码生成" class="headerlink" title="语义分析与字节码生成"></a>语义分析与字节码生成</h2><p>语法树能够表示一个结构正确的源程序的抽象，但无法保证源程序是符合逻辑的。语义分析的主要任务是对结构上正确的源程序进行上下文有关性质的审查，如进行类型审查。</p>
+<ul>
+<li>标注检查步骤检查的内容包括诸如变量使用前是否被声明、变量与赋值之间的数据类型是否匹配；标注检查中还有一个重要的动作称为常量折叠。</li>
+<li>数据及控制流分析是对程序上下文逻辑更进一步的验证，它可以检查出诸如程序局部变量在使用前是否有赋值，方法的每条路径是否都有返回值，是否所有的受查异常都被正确处理了等问题</li>
+<li>解语法糖：语法糖指在计算机语言中添加的某种语法，这种语法对语言的功能并没有影响，但是更方便程序员使用</li>
+<li>字节码生成阶段不仅仅是把前面各个步骤所生成的信息转化成字节码写到磁盘中，编译器还进行了少量的代码添加和转换工作</li>
+</ul>
+<h2 id="Java语法糖的味道"><a href="#Java语法糖的味道" class="headerlink" title="Java语法糖的味道"></a>Java语法糖的味道</h2><h3 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h3><p>泛型的本质是参数化类型（Parameterized Type）或者参数化多态（Parametric Polymorphism）的应用，即可以将操作的数据类型指定为方法签名中的一种特殊参数，这种参数类型能够用在类、接口和方法的创建中，分别构成泛型类、泛型接口和泛型方法。泛型让程序员能够针对泛化的数据类型编写相同的算法，这极大地增强了编程语言的类型系统及抽象能力。</p>
+<p>C#里面的泛型无论在程序源码中、编译后的 Intermediate Language 中，或是运行期的CLR中，都是切实存在的，List<int>与List<String>就是两个不同的类型，它们在系统运行期生成，有自己的虚方法表和类型数据，这种实现称为类型膨胀，基于这种方法实现的泛型称为<strong>真实泛型</strong>。</p>
+<p>Java语言中的泛型则不一样，它只在程序源码中存在，编译后的字节码文件中，就已经替换为原始类型了，并且在相应的地方插入了强制类型转换。因此对于运行期的Java语言来说，ArrayList<Integer>与ArrayList<String>就是同一个类，所以泛型技术实际上是Java语言的一颗语法糖，Java语言中的泛型实现方法称为<strong>类型擦除</strong>，基于这种方法实现的泛型称为伪泛型</p>
+<p>擦除法所谓的擦除，仅仅是对方法的Code属性中的字节码进行擦除，实际上元数据中还是保留了泛型信息，这也是我们能通过反射手段取得参数化类型的根本依据。</p>
+<h3 id="自动装箱、拆箱与遍历循环"><a href="#自动装箱、拆箱与遍历循环" class="headerlink" title="自动装箱、拆箱与遍历循环"></a>自动装箱、拆箱与遍历循环</h3><h3 id="条件编译"><a href="#条件编译" class="headerlink" title="条件编译"></a>条件编译</h3><p>Java语言中条件编译的实现，也是Java语言的一颗语法糖，根据布尔常量值的真假，编译器将会把分支中不成立的代码块消除掉</p>
+<h1 id="后端编译与优化"><a href="#后端编译与优化" class="headerlink" title="后端编译与优化"></a>后端编译与优化</h1><h2 id="即时编译器"><a href="#即时编译器" class="headerlink" title="即时编译器"></a>即时编译器</h2><p>Java程序最初是通过解释器进行解释执行的，当虚拟机发现某个方法或代码块的运行特别频繁时，就会把这些代码认定为”热点代码”。为了提高热点代码的执行效率，在运行时，虚拟机将会把这些代码编译成本地平台的机器码，并进行各种层次的优化，完成这个任务的编译器称为即时编译器JIT</p>
+<h3 id="编译对象与触发条件"><a href="#编译对象与触发条件" class="headerlink" title="编译对象与触发条件"></a>编译对象与触发条件</h3><ul>
+<li><p>热点代码：被多次调用的方法以及被多次执行的循环体（编译器都是编译整个方法）</p>
+</li>
+<li><p>热点探测判定方式：</p>
+</li>
+</ul>
+<ol>
+<li>基于采样的热点探测：虚拟机周期性地检查各个线程的栈顶，如果发现某个方法经常出现在栈顶，那个这个方法就是“热点方法”。<ul>
+<li>优点是实现简单、高效，还可以很容易的获取方法调用关系。</li>
+<li>缺点是不够精确，且容易受到线程阻塞或别的外界因素的印象而扰乱热点探测。</li>
+</ul>
+</li>
+<li>基于计数器的热点探测：虚拟机为每个方法建立计数器，统计方法的执行次数，执行次数超过一定的阈值就认为它是热点方法<ul>
+<li>实现麻烦，需要为每个方法建立并维护计数器，并且不能直接获取到方法的调用关系。</li>
+<li>统计结果精确严谨。</li>
+<li>默认方法调用计数器统计的并不是方法被调用的次数，而是一个相对的执行频率。当超过一定的时间限度，如果方法的调用次数仍不足以让它提交给JIT，那个这个方法的调用计数器就被减少一半，这个过程称为方法调用计数器热度的衰减，而这段时间就称为此方法统计的半衰周期。</li>
+<li>回边计数器，它的作用是统计一个方法中循环体代码执行的次数，建立回边计数器的目的就是为了出发OSR编译</li>
+</ul>
+</li>
+</ol>
+<h2 id="Java与C-C-的编译器对比"><a href="#Java与C-C-的编译器对比" class="headerlink" title="Java与C/C++的编译器对比"></a>Java与C/C++的编译器对比</h2><p>即时编译器运行占用的是用户程序的运行时间，所以不可以随便引入大规模的优化技术；静态编译的时间成本不是主要关注点。</p>
+<p>Java语言是动态的类型安全语言，意味着虚拟机来确保程序不会违反语言语义或访问非结构化内存。动态检查会消耗不少的运行时间。</p>
+<p>虚方法的频率远大于C/C++语言，方法接收者进行多态选择的频率高于C/C++语言。即时编译器的一些优化难度较高，例如方法内联。</p>
+<p>Java语言是可动态扩展的语言，运行时加载新的类可能改变程序类型的继承关系，这使得很多全局优化难以进行，因为编译器无法看到程序的全貌，许多全局优化都只能以激进优化的方式来完成，便以其不得不时刻注意并随着类型的变化而在运行时撤销或者重新进行一些优化。</p>
+<p>C/C++垃圾回收不存在无用对象筛选的过程，效率较高</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%EF%BC%9A%E8%B5%B0%E8%BF%9B%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" rel="prev" title="深入理解Java虚拟机第二部分：走进内存管理">
+      <i class="fa fa-chevron-left"></i> 深入理解Java虚拟机第二部分：走进内存管理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/10/Operating%20System/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/" rel="next" title="简单操作系统概念">
+      简单操作系统概念 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前端编译与优化"><span class="nav-number">1.</span> <span class="nav-text">前端编译与优化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Javac编译器"><span class="nav-number">1.1.</span> <span class="nav-text">Javac编译器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解析与填充符号表过程"><span class="nav-number">1.1.1.</span> <span class="nav-text">解析与填充符号表过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注解处理器"><span class="nav-number">1.2.</span> <span class="nav-text">注解处理器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#语义分析与字节码生成"><span class="nav-number">1.3.</span> <span class="nav-text">语义分析与字节码生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java语法糖的味道"><span class="nav-number">1.4.</span> <span class="nav-text">Java语法糖的味道</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#泛型"><span class="nav-number">1.4.1.</span> <span class="nav-text">泛型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自动装箱、拆箱与遍历循环"><span class="nav-number">1.4.2.</span> <span class="nav-text">自动装箱、拆箱与遍历循环</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#条件编译"><span class="nav-number">1.4.3.</span> <span class="nav-text">条件编译</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#后端编译与优化"><span class="nav-number">2.</span> <span class="nav-text">后端编译与优化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#即时编译器"><span class="nav-number">2.1.</span> <span class="nav-text">即时编译器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#编译对象与触发条件"><span class="nav-number">2.1.1.</span> <span class="nav-text">编译对象与触发条件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java与C-C-的编译器对比"><span class="nav-number">2.2.</span> <span class="nav-text">Java与C&#x2F;C++的编译器对比</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wayne"
+      src="/images/808.jpg">
+  <p class="site-author-name" itemprop="name">Wayne</p>
+  <div class="site-description" itemprop="description">记录成长</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:winter98@foxmail.com" title="E-Mail → mailto:winter98@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wayne</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

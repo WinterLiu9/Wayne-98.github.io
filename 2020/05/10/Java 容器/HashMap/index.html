@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wayne-98.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="java.util.Map 的实现类主要有四个常用的：HashMap、Hashtable、LinkedHashMap和TreeMap (1) HashMap：遍历顺序不确定， HashMap最多只允许一条记录的键为null。HashMap非线程安全。 (2) Hashtable：线程安全的(sync)，Hashtable不建议在新代码中使用，不需要线程安全的场合可以用HashMap替换，需要线程安">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HashMap">
+<meta property="og:url" content="http://wayne-98.github.io/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/HashMap/index.html">
+<meta property="og:site_name" content="Wayne">
+<meta property="og:description" content="java.util.Map 的实现类主要有四个常用的：HashMap、Hashtable、LinkedHashMap和TreeMap (1) HashMap：遍历顺序不确定， HashMap最多只允许一条记录的键为null。HashMap非线程安全。 (2) Hashtable：线程安全的(sync)，Hashtable不建议在新代码中使用，不需要线程安全的场合可以用HashMap替换，需要线程安">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/hash.png?raw=true">
+<meta property="og:image" content="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/put.png?raw=true">
+<meta property="og:image" content="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/transfer.png?raw=true">
+<meta property="og:image" content="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/reHash.png?raw=true">
+<meta property="og:image" content="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/OldCap.png?raw=true">
+<meta property="article:published_time" content="2020-05-10T13:39:10.535Z">
+<meta property="article:modified_time" content="2020-05-10T14:13:04.131Z">
+<meta property="article:author" content="Wayne">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/hash.png?raw=true">
+
+<link rel="canonical" href="http://wayne-98.github.io/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/HashMap/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>HashMap | Wayne</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Wayne</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/HashMap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="记录成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HashMap
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:13:04" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java-%E5%AE%B9%E5%99%A8/" itemprop="url" rel="index"><span itemprop="name">Java 容器</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>java.util.Map 的实现类主要有四个常用的：HashMap、Hashtable、LinkedHashMap和TreeMap</p>
+<p>(1) HashMap：<strong>遍历顺序不确定</strong>， HashMap最多只<strong>允许一条记录的</strong>键为null。HashMap非线程安全。</p>
+<p>(2) Hashtable：<strong>线程安全的</strong>(sync)，Hashtable不建议在新代码中使用，不需要线程安全的场合可以用HashMap替换，需要线程安全的场合可以用ConcurrentHashMap替换。</p>
+<p>(3) LinkedHashMap：LinkedHashMap是HashMap的一个子类，保存了记录的<strong>插入顺序</strong>，在用Iterator遍历LinkedHashMap时，先得到的记录肯定是先插入的，也可以在构造时带参数，按照访问次序排序。</p>
+<p>(4) TreeMap：TreeMap实现SortedMap接口，能够把它保存的记录根据键排序，默认是<strong>按键值的升序排序</strong>，也可以指定排序的比较器，当用Iterator遍历TreeMap时，得到的记录是排过序的。如果使用排序的映射，建议使用TreeMap。在使用TreeMap时，key必须实现Comparable接口或者在构造TreeMap传入自定义的Comparator，否则会在运行时抛出java.lang.ClassCastException类型的异常。</p>
+<p>对于上述四种Map类型的类，要求映射中的key是不可变对象。不可变对象是该对象在创建后它的哈希值不会被改变。如果对象的哈希值发生变化，Map对象很可能就定位不到映射的位置了。</p>
+<h2 id="存储结构字段"><a href="#存储结构字段" class="headerlink" title="存储结构字段"></a>存储结构字段</h2><ol>
+<li>HashMap类中有一个非常重要的字段，就是 Node[] table，即哈希桶数组，明显它是一个Node的数组。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> hash;    <span class="comment">//用来定位数组索引位置</span></span><br><span class="line">        <span class="keyword">final</span> K key;</span><br><span class="line">        V value;</span><br><span class="line">        Node&lt;K,V&gt; next;   <span class="comment">//链表的下一个node</span></span><br><span class="line"></span><br><span class="line">        Node(<span class="keyword">int</span> hash, K key, V value, Node&lt;K,V&gt; next) &#123; ... &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> K <span class="title">getKey</span><span class="params">()</span></span>&#123; ... &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">getValue</span><span class="params">()</span> </span>&#123; ... &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123; ... &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123; ... &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">setValue</span><span class="params">(V newValue)</span> </span>&#123; ... &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object o)</span> </span>&#123; ... &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>HashMap就是使用哈希表来存储的。哈希表为解决冲突，可以采用<strong>开放地址法</strong>和<strong>链地址法</strong>等来解决问题，Java中HashMap采用了链地址法。</li>
+</ol>
+<p>如果哈希桶数组很大，即使较差的Hash算法也会比较分散，如果哈希桶数组数组很小，即使好的Hash算法也会出现较多碰撞，所以就需要在<strong>空间成本和时间成本</strong>之间权衡，其实就是在根据实际情况确定哈希桶数组的大小，并在此基础上设计好的hash算法减少Hash碰撞。那么通过什么方式来控制map使得Hash碰撞的概率又小，哈希桶数组（Node[] table）占用空间又少呢？答案就是<strong>好的Hash算法和扩容机制</strong>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> threshold;             <span class="comment">// 所能容纳的key-value对极限 </span></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">float</span> loadFactor;    <span class="comment">// 负载因子</span></span><br><span class="line"><span class="keyword">int</span> modCount;  <span class="comment">//记录HashMap内部结构发生变化的次数</span></span><br><span class="line"><span class="keyword">int</span> size;</span><br></pre></td></tr></table></figure>
+
+<p>Node[] table的初始化长度length(默认值是<strong>16</strong>)，Load factor为负载因子(默认值是<strong>0.75</strong>)，threshold是HashMap所能容纳的最大数据量的Node(键值对)个数。threshold = length * Load factor。也就是说，在数组定义好长度之后，负载因子越大，所能容纳的键值对个数越多。</p>
+<p>结合负载因子的定义公式可知，threshold就是在此Load factor和length(数组长度)对应下允许的最大元素数目，超过这个数目就重新resize(扩容)，扩容后的HashMap容量是之前容量的<strong>两倍</strong>。<strong>默认的负载因子0.75是对空间和时间效率的一个平衡选择</strong>，建议大家不要修改，除非在时间和空间比较特殊的情况下，如果<strong>内存空间很多而又对时间效率要求很高，可以降低负载因子Load factor的值</strong>；相反，如果内存空间紧张而对时间效率要求不高，可以增加负载因子loadFactor的值，这个值可以大于1。</p>
+<p>哈希桶数组table的长度length大小必须为2的n次方(一定是合数)，这是一种非常规的设计，常规的设计是把桶的大小设计为素数。相对来说素数导致冲突的概率要小于合数。<strong>当length总是2的n次方时，h&amp; (length-1)运算等价于对length取模，也就是h%length，但是&amp;比%具有更高的效率。</strong></p>
+<p>负载因子和Hash算法设计的再合理，也免不了会出现拉链过长的情况，一旦出现拉链过长，则会严重影响HashMap的性能。于是，在JDK1.8版本中，对数据结构做了进一步的优化，引入了红黑树。而当链表长度太长（默认超过8）时，链表就转换为红黑树，利用红黑树快速增删改查的特点提高HashMap的性能。</p>
+<h2 id="功能实现-方法"><a href="#功能实现-方法" class="headerlink" title="功能实现-方法"></a>功能实现-方法</h2><h3 id="1-确定哈希桶数组索引位置"><a href="#1-确定哈希桶数组索引位置" class="headerlink" title="1. 确定哈希桶数组索引位置"></a>1. 确定哈希桶数组索引位置</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">方法一：</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object key)</span> </span>&#123;   <span class="comment">//jdk1.8 &amp; jdk1.7</span></span><br><span class="line">     <span class="keyword">int</span> h;</span><br><span class="line">     <span class="comment">// h = key.hashCode() 为第一步 取hashCode值</span></span><br><span class="line">     <span class="comment">// h ^ (h &gt;&gt;&gt; 16)  为第二步 高位参与运算</span></span><br><span class="line">     <span class="keyword">return</span> (key == <span class="keyword">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">&#125;</span><br><span class="line">方法二：</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">indexFor</span><span class="params">(<span class="keyword">int</span> h, <span class="keyword">int</span> length)</span> </span>&#123;  <span class="comment">//jdk1.7的源码，jdk1.8没有这个方法，但是实现原理一样的</span></span><br><span class="line">     <span class="keyword">return</span> h &amp; (length-<span class="number">1</span>);  <span class="comment">//第三步 取模运算</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>这里的Hash算法本质上就是三步：<strong>取key的hashCode值、高位运算、取模运算</strong>。</p>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/hash.png?raw=true" alt=""></p>
+<p>在JDK1.8的实现中，优化了高位运算的算法，通过hashCode()的高16位异或低16位实现的：(h = k.hashCode()) ^ (<strong>h &gt;&gt;&gt; 16</strong>)，主要是从速度、功效、质量来考虑的，这么做可以在数组table的length比较小的时候，也能保证考虑到<strong>高低Bit都参与到Hash的</strong>计算中，同时不会有太大的开销。</p>
+<h2 id="2-分析HashMap的put方法"><a href="#2-分析HashMap的put方法" class="headerlink" title="2. 分析HashMap的put方法"></a>2. 分析HashMap的put方法</h2><p><img src="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/put.png?raw=true" alt=""></p>
+<h2 id="3-扩容机制"><a href="#3-扩容机制" class="headerlink" title="3. 扩容机制"></a>3. 扩容机制</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"> <span class="number">1</span> <span class="function"><span class="keyword">void</span> <span class="title">resize</span><span class="params">(<span class="keyword">int</span> newCapacity)</span> </span>&#123;   <span class="comment">//传入新的容量</span></span><br><span class="line"> <span class="number">2</span>     Entry[] oldTable = table;    <span class="comment">//引用扩容前的Entry数组</span></span><br><span class="line"> <span class="number">3</span>     <span class="keyword">int</span> oldCapacity = oldTable.length;         </span><br><span class="line"> <span class="number">4</span>     <span class="keyword">if</span> (oldCapacity == MAXIMUM_CAPACITY) &#123;  <span class="comment">//扩容前的数组大小如果已经达到最大(2^30)了</span></span><br><span class="line"> <span class="number">5</span>         threshold = Integer.MAX_VALUE; <span class="comment">//修改阈值为int的最大值(2^31-1)，这样以后就不会扩容了</span></span><br><span class="line"> <span class="number">6</span>         <span class="keyword">return</span>;</span><br><span class="line"> <span class="number">7</span>     &#125;</span><br><span class="line"> <span class="number">8</span>  </span><br><span class="line"> <span class="number">9</span>     Entry[] newTable = <span class="keyword">new</span> Entry[newCapacity];  <span class="comment">//初始化一个新的Entry数组</span></span><br><span class="line"><span class="number">10</span>     transfer(newTable);                         <span class="comment">//！！将数据转移到新的Entry数组里</span></span><br><span class="line"><span class="number">11</span>     table = newTable;                           <span class="comment">//HashMap的table属性引用新的Entry数组</span></span><br><span class="line"><span class="number">12</span>     threshold = (<span class="keyword">int</span>)(newCapacity * loadFactor);<span class="comment">//修改阈值</span></span><br><span class="line"><span class="number">13</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"> <span class="number">1</span> <span class="function"><span class="keyword">void</span> <span class="title">transfer</span><span class="params">(Entry[] newTable)</span> </span>&#123;</span><br><span class="line"> <span class="number">2</span>     Entry[] src = table;                   <span class="comment">//src引用了旧的Entry数组</span></span><br><span class="line"> <span class="number">3</span>     <span class="keyword">int</span> newCapacity = newTable.length;</span><br><span class="line"> <span class="number">4</span>     <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; src.length; j++) &#123; <span class="comment">//遍历旧的Entry数组</span></span><br><span class="line"> <span class="number">5</span>         Entry&lt;K,V&gt; e = src[j];             <span class="comment">//取得旧Entry数组的每个元素</span></span><br><span class="line"> <span class="number">6</span>         <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123;</span><br><span class="line"> <span class="number">7</span>             src[j] = <span class="keyword">null</span>;<span class="comment">//释放旧Entry数组的对象引用（for循环后，旧的Entry数组不再引用任何对象）</span></span><br><span class="line"> <span class="number">8</span>             <span class="keyword">do</span> &#123;</span><br><span class="line"> <span class="number">9</span>                 Entry&lt;K,V&gt; next = e.next;</span><br><span class="line"><span class="number">10</span>                 <span class="keyword">int</span> i = indexFor(e.hash, newCapacity); <span class="comment">//！！重新计算每个元素在数组中的位置</span></span><br><span class="line"><span class="number">11</span>                 e.next = newTable[i]; <span class="comment">//标记[1]</span></span><br><span class="line"><span class="number">12</span>                 newTable[i] = e;      <span class="comment">//将元素放在数组上</span></span><br><span class="line"><span class="number">13</span>                 e = next;             <span class="comment">//访问下一个Entry链上的元素</span></span><br><span class="line"><span class="number">14</span>             &#125; <span class="keyword">while</span> (e != <span class="keyword">null</span>);</span><br><span class="line"><span class="number">15</span>         &#125;</span><br><span class="line"><span class="number">16</span>     &#125;</span><br><span class="line"><span class="number">17</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/transfer.png?raw=true" alt=""></p>
+<p>我们使用的是2次幂的扩展(指长度扩为原来2倍)，所以，元素的位置要么是在原位置，要么是在原位置再移动2次幂的位置。看下图可以明白这句话的意思，n为table的长度，图（a）表示扩容前的key1和key2两种key确定索引位置的示例，图（b）表示扩容后key1和key2两种key确定索引位置的示例，其中hash1是key1对应的哈希与高位运算结果。</p>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/reHash.png?raw=true" alt=""></p>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/OldCap.png?raw=true" alt=""></p>
+<p>因此，我们在扩充HashMap的时候，不需要像JDK1.7的实现那样重新计算hash，只需要看看原来的hash值新增的那个bit是1还是0就好了，是0的话索引没变，是1的话索引变成“原索引+oldCap”。</p>
+<h3 id="HashMap-线程不安全"><a href="#HashMap-线程不安全" class="headerlink" title="HashMap 线程不安全"></a>HashMap 线程不安全</h3><p>并发的多线程使用场景中使用HashMap可能造成死循环。主要是多线程同时put时，如果同时触发了rehash操作，会导致HashMap中的链表中出现循环节点，进而使得后面get的时候，会死循环。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HashMapInfiniteLoop</span> </span>&#123;  </span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> HashMap&lt;Integer,String&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">2</span>，<span class="number">0.75f</span>);  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;  </span><br><span class="line">        map.put(<span class="number">5</span>， <span class="string">"C"</span>);  </span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> Thread(<span class="string">"Thread1"</span>) &#123;  </span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">                map.put(<span class="number">7</span>, <span class="string">"B"</span>);  </span><br><span class="line">                System.out.println(map);  </span><br><span class="line">            &#125;;  </span><br><span class="line">        &#125;.start();  </span><br><span class="line">        <span class="keyword">new</span> Thread(<span class="string">"Thread2"</span>) &#123;  </span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">                map.put(<span class="number">3</span>, <span class="string">"A);  </span></span><br><span class="line"><span class="string">                System.out.println(map);  </span></span><br><span class="line"><span class="string">            &#125;;  </span></span><br><span class="line"><span class="string">        &#125;.start();        </span></span><br><span class="line"><span class="string">    &#125;  </span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p><a href="https://tech.meituan.com/2016/06/24/java-hashmap.html" target="_blank" rel="noopener">主要参考与美团的文章：Java 8系列之重新认识HashMap</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/ConcurrentHashMap/" rel="prev" title="ConcurrentHashMap">
+      <i class="fa fa-chevron-left"></i> ConcurrentHashMap
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%B8%89%E9%83%A8%E5%88%86%EF%BC%9A%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%A7%E8%A1%8C%E5%AD%90%E7%B3%BB%E7%BB%9F/" rel="next" title="深入理解Java虚拟机第三部分：虚拟机执行子系统">
+      深入理解Java虚拟机第三部分：虚拟机执行子系统 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#存储结构字段"><span class="nav-number">1.</span> <span class="nav-text">存储结构字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#功能实现-方法"><span class="nav-number">2.</span> <span class="nav-text">功能实现-方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-确定哈希桶数组索引位置"><span class="nav-number">2.1.</span> <span class="nav-text">1. 确定哈希桶数组索引位置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-分析HashMap的put方法"><span class="nav-number">3.</span> <span class="nav-text">2. 分析HashMap的put方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-扩容机制"><span class="nav-number">4.</span> <span class="nav-text">3. 扩容机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HashMap-线程不安全"><span class="nav-number">4.1.</span> <span class="nav-text">HashMap 线程不安全</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wayne"
+      src="/images/808.jpg">
+  <p class="site-author-name" itemprop="name">Wayne</p>
+  <div class="site-description" itemprop="description">记录成长</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:winter98@foxmail.com" title="E-Mail → mailto:winter98@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wayne</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wayne-98.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="第一章：分布式架构从集中式到分布式 分布式系统的定义：分布式系统是一个硬件或软件组件分布在不同的网络计算机上，彼此之间仅仅通过消息传递进行通信和协调的系统。  分布式环境的各种问题：  通信异常 网络分区：当网络由于发生异常情况，导致分布式系统中部分节点之间的网络延时不断增大，最终导致组成分布式系统的所有节点中，只有部分节点能够进行正常的通信，俗称“脑裂” 三态：成功、失败和超时 节点故障">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从Paxos到Zookeeper 第一章：分布式架构">
+<meta property="og:url" content="http://wayne-98.github.io/2020/05/10/Distributed%20System/%E4%BB%8EPaxos%E5%88%B0Zookeeper%20%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9A%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84/index.html">
+<meta property="og:site_name" content="Wayne">
+<meta property="og:description" content="第一章：分布式架构从集中式到分布式 分布式系统的定义：分布式系统是一个硬件或软件组件分布在不同的网络计算机上，彼此之间仅仅通过消息传递进行通信和协调的系统。  分布式环境的各种问题：  通信异常 网络分区：当网络由于发生异常情况，导致分布式系统中部分节点之间的网络延时不断增大，最终导致组成分布式系统的所有节点中，只有部分节点能够进行正常的通信，俗称“脑裂” 三态：成功、失败和超时 节点故障">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://github.com/Wayne-98/image/blob/master/Distributed%20System/cap.png?raw=true">
+<meta property="article:published_time" content="2020-05-10T13:39:10.404Z">
+<meta property="article:modified_time" content="2020-05-10T14:07:22.418Z">
+<meta property="article:author" content="Wayne">
+<meta property="article:tag" content="Distributed System">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://github.com/Wayne-98/image/blob/master/Distributed%20System/cap.png?raw=true">
+
+<link rel="canonical" href="http://wayne-98.github.io/2020/05/10/Distributed%20System/%E4%BB%8EPaxos%E5%88%B0Zookeeper%20%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9A%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>从Paxos到Zookeeper 第一章：分布式架构 | Wayne</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Wayne</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Distributed%20System/%E4%BB%8EPaxos%E5%88%B0Zookeeper%20%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9A%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="记录成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          从Paxos到Zookeeper 第一章：分布式架构
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:07:22" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BB%8EPaxos%E5%88%B0Zookeeper/" itemprop="url" rel="index"><span itemprop="name">从Paxos到Zookeeper</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="第一章：分布式架构"><a href="#第一章：分布式架构" class="headerlink" title="第一章：分布式架构"></a>第一章：分布式架构</h1><h2 id="从集中式到分布式"><a href="#从集中式到分布式" class="headerlink" title="从集中式到分布式"></a>从集中式到分布式</h2><ul>
+<li><p>分布式系统的定义：分布式系统是一个硬件或软件组件分布在不同的网络计算机上，彼此之间仅仅通过消息传递进行通信和协调的系统。</p>
+</li>
+<li><p>分布式环境的各种问题：</p>
+<ul>
+<li>通信异常</li>
+<li>网络分区：当网络由于发生异常情况，导致分布式系统中部分节点之间的网络延时不断增大，最终导致组成分布式系统的所有节点中，只有部分节点能够进行正常的通信，俗称“脑裂”</li>
+<li>三态：成功、失败和超时</li>
+<li>节点故障</li>
+</ul>
+</li>
+</ul>
+<h2 id="从ACID到CAP-BASE"><a href="#从ACID到CAP-BASE" class="headerlink" title="从ACID到CAP/BASE"></a>从ACID到CAP/BASE</h2><h3 id="CAP"><a href="#CAP" class="headerlink" title="CAP"></a>CAP</h3><p>一个分布式系统不可能同时满足 一致性(C: Consistency)、可用性(A: Availability) 和分区容错性(P: Partition tolerance) 这三个基本需求，最多只能同时满足其中两项。</p>
+<ul>
+<li>一致性：在分布式系统中，一致性是指数据在多个副本之间是否能够保持一致的特性。</li>
+<li>可用性：可用性是指系统提供的服务必须一直处于可用的状态，对于用户的每一个操作请求总是能够在有限的时间内返回结果。</li>
+<li>分区容错性：分布式系统在遇到任何网络分区故障的时候，仍然需要能够保证对外提供满足一致性和可用性的服务，除非是整个网络环境都发生了故障。</li>
+</ul>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Distributed%20System/cap.png?raw=true" alt=""></p>
+<ul>
+<li>分区容错性是一个最基本的需求。因为既然是一个分布式系统，那么分布式系统的组件必然需要被部署到不同的节点，否则也就无所谓分布式系统了，因此必然会出现子网络。而对于分布式系统而言，网络问题又是一个必然会出现的异常情况，因此分区容错性也就成了一个分布式系统必然需要面对和解决的问题。因此系统架构师往往需要把精力花在如何根据业务特点在C（一致性）和 A （可用性）之间寻求平衡。</li>
+</ul>
+<h3 id="BASE"><a href="#BASE" class="headerlink" title="BASE"></a>BASE</h3><p>BASE 是  Basically Available(基本可用)、Soft State(软状态) 和 Eventually Consistent(最终一致性) 三个短语的简写。</p>
+<p>BASE 是对 CAP 中一致性和可用性权衡的结果， 其来源于对大规模互联网系统分布式实践的总结，基于 CAP 定理逐渐演化而来，其核心思想是即使无法做到 强一致性(Strong consistency)，但每个应用可以根据自身的业务特点，采用适当的方式来使系统达到最终一致性(Eventual consistency)。</p>
+<ul>
+<li>基本可用：分布式系统在出现不可预知的故障的时候，允许损失部分可用性。</li>
+<li>弱状态(软状态)：是指系统中的数据存在中间状态，并认为该中间状态的存在不会影响系统的整体可用性，即允许系统在不同节点的数据副本之间进行数据同步的过程存在延时。</li>
+<li>最终一致性：强调的是系统中所有的数据副本，在经过一段时间的同步后，最终能够达到一个一致的状态。最终一致性的本质是需要系统保证最终数据能够达成一致，而不需要实时保证系统数据的强一致性。</li>
+</ul>
+<p>最终一致性的主要变种：</p>
+<ol>
+<li>因果一致性(Causal consistency)：如果进程 A 在更新完某个数据项后通知了进程 B ，那么进程 B 之后对该数据项的访问都应该能够获取到进程 A 更新后的最新值，并且如果进程 B 要对该数据项进行更新操作的话，务必基于进程 A 更新后的最新值，即不能发生丢失更新的情况。</li>
+<li>读己之所写(Read your writes)：进程 A 更新一个数据项之后，它总是能够访问到更新后的最新值，而不会看到旧值。</li>
+<li>会话一致性(Session consistency)：会话一致性将对系统数据的访问过程框定在一个会话当中：系统能够保证在同一个有效的会话中实现“读己之所写”的一致性。也就是说，执行更新操作后，客户端能够在同一个会话中始终读取到该数据项的最新值。</li>
+<li>单调读一致性(Monotonic read consistency)：如果一个进程从系统中读取出一个数据项的某个值后，那么系统对于该进程后续的任何数据访问都不应该返回更旧的值。</li>
+<li>单调写一致性(Monotonic write consistency)：一个系统需要能够保证来自同一个进程的写操作被顺序地执行。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Distributed-System/" rel="tag"># Distributed System</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/10/Design%20Pattern/Head%20First%20Design%20Pattern/" rel="prev" title="Head First Desig Pattern">
+      <i class="fa fa-chevron-left"></i> Head First Desig Pattern
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/10/Distributed%20System/%E4%BB%8EPaxos%E5%88%B0Zookeeper%20%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9A%E4%B8%80%E8%87%B4%E6%80%A7%E5%8D%8F%E8%AE%AE/" rel="next" title="从Paxos到Zookeeper 第二章：一致性协议">
+      从Paxos到Zookeeper 第二章：一致性协议 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#第一章：分布式架构"><span class="nav-number">1.</span> <span class="nav-text">第一章：分布式架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#从集中式到分布式"><span class="nav-number">1.1.</span> <span class="nav-text">从集中式到分布式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从ACID到CAP-BASE"><span class="nav-number">1.2.</span> <span class="nav-text">从ACID到CAP&#x2F;BASE</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CAP"><span class="nav-number">1.2.1.</span> <span class="nav-text">CAP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BASE"><span class="nav-number">1.2.2.</span> <span class="nav-text">BASE</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wayne"
+      src="/images/808.jpg">
+  <p class="site-author-name" itemprop="name">Wayne</p>
+  <div class="site-description" itemprop="description">记录成长</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:winter98@foxmail.com" title="E-Mail → mailto:winter98@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wayne</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

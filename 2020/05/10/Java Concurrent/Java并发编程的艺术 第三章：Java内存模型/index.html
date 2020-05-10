@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wayne-98.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="3. Java内存模型Java线程之间的通信对程序员完全透明，内存可见性问题很容易困扰Java程序员。  Java内存模型的基础：主要介绍内存模型相关的基本概念； Java内存模型中的顺序一致性：主要介绍重排序与顺序一致性内存模型； 同步原语：主要介绍3个同步原语（synchronized、volatile和final）的内存语义及重排序规则在处理器中的实现； Java内存模型的设计：主要介绍Ja">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java并发编程的艺术 第三章：Java内存模型">
+<meta property="og:url" content="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%20%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/index.html">
+<meta property="og:site_name" content="Wayne">
+<meta property="og:description" content="3. Java内存模型Java线程之间的通信对程序员完全透明，内存可见性问题很容易困扰Java程序员。  Java内存模型的基础：主要介绍内存模型相关的基本概念； Java内存模型中的顺序一致性：主要介绍重排序与顺序一致性内存模型； 同步原语：主要介绍3个同步原语（synchronized、volatile和final）的内存语义及重排序规则在处理器中的实现； Java内存模型的设计：主要介绍Ja">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-05-10T13:39:10.509Z">
+<meta property="article:modified_time" content="2020-05-10T14:11:19.899Z">
+<meta property="article:author" content="Wayne">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%20%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Java并发编程的艺术 第三章：Java内存模型 | Wayne</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Wayne</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%20%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="记录成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java并发编程的艺术 第三章：Java内存模型
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:11:19" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java-Concurrent/" itemprop="url" rel="index"><span itemprop="name">Java Concurrent</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="3-Java内存模型"><a href="#3-Java内存模型" class="headerlink" title="3. Java内存模型"></a>3. Java内存模型</h1><p>Java线程之间的通信对程序员完全透明，内存可见性问题很容易困扰Java程序员。</p>
+<ul>
+<li>Java内存模型的基础：主要介绍内存模型相关的基本概念；</li>
+<li>Java内存模型中的顺序一致性：主要介绍重排序与顺序一致性内存模型；</li>
+<li>同步原语：主要介绍3个同步原语（synchronized、volatile和final）的内存语义及重排序规则在处理器<br>中的实现；</li>
+<li>Java内存模型的设计：主要介绍Java内存模型的设计原理，及其与处理器内存模型和顺序一致性内存模型的关系。</li>
+</ul>
+<h2 id="3-1-Java内存模型的基础"><a href="#3-1-Java内存模型的基础" class="headerlink" title="3.1 Java内存模型的基础"></a>3.1 Java内存模型的基础</h2><h3 id="3-1-1-并发编程模型的两个关键问题"><a href="#3-1-1-并发编程模型的两个关键问题" class="headerlink" title="3.1.1 并发编程模型的两个关键问题"></a>3.1.1 并发编程模型的两个关键问题</h3><ol>
+<li><strong>线程之间的通信</strong>  <ul>
+<li>共享内存</li>
+<li>消息传递</li>
+</ul>
+</li>
+<li><strong>线程之间的同步</strong><ul>
+<li>在共享内存并发模型中，同步是显示进行的</li>
+<li>在消息传递并发模型中，由于消息的发送必须在消息的接收之前，同步是隐式进行</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="3-1-2-Java内存模型的抽象结构"><a href="#3-1-2-Java内存模型的抽象结构" class="headerlink" title="3.1.2 Java内存模型的抽象结构"></a>3.1.2 Java内存模型的抽象结构</h3><p>实例域，静态域和数组存储在堆内存中，多线程共享（共享变量）。<br>局部变量，方法定义参数和异常处理器参数不在线程之间共享，所以不会有内存可见性问题，也不受内存模型的影响。</p>
+<p><strong>Java线程之间的通信由Java内存模型JMM控制, JMM决定一个线程对共享变量的写入何时对另一个线程可见</strong></p>
+<ul>
+<li><p>JMM定义了线程和主内存之间的抽象关系<br>  线程之间的共享变量存储在主内存中，每个线程都有一个私有的本地内存，本地内存中存储了该线程以读/写共享变量的副本。</p>
+<ul>
+<li>本地内存是JMM的一个抽象概念，并不真实存在。它涵盖了缓存、写缓冲区、寄存器以及其他的硬件和编译器优化</li>
+</ul>
+</li>
+<li><p>JMM通过控制主内存与每个线程的本地内存之间的交互，来为Java程序员提供内存可见性保证。</p>
+</li>
+</ul>
+<hr>
+<h3 id="3-1-3-从源代码到指令序列的重排序"><a href="#3-1-3-从源代码到指令序列的重排序" class="headerlink" title="3.1.3 从源代码到指令序列的重排序"></a>3.1.3 从源代码到指令序列的重排序</h3><ol>
+<li><strong>编译器优化的重排序</strong><br>编译器在不改变单线程程序语义的前提下，可以重新安排语句的执行顺序。</li>
+<li><strong>指令级并行的重排序</strong><br>现代处理器采用了指令级并行技术（Instruction-Level Parallelism，ILP）来将多条指令重叠执行。如果不存在数据依赖性，处理器可以改变语句对应机器指令的执行顺序。</li>
+<li><strong>内存系统的重排序</strong><br>由于处理器使用缓存和读/写缓冲区，这使得加载和存储操作看上去可能是在乱序执行。</li>
+</ol>
+<p>对于编译器，JMM的编译器重排序规则会禁止特定类型的编译器重排序（不是所有的编译器重排序都要禁止）。对于处理器重排序，JMM的处理器重排序规则会要求Java编译器在生成指令序列时，插入特定类型的内存屏障（Memory Barriers，Intel称之为Memory Fence）指令，通过<strong>内存屏障指令</strong>来禁止特定类型的处理器重排序。</p>
+<h3 id="3-1-4-并发编程模型的分类"><a href="#3-1-4-并发编程模型的分类" class="headerlink" title="3.1.4 并发编程模型的分类"></a>3.1.4 并发编程模型的分类</h3><p>现代处理器使用写缓冲区临时保存向内存写入的数据。</p>
+<p>优点：</p>
+<ul>
+<li><p>保证指令流水线式持续运行，避免由于处理器停顿等待向内存写入数据而产生的延迟。</p>
+</li>
+<li><p>通过批处理的方式刷新写缓冲区，以及合并写缓冲区对同一内存地址的多次写，可以减少对内存总线的占用</p>
+</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>每个处理器上的写缓冲区仅仅对其自己可见，处理器对内存的读写操作的执行顺序，并不一定与内存实际发生的读写顺序一致。</li>
+</ul>
+<p>为了保证内存可见性，Java 编译器在生成指令序列的适当位置会插入内存屏障指令来禁止特定类型的处理器重排序。</p>
+<table>
+<thead>
+<tr>
+<th align="left">屏障类型</th>
+<th>指令示例</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">LoadLoad Barriers</td>
+<td>Load 1; LoadLoad; Load 2</td>
+<td>确保Load 1 数据的装载先于 <br/>Load 2 及后续所有装载指令的装载</td>
+</tr>
+<tr>
+<td align="left">StoreStore Barriers</td>
+<td>Store 1; StoreStore; Store 2</td>
+<td>确保 Store1 的数据对其他处理器可见<br/>(刷新到内存)先于 Store2 及后续存储指令的存储</td>
+</tr>
+<tr>
+<td align="left">LoadStore Barriers</td>
+<td>Load 1; LoadStore; Store 2</td>
+<td>确保Load 1 数据的装载先于 <br/>Store 2 及后续的存储指令刷新到内存</td>
+</tr>
+<tr>
+<td align="left">StoreLoad Barriers</td>
+<td>Store 1; StoreLoad; Load 2</td>
+<td>确保 Store1 的数据对其他处理器可见<br/>(刷新到内存)先于 Load 2 及后续装载指令的装载。</td>
+</tr>
+</tbody></table>
+<p>StoreLoad Barriers 是一个“全能型” 的屏障，执行该屏障开销大，因为当前处理器会把写缓冲区中的数据全部刷新到内存中。</p>
+<hr>
+<h3 id="3-1-5-happens-before简介"><a href="#3-1-5-happens-before简介" class="headerlink" title="3.1.5 happens-before简介"></a>3.1.5 happens-before简介</h3><p>在JMM中，如果一个操作执行的结果需要对另一个操作可见，那么这两个操作之间必须要存在happens-before关<br>系。这里提到的两个操作既可以是在一个线程之内，也可以是在不同线程之间。</p>
+<ul>
+<li>the first is visible to and ordered before the second</li>
+<li>一个happens-before规则对应于一个或多个编译器和处理器重排序规则</li>
+</ul>
+<ol>
+<li><strong>程序顺序规则</strong><br>一个线程中的每个操作，happens-before于线程中的任意后续操作</li>
+<li><strong>监视器锁规则</strong><br>对一个锁的解锁，happens-before于随后对这个锁的加锁</li>
+<li><strong>volatile变量规则</strong><br>对一个volatile域的写，happens-before于任意后续对这个volatile域的读</li>
+<li><strong>传递性</strong></li>
+</ol>
+<hr>
+<h2 id="3-2-重排序"><a href="#3-2-重排序" class="headerlink" title="3.2 重排序"></a>3.2 重排序</h2><p>重排序是指编译器和处理器为了优化程序性能而对<strong>指令序列进行重新排序</strong>的一种手段。</p>
+<h3 id="3-2-1-数据依赖性"><a href="#3-2-1-数据依赖性" class="headerlink" title="3.2.1 数据依赖性"></a>3.2.1 数据依赖性</h3><p>如果两个操作访问同一个变量，且这两个操作中有一个为写操作，此时这两个操作之间就存在数据依赖性</p>
+<p>编译器和处理器在重排序时，会遵守数据依赖性，编译器和处理器不会改变存在数据依赖关系的两个操作的执行顺序。</p>
+<h3 id="3-2-2-as-if-serial-语义"><a href="#3-2-2-as-if-serial-语义" class="headerlink" title="3.2.2 as-if-serial 语义"></a>3.2.2 as-if-serial 语义</h3><p>as-if-serial 语义的意思是：不管怎么重排序（编译器和处理器为了提高并行度），（单线程）程序的执行结果不能被改变。编译器、runtime 和处理器都必须遵守 as-if-serial 语义。</p>
+<p>as-if-serial 语义使单线程程序员无需担心重排序会干扰他们，也无需担心内存可见性问题。</p>
+<h3 id="3-2-3-程序顺序规则"><a href="#3-2-3-程序顺序规则" class="headerlink" title="3.2.3 程序顺序规则"></a>3.2.3 程序顺序规则</h3><p>在不改变程序执行结果的前提下，尽可能提高并行度。</p>
+<h3 id="3-2-4-重排序对多线程的影响"><a href="#3-2-4-重排序对多线程的影响" class="headerlink" title="3.2.4 重排序对多线程的影响"></a>3.2.4 重排序对多线程的影响</h3><p>代码中存在控制依赖性时，会影响指令序列执行的并行度。为此，编译器和处理器会采用猜测（Speculation）执行来克服控制相关性对并行度的影响。以处理器的猜测执行为例，执行线程B的处理器可以提前读取并计算a*a，然后把计算结果临时保存到一个名为重排序缓冲（Reorder Buffer，ROB）的硬件缓存中。当操作3的条<br>件判断为真时，就把该计算结果写入变量i中。</p>
+<h2 id="3-3-顺序一致性"><a href="#3-3-顺序一致性" class="headerlink" title="3.3 顺序一致性"></a>3.3 顺序一致性</h2><p>顺序一致性内存模型是一个理论参考模型。</p>
+<h3 id="3-3-1-数据竞争和顺序一致性"><a href="#3-3-1-数据竞争和顺序一致性" class="headerlink" title="3.3.1 数据竞争和顺序一致性"></a>3.3.1 数据竞争和顺序一致性</h3>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/10/Java%20Concurrent/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/" rel="prev" title="Java中的线程池">
+      <i class="fa fa-chevron-left"></i> Java中的线程池
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/10/Java%20Concurrent/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%20%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9AJava%E5%B9%B6%E5%8F%91%E6%9C%BA%E5%88%B6%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" rel="next" title="Java并发编程的艺术 第二章：Java并发机制的底层实现原理">
+      Java并发编程的艺术 第二章：Java并发机制的底层实现原理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Java内存模型"><span class="nav-number">1.</span> <span class="nav-text">3. Java内存模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-Java内存模型的基础"><span class="nav-number">1.1.</span> <span class="nav-text">3.1 Java内存模型的基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-1-并发编程模型的两个关键问题"><span class="nav-number">1.1.1.</span> <span class="nav-text">3.1.1 并发编程模型的两个关键问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-2-Java内存模型的抽象结构"><span class="nav-number">1.1.2.</span> <span class="nav-text">3.1.2 Java内存模型的抽象结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-3-从源代码到指令序列的重排序"><span class="nav-number">1.1.3.</span> <span class="nav-text">3.1.3 从源代码到指令序列的重排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-4-并发编程模型的分类"><span class="nav-number">1.1.4.</span> <span class="nav-text">3.1.4 并发编程模型的分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-5-happens-before简介"><span class="nav-number">1.1.5.</span> <span class="nav-text">3.1.5 happens-before简介</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-重排序"><span class="nav-number">1.2.</span> <span class="nav-text">3.2 重排序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-1-数据依赖性"><span class="nav-number">1.2.1.</span> <span class="nav-text">3.2.1 数据依赖性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-2-as-if-serial-语义"><span class="nav-number">1.2.2.</span> <span class="nav-text">3.2.2 as-if-serial 语义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-3-程序顺序规则"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.2.3 程序顺序规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-4-重排序对多线程的影响"><span class="nav-number">1.2.4.</span> <span class="nav-text">3.2.4 重排序对多线程的影响</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-顺序一致性"><span class="nav-number">1.3.</span> <span class="nav-text">3.3 顺序一致性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-1-数据竞争和顺序一致性"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.3.1 数据竞争和顺序一致性</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wayne"
+      src="/images/808.jpg">
+  <p class="site-author-name" itemprop="name">Wayne</p>
+  <div class="site-description" itemprop="description">记录成长</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:winter98@foxmail.com" title="E-Mail → mailto:winter98@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wayne</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

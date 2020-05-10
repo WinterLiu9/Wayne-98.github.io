@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wayne-98.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="MySQL逻辑架构 连接管理、授权认证与安全  每个客户端连接都会在服务器进程中拥有一个线程  认证基于用户名、原始主机信息和密码 优化与执行MySQL 会解析查询，并创建内部数据结构，然后对其进行各种优化，包括重写查询、决定表的读取顺序以及选择合适的索引等。   并发控制 并发控制的两个层面：  服务器层和存储引擎层 读写锁  读锁是共享的，相互不堵塞的  写锁是排他的，一个写锁会堵塞其他读锁和">
+<meta property="og:type" content="article">
+<meta property="og:title" content="高性能MySQL第一章：MySQL架构">
+<meta property="og:url" content="http://wayne-98.github.io/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9AMySQL%E6%9E%B6%E6%9E%84/index.html">
+<meta property="og:site_name" content="Wayne">
+<meta property="og:description" content="MySQL逻辑架构 连接管理、授权认证与安全  每个客户端连接都会在服务器进程中拥有一个线程  认证基于用户名、原始主机信息和密码 优化与执行MySQL 会解析查询，并创建内部数据结构，然后对其进行各种优化，包括重写查询、决定表的读取顺序以及选择合适的索引等。   并发控制 并发控制的两个层面：  服务器层和存储引擎层 读写锁  读锁是共享的，相互不堵塞的  写锁是排他的，一个写锁会堵塞其他读锁和">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-05-10T13:39:10.085Z">
+<meta property="article:modified_time" content="2020-05-10T13:59:43.741Z">
+<meta property="article:author" content="Wayne">
+<meta property="article:tag" content="MySQL">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://wayne-98.github.io/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9AMySQL%E6%9E%B6%E6%9E%84/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>高性能MySQL第一章：MySQL架构 | Wayne</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Wayne</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9AMySQL%E6%9E%B6%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="记录成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          高性能MySQL第一章：MySQL架构
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：21:59:43" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%AB%98%E6%80%A7%E8%83%BDMySQL/" itemprop="url" rel="index"><span itemprop="name">高性能MySQL</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="MySQL逻辑架构"><a href="#MySQL逻辑架构" class="headerlink" title="MySQL逻辑架构"></a>MySQL逻辑架构</h2><ul>
+<li><strong>连接管理、授权认证与安全</strong><br>  每个客户端连接都会在服务器进程中拥有一个线程<br>  认证基于用户名、原始主机信息和密码</li>
+<li><strong>优化与执行</strong><br>MySQL 会解析查询，并创建内部数据结构，然后对其进行各种优化，包括重写查询、决定表的读取顺序以及选择合适的索引等。</li>
+</ul>
+<hr>
+<h2 id="并发控制"><a href="#并发控制" class="headerlink" title="并发控制"></a>并发控制</h2><ul>
+<li><strong>并发控制的两个层面：</strong><br>  服务器层和存储引擎层</li>
+<li><strong>读写锁</strong><br>  读锁是共享的，相互不堵塞的<br>  写锁是排他的，一个写锁会堵塞其他读锁和写锁</li>
+<li><strong>锁粒度</strong><br>  表锁：最基本的锁策略，开销最小的策略，（一般是在服务器层实现）<br>  行锁：支持最大程度的并发处理，同时也带来了最大的锁开销，行级锁只在存储引擎实现</li>
+</ul>
+<hr>
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>事务就是一个原子性的 SQL 查询或者说一个独立的工作单元。事务内的语句，要么全部执行成功，要么全部执行失败。</p>
+<ul>
+<li><p><strong>ACID</strong></p>
+<ol>
+<li>Atomicity 原子性：一个事务必须被视为一个不可分割的最小工作单元，整个事务中的所有操作要么全部提交成功，要么全部失败回滚，对一个事务来说，不可能只执行其中的一部分操作。</li>
+<li>Consistency 一致性：数据库总是从一个一致性状态转换到另外一个一致性状态。</li>
+<li>Isolation 隔离性：一个事务所做的修改在最终提交以前，对其他事务是不可见的。</li>
+<li>Durability 持续性：一旦事务提交，其所做的修改就会永久保存到数据库中。</li>
+</ol>
+</li>
+<li><p><strong>隔离级别</strong></p>
+<ol>
+<li>READ UNCOMMITTED (未提交读)<ul>
+<li>在未提交读级别，事务中的修改，即使没有提交，对其他事务也是可见的</li>
+<li>事务可以读取未提交的数据，被称为脏读</li>
+</ul>
+</li>
+<li>READ COMMITTED (提交读)<ul>
+<li>提交读满足隔离性的定义。一个事务开始时，只能“看见”已经提交的事务所做的修改</li>
+<li>也称作不可重复读，一个事务内执行两次同样的查询，可能会得到不一样的结果</li>
+</ul>
+</li>
+<li>REPEATABLE READ (可重复读)（是 MySQL 默认事务隔离级别）<ul>
+<li>解决了脏读的问题，该级别保证了在同一个事务中多次读取同样记录的结果是一致的</li>
+<li>幻读：当某个事物在读取某个范围内的记录时，另外一个事务又在该范围内插入了新的记录，当之前的事务再次读取该范围的时候就会产生幻行。多版本并发控制 MVCC 解决了幻读的问题</li>
+</ul>
+</li>
+<li>SERIALIZABLE (可串行化)<ul>
+<li>强制事务串行执行</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p><strong>死锁</strong><br>  死锁是指两个或多个事务在同一资源上相互占用，并请求锁定对方占用的资源，从而导致恶性循环的现象。<br>  InnoDB目前处理死锁的方法是将持有最少行级排他锁的事务进行回滚</p>
+</li>
+<li><p><strong>事务日志</strong></p>
+<ol>
+<li>可以帮助提高事务的效率</li>
+<li>使用事务日志，存储引擎在修改表数据的时只需要修改其内存拷贝，再把该修改行为记录到持久在硬盘上的事务日志中，而不用每次都将修改的数据本身持久到磁盘。</li>
+<li>事务日志采取的是追加的方式，因此写日志的操作是磁盘上一小块区域的顺序 I/O ,而不是像随机 I/O 需要在磁盘的多个地方移动磁头</li>
+<li>事务日志持久以后，内存中被修改的数据在后台可以慢慢地刷回到磁盘</li>
+</ol>
+</li>
+<li><p><strong>MySQL中的事务</strong></p>
+<ol>
+<li>自动提交：如果不显式的开始一个事务，则每个查询都会被当成一个事务执行操作</li>
+<li>在事务中混合使用存储引擎：MySQL 服务器层不管理事务，事务是由下层的存储引擎实现的。所以在同一个事务中，使用多种存储引擎是不可靠的。</li>
+<li>隐式和显式锁定：InnoDB 采用的是两阶段锁定协议。在事务执行过程中，随时都可以执行锁定，锁只有在执行 commit 或者 rollback 的时候才会释放，并且所有的锁是在同一时刻被释放。</li>
+</ol>
+</li>
+</ul>
+<hr>
+<h2 id="多版本并发控制"><a href="#多版本并发控制" class="headerlink" title="多版本并发控制"></a>多版本并发控制</h2><ul>
+<li><p>可以认为 MVCC 是行级锁的一个变种，但是它在很多情况下避免的加锁操作，因此开销更低。虽然实现的机制有所不同，但大都实现了非阻塞的读操作，写操作也只锁定必要的行。</p>
+</li>
+<li><p>MVCC 的实现，是通过保存数据在某个时间点上的快照实现的。</p>
+<ul>
+<li>事务快照是用来存储数据库的事务运行情况，用来做可见性判断</li>
+<li>一个事务快照的创建过程可以概括为：<ol>
+<li>查看当前所有的未提交并活跃的事务，存储在数组中</li>
+<li>选取未提交并活跃的事务中最小的XID，记录在快照的xmin中</li>
+<li>选取所有已提交事务中最大的XID，加1后记录在xmax中</li>
+</ol>
+</li>
+<li>快照生成时机的不同, 造成了RC,RR两种隔离级别的不同可见性<ol>
+<li>repeatable read 级别, 事务在 begin/start transaction 之后的第一条 select 读操作后, 会创建一个快照(read view), 将当前系统中活跃的其他事务记录记录起来;</li>
+<li>read committed 级别, 事务中每条 select 语句都会创建一个快照(read view);</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p>InnoDB 的 MVCC，InnoDB存储引擎在数据库每行数据的后面添加了三个字段来实现的。一个字段保存了行的创建时间，一个保存了行的过期(删除)时间。存储并不是实际时间值，而是系统版本号。每开始一个事务，系统版本号都会自动递增。还有一个是回滚指针(DB_ROLL_PTR)字段: 指写入回滚段(rollback segment)的 undo log record (撤销日志记录记录)。</p>
+<ol>
+<li>SELECT：<ul>
+<li>InnoDB只查找版本早于当前事务版本的数据行。这样可以确保事务读取的行要么是在事务开始前就已经存在的，要么是事务自身插入或修改过的</li>
+<li>行的删除版本号要么未定义，要么大于当前事务版本号。这可以确保事务读到的行，在事务开始之前未被删除</li>
+</ul>
+</li>
+<li>INSERT<br> InnoDB为新插入的每一行保存当前系统版本号作为行版本号</li>
+<li>DELETE<br> InnoDB为删除的每一行保存当前系统版本号作为行删除标识</li>
+<li>UPDATE<br> InnoDB为插入一行新数据，保存当前系统版本号作为行版本号，同时保存当前系统版本号到原来的行作为行删除标识</li>
+</ol>
+</li>
+<li><p>MVCC只在可重复读和提交读两个隔离级别下工作</p>
+<ol>
+<li>未提交读总是读取最新的数据行，而不是符合当前事务版本的数据行。</li>
+<li>SERIALIZABLE 则会对所有读取的行都加锁。</li>
+</ol>
+</li>
+<li><p>Undo-log</p>
+<ol>
+<li>Undo log 是 InnoDB MVCC 事务特性的重要组成部分。当我们对记录做了变更操作时就会产生 undo记录，Undo 记录默认被记录到系统表空间(ibdata)中，但从5.6开始，也可以使用独立的Undo 表空间。</li>
+<li>Undo记录中存储的是老版本数据，当一个旧的事务需要读取数据时，为了能读取到老版本的数据，需要顺着undo链找到满足其可见性的记录。当版本链很长时，通常可以认为这是个比较耗时的操作（例如bug#69812）。</li>
+<li>大多数对数据的变更操作包括INSERT/DELETE/UPDATE，其中INSERT操作在事务提交前只对当前事务可见，因此产生的Undo日志可以在事务提交后直接删除（谁会对刚插入的数据有可见性需求呢！！），而对于UPDATE/DELETE则需要维护多版本信息，在InnoDB里，UPDATE和DELETE操作产生的Undo日志被归成一类，即update_undo</li>
+<li>另外, 在回滚段中的undo logs分为: insert undo log 和 update undo log<ul>
+<li>insert undo log : 事务对insert新记录时产生的undolog, 只在事务回滚时需要, 并且在事务提交后就可以立即丢弃。</li>
+<li>update undo log : 事务对记录进行delete和update操作时产生的undo log, 不仅在事务回滚时需要, 一致性读也需要，所以不能随便删除，只有当数据库所使用的快照中不涉及该日志记录，对应的回滚日志才会被purge线程删除。</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+<hr>
+<h2 id="MySQL存储引擎"><a href="#MySQL存储引擎" class="headerlink" title="MySQL存储引擎"></a>MySQL存储引擎</h2><ul>
+<li>InnoDB<ol>
+<li>InnoDB的数据存储在表空间中，表空间是由InnoDB管理的黑盒子，由一系列的数据文件组成。InnoDB可以将每个表的数据和索引放在单独的文件中。</li>
+<li>InnoDB采用MVCC来支持高并发，默认的隔离级别是可重复读，并且通过间隙锁(next-key locking)策略防止幻读的出现。间隙锁是的InnoDB不仅仅锁定查询涉及的行，还会对索引中的间隙进行锁定，以防止幻影行的插入</li>
+<li>InnoDB表是基于聚簇索引来实现的，聚簇索引对主键查询有很高的性能，不过它的二级索引中必须包含主键列。因此若表上的索引较多的话，主键应当尽可能的小。</li>
+</ol>
+</li>
+<li>MyISAM<ol>
+<li>MySQL5.1及之前的版本，是默认存储引擎。MyISAM提供了大量的特性，包括全文索引，压缩，空间函数等</li>
+<li>MyISAM不支持事务和行级锁，并且崩溃后无法安全恢复</li>
+<li>存储：MyISAM将表存储在两个文件中：数据文件和索引文件。表可以包括动态或静态行</li>
+<li>特性<ul>
+<li>加锁和并发：对整张表加锁；在表有读取查询的同时，也可以往表中插入新的记录，称为并发插入</li>
+<li>修复：check table mytable; repair table mytable</li>
+<li>索引：即使是BLOB和TEXT等长字段，基于前500个字符创建索引；支持全文索引，是一种基于分词创建的索引</li>
+<li>延迟更新索引键：在每次修改执行完成时，不会立即将修改的索引数据写入磁盘，而是会写到内存中的键缓冲区，只有在清理键缓冲区或者关闭表的时候才会将对应的索引块写入到磁盘</li>
+</ul>
+</li>
+<li>压缩表：压缩表是不能修改的，可以极大的减少磁盘空间占用，因此也可以减少磁盘I/O，从而提升查询性能。支持索引，索引也是只读的</li>
+</ol>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/10/Algorithms/May/%E5%9B%BE%E8%AE%BA%E7%AE%97%E6%B3%95%E5%A4%8D%E4%B9%A0/" rel="prev" title="图论算法复习">
+      <i class="fa fa-chevron-left"></i> 图论算法复习
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E4%BA%94%E7%AB%A0%EF%BC%9A%E5%88%9B%E5%BB%BA%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E7%B4%A2%E5%BC%95/" rel="next" title="高性能MySQL第五章：创建高性能的索引">
+      高性能MySQL第五章：创建高性能的索引 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL逻辑架构"><span class="nav-number">1.</span> <span class="nav-text">MySQL逻辑架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#并发控制"><span class="nav-number">2.</span> <span class="nav-text">并发控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事务"><span class="nav-number">3.</span> <span class="nav-text">事务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多版本并发控制"><span class="nav-number">4.</span> <span class="nav-text">多版本并发控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL存储引擎"><span class="nav-number">5.</span> <span class="nav-text">MySQL存储引擎</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Wayne"
+      src="/images/808.jpg">
+  <p class="site-author-name" itemprop="name">Wayne</p>
+  <div class="site-description" itemprop="description">记录成长</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:winter98@foxmail.com" title="E-Mail → mailto:winter98@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wayne</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
