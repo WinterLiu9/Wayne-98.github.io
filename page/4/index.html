@@ -347,10 +347,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：21:59:43" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-11 20:51:40" itemprop="dateModified" datetime="2020-05-11T20:51:40+08:00">2020-05-11</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -454,7 +460,7 @@
 </li>
 </ul>
 </li>
-<li><p>InnoDB 的 MVCC，InnoDB存储引擎在数据库每行数据的后面添加了三个字段来实现的。一个字段保存了行的创建时间，一个保存了行的过期(删除)时间。存储并不是实际时间值，而是系统版本号。每开始一个事务，系统版本号都会自动递增。还有一个是回滚指针(DB_ROLL_PTR)字段: 指写入回滚段(rollback segment)的 undo log record (撤销日志记录记录)。</p>
+<li><p>InnoDB 的 MVCC，InnoDB存储引擎在数据库每行数据的后面添加了三个字段来实现的。一个字段保存了行的创建时间，一个保存了行的过期(删除)时间。存储并不是实际时间值，而是系统版本号。每开始一个事务，系统版本号都会自动递增。还有一个是回滚指针(DB_ROLL_PTR)字段: 指写入回滚段(rollback segment)的 undo log record (撤销日志记录)。</p>
 <ol>
 <li>SELECT：<ul>
 <li>InnoDB只查找版本早于当前事务版本的数据行。这样可以确保事务读取的行要么是在事务开始前就已经存在的，要么是事务自身插入或修改过的</li>
@@ -489,7 +495,10 @@
 <h2 id="MySQL存储引擎"><a href="#MySQL存储引擎" class="headerlink" title="MySQL存储引擎"></a>MySQL存储引擎</h2><ul>
 <li>InnoDB<ol>
 <li>InnoDB的数据存储在表空间中，表空间是由InnoDB管理的黑盒子，由一系列的数据文件组成。InnoDB可以将每个表的数据和索引放在单独的文件中。</li>
-<li>InnoDB采用MVCC来支持高并发，默认的隔离级别是可重复读，并且通过间隙锁(next-key locking)策略防止幻读的出现。间隙锁是的InnoDB不仅仅锁定查询涉及的行，还会对索引中的间隙进行锁定，以防止幻影行的插入</li>
+<li>InnoDB采用MVCC来支持高并发，默认的隔离级别是可重复读，并且通过间隙锁(next-key locking)策略防止幻读的出现。间隙锁是的InnoDB不仅仅锁定查询涉及的行，还会对索引中的间隙进行锁定，以防止幻影行的插入<ul>
+<li>InnoDB支持行锁（锁定字段含有索引的情况下，否则走表锁），但锁定方式并非简单的锁定指定行上的索引，而是分为3种锁定算法：<br>1）记录锁（Record Locks）：锁定指定行的索引项<br>2）Gap Locks：锁定某一个范围内的索引，但不包括记录本身<br>3）间隙锁定（Next-Key Locks）：锁定一个范围内的索引，并且锁定记录本身   Next-Key Locks = Record Locks + Gap Locks<br>A next-key lock is a combination of a record lock on the index record and a gap lock on the gap before the index record</li>
+</ul>
+</li>
 <li>InnoDB表是基于聚簇索引来实现的，聚簇索引对主键查询有很高的性能，不过它的二级索引中必须包含主键列。因此若表上的索引较多的话，主键应当尽可能的小。</li>
 </ol>
 </li>
