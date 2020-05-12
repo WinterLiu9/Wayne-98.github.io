@@ -162,6 +162,253 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Internet/DNS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="记录成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Internet/DNS/" class="post-title-link" itemprop="url">DNS</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:09:19" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h2><p>域名系统(Domain Name System)能进行<strong>主机名到IP地址转换</strong>的目录服务。</p>
+<ul>
+<li>DNS：</li>
+</ul>
+<ol>
+<li><strong>一个由分层的 DNS 服务器实现的分布式数据库</strong></li>
+<li><strong>一个使得主机能够查询分布式数据的应用层协议</strong></li>
+</ol>
+<p>DNS 协议运行在 UDP 之上，使用53端口号。</p>
+<blockquote>
+<p>DNS 可以使用 UDP 或者 TCP 进行传输，使用的端口号都为 53。大多数情况下 DNS 使用 UDP 进行传输，这就要求域名解析器和域名服务器都必须自己处理超时和重传从而保证可靠性。在两种情况下会使用 TCP 进行传输：</p>
+<p>如果返回的响应超过的 512 字节（UDP 最大只支持 512 字节的数据）。<br>区域传送（区域传送是主域名服务器向辅助域名服务器传送变化的那部分数据）。</p>
+</blockquote>
+<ol>
+<li>主机向本地域名服务器的查询一般都是采用<strong>递归查询</strong>。        </li>
+</ol>
+<p>所谓递归查询就是：如果主机所询问的本地域名服务器不知道被查询的域名的IP地址，那么本地域名服务器就以DNS客户的身份，向其它根域名服务器继续发出查询请求报文(即替主机继续查询)，而不是让主机自己进行下一步查询。因此，递归查询返回的查询结果或者是所要查询的IP地址，或者是报错，表示无法查询到所需的IP地址。</p>
+<ol start="2">
+<li><p>本地域名服务器向根域名服务器的查询的<strong>迭代查询</strong><br> 迭代查询的特点：当根域名服务器收到本地域名服务器发出的迭代查询请求报文时，要么给出所要查询的IP地址，要么告诉本地服务器：“你下一步应当向哪一个域名服务器进行查询”。然后让本地服务器进行后续的查询。</p>
+<p> 搜索浏览器DNS缓存 –&gt; 操作系统DNS缓存 –&gt; 向本地DNS服务器发起DNS请求</p>
+</li>
+</ol>
+<p>本地DNS服务器 –&gt; 根DNS服务器 –&gt; 根DNS服务器向本地DNS服务器响应：你去找哪个哪个顶级域DNS服务器 –&gt; 顶级域DNS服务器：你去找哪个哪个权威DNS服务器</p>
+<ul>
+<li>除了进行主机名到IP地址的转换之外，DNS还提供了一些重要的服务：</li>
+</ul>
+<ol>
+<li>主机别名 2. 邮件服务器别名 3. 负载分配</li>
+</ol>
+<h1 id="DNS工作机理"><a href="#DNS工作机理" class="headerlink" title="DNS工作机理"></a>DNS工作机理</h1><ul>
+<li>分布式、层次数据库<br>大致来说，有三种类型的 DNS 服务器：<ol>
+<li>根 DNS 服务器</li>
+<li>顶级域(Top-Level Domain, TLD)DNS服务器(com. org. net. edu. fr. ca. jp)</li>
+<li>权威 DNS 服务器。</li>
+</ol>
+</li>
+</ul>
+<p><strong>本地DNS服务器</strong>并不属于该服务器的层级结构，但它对DNS层次结构是至关重要的。每个ISP都有一台本地DNS服务器。</p>
+<ul>
+<li>DNS 缓存<br>在一个请求链中，当某 DNS 服务器接受一个 DNS 回答时，它能将映射换存在本地存储器中。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Git/Git%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="记录成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Git/Git%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">Git 学习笔记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:08:50" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">开发工具</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Git是目前世界上最先进的分布式版本控制系统</p>
+<h1 id="时光机穿梭"><a href="#时光机穿梭" class="headerlink" title="时光机穿梭"></a>时光机穿梭</h1><p><strong>$ git config –global user.name “Your Name”<br>$ git config –global user.email “<a href="mailto:email@example.com">email@example.com</a>“</strong></p>
+<hr>
+<ul>
+<li>初始化一个Git仓库，使用<strong>git init</strong>命令。</li>
+<li>添加文件到Git仓库，分两步：<ol>
+<li>使用命令<strong>git add <file></strong>，注意，可反复多次使用，添加多个文件；</li>
+<li>使用命令<strong>git commit -m <message></strong>，完成。</li>
+</ol>
+</li>
+</ul>
+<hr>
+<ul>
+<li>要随时掌握工作区的状态，使用<strong>git status</strong>命令。</li>
+<li>如果git status告诉你有文件被修改过，用<strong>git diff</strong>可以查看修改内容。</li>
+</ul>
+<hr>
+<h2 id="版本回退"><a href="#版本回退" class="headerlink" title="版本回退"></a>版本回退</h2><ul>
+<li>HEAD指向的版本就是当前版本，因此，Git允许我们在版本的历史之间穿梭，<br>使用命令<strong>git reset –hard commit_id</strong>。</li>
+<li>穿梭前，用<strong>git log</strong>可以查看提交历史，以便确定要回退到哪个版本。</li>
+<li>要重返未来，用<strong>git reflog</strong>查看命令历史，以便确定要回到未来的哪个版本。</li>
+</ul>
+<hr>
+<h2 id="工作区和暂存区"><a href="#工作区和暂存区" class="headerlink" title="工作区和暂存区"></a>工作区和暂存区</h2><p><strong>暂存区</strong>是Git非常重要的概念<br>[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-hcAUgRih-1587607662307)(en-resource://database/1321:1)]</p>
+<hr>
+<h2 id="撤销修改"><a href="#撤销修改" class="headerlink" title="撤销修改"></a>撤销修改</h2><ol>
+<li>当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令<strong>git checkout – file</strong>。</li>
+<li>当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，<br>分两步，第一步用命令<strong>git reset HEAD <file></strong>，就回到了场景1，第二步按场景1操作。</li>
+<li>已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退一节，不过前提是没有推送到远程库。</li>
+</ol>
+<h1 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h1><h2 id="添加远程库"><a href="#添加远程库" class="headerlink" title="添加远程库"></a>添加远程库</h2><ul>
+<li><p>要关联一个远程库，使用命令</p>
+</li>
+<li><p><em>git remote add origin git@server-name:path/repo-name.git；*</em></p>
+</li>
+<li><p>关联后，使用命令<strong>git push -u origin master</strong>第一次推送master分支的所有内容；</p>
+</li>
+<li><p>此后，每次本地提交后，只要有必要，就可以使用命令<strong>git push origin master</strong>推送最新修改；</p>
+</li>
+</ul>
+<hr>
+<h2 id="从远程库克隆"><a href="#从远程库克隆" class="headerlink" title="从远程库克隆"></a>从远程库克隆</h2><ul>
+<li>git clone <a href="mailto:git@github.com">git@github.com</a>:Winter-XJTU/gitskills.git</li>
+</ul>
+<h1 id="分支管理"><a href="#分支管理" class="headerlink" title="分支管理"></a>分支管理</h1><h2 id="创建与合并分支"><a href="#创建与合并分支" class="headerlink" title="创建与合并分支"></a>创建与合并分支</h2><p>Git鼓励大量使用分支：</p>
+<ul>
+<li>查看分支：git branch</li>
+<li>创建分支：git branch <name></li>
+<li>切换分支：git checkout <name></li>
+<li>创建+切换分支：git checkout -b <name></li>
+<li>合并某分支到当前分支：git merge <name></li>
+<li>删除分支：git branch -d <name></li>
+</ul>
+<hr>
+<h2 id="解决冲突"><a href="#解决冲突" class="headerlink" title="解决冲突"></a>解决冲突</h2><p>当Git无法自动合并分支时，就必须首先解决冲突。<br>解决冲突后，再提交，合并完成。<br>解决冲突就是把Git合并失败的文件手动编辑为我们希望的内容，再提交。<br>用<strong>git log –graph</strong>命令可以看到分支合并图。</p>
+<ul>
+<li>分支策略<br>分支策略在实际开发中，我们应该按照几个基本原则进行分支管理：<br>首先，master分支应该是非常稳定的，也就是仅用来发布新版本，平时不能在上面干活；那在哪干活呢？干活都在dev分支上，也就是说，dev分支是不稳定的，到某个时候，比如1.0版本发布时，再把dev分支合并到master上，在master分支发布1.0版本；你和你的小伙伴们每个人都在dev分支上干活，每个人都有自己的分支，时不时地往dev分支上合并就可以了。</li>
+</ul>
+<p><strong>git merge –no-ff -m “merge with no ff” dev</strong><br>Git分支十分强大，在团队开发中应该充分应用。合并分支时，加上–no-ff参数就可以用普通模式合并，合并后的历史有分支，能看出来曾经做过合并，而fast forward合并就看不出来曾经做过合并。</p>
+<ul>
+<li>bug分支</li>
+</ul>
+<p>修复bug时，我们会通过创建新的bug分支进行修复，然后合并，最后删除；当手头工作没有完成时，先把工作现场git stash一下，然后去修复bug，修复后，再git stash pop，回到工作现场；在master分支上修复的bug，想要合并到当前dev分支，可以用git cherry-pick <commit>命令，把bug提交的修改“复制”到当前分支，避免重复劳动。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">168  vim hello.py</span><br><span class="line">170  git add hello.py</span><br><span class="line">171  git commit -m <span class="string">"hello.py"</span></span><br><span class="line">172  git stash</span><br><span class="line">//保留工作现场</span><br><span class="line"></span><br><span class="line">176  git checkout master</span><br><span class="line">177  git checkout -b issue</span><br><span class="line">179  vim readme.txt</span><br><span class="line">180  git add readme.txt</span><br><span class="line">181  git commit -m <span class="string">"fix bug"</span></span><br><span class="line">182  git checkout master</span><br><span class="line">183  git merge --no-ff -m <span class="string">"merge bug fix issue with no ff"</span> issue</span><br><span class="line">//修复bug并且合并到master</span><br><span class="line"></span><br><span class="line">186  git checkout dev</span><br><span class="line">190  git stash list</span><br><span class="line">191  git stash pop</span><br><span class="line">//恢复工作现场</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">201  git cherry-pick 891c0cf</span><br><span class="line">//在master分支上修复的bug，想要合并到当前dev分支</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="多人协作"><a href="#多人协作" class="headerlink" title="多人协作"></a>多人协作</h2><p>因此，多人协作的工作模式通常是这样：<br>首先，可以试图用git push origin <branch-name>推送自己的修改；<br>如果推送失败，则因为远程分支比你的本地更新，需要先用git pull试图合并；<br>如果合并有冲突，则解决冲突，并在本地提交；没有冲突或者解决掉冲突后，再用git push origin <branch-name>推送就能成功！如果git pull提示no tracking information，则说明本地分支和远程分支的链接关系没有创建，用命令git branch –set-upstream-to <branch-name> origin/<branch-name>。这就是多人协作的工作模式，一旦熟悉了，就非常简单。</p>
+<p>小结</p>
+<p>查看远程库信息，使用git remote -v；<br>本地新建的分支如果不推送到远程，对其他人就是不可见的；<br>从本地推送分支，使用git push origin branch-name，如果推送失败，先用git pull抓取远程的新提交；<br>在本地创建和远程分支对应的分支，使用git checkout -b branch-name origin/branch-name，本地和远程分支的名称最好一致；<br>建立本地分支和远程分支的关联，使用git branch –set-upstream branch-name origin/branch-name；<br>从远程抓取分支，使用git pull，如果有冲突，要先处理冲突。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Distributed%20System/%E4%BB%8EPaxos%E5%88%B0Zookeeper%20%E7%AC%AC%E5%9B%9B%E7%AB%A0%EF%BC%9AZookeeper%20%E4%B8%8E%20Paxos/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1034,273 +1281,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E5%8D%81%E4%B8%80%E7%AB%A0%EF%BC%9A%E6%89%A9%E5%B1%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="记录成长">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E5%8D%81%E4%B8%80%E7%AB%A0%EF%BC%9A%E6%89%A9%E5%B1%95/" class="post-title-link" itemprop="url">高性能MySQL第十一章：扩展</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：21:59:28" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%AB%98%E6%80%A7%E8%83%BDMySQL/" itemprop="url" rel="index"><span itemprop="name">高性能MySQL</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="向上扩展"><a href="#向上扩展" class="headerlink" title="向上扩展"></a>向上扩展</h1><p>加强服务器性能</p>
-<h1 id="向外扩展"><a href="#向外扩展" class="headerlink" title="向外扩展"></a>向外扩展</h1><ol>
-<li>按功能拆分</li>
-<li>数据分片：通用且成功</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E5%85%AD%E7%AB%A0%EF%BC%9A%E6%9F%A5%E8%AF%A2%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="记录成长">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E5%85%AD%E7%AB%A0%EF%BC%9A%E6%9F%A5%E8%AF%A2%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" class="post-title-link" itemprop="url">高性能MySQL第六章：查询性能优化</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：21:59:23" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%AB%98%E6%80%A7%E8%83%BDMySQL/" itemprop="url" rel="index"><span itemprop="name">高性能MySQL</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="为什么查询速度会慢？"><a href="#为什么查询速度会慢？" class="headerlink" title="为什么查询速度会慢？"></a>为什么查询速度会慢？</h2><ul>
-<li><p>查询的生命周期</p>
-<p>查询的生命周期，从客户端，到服务器，然后在服务器上进行解析，生成执行计划，执行，并返回结果给客户端。执行是查询生命周期最重要的阶段，这其中包括了大量为了检索数据到存储引擎的调用以及调用后的数据处理，包括排序、分组等等。</p>
-</li>
-</ul>
-<h2 id="慢查询基础：优化数据访问"><a href="#慢查询基础：优化数据访问" class="headerlink" title="慢查询基础：优化数据访问"></a>慢查询基础：优化数据访问</h2><ul>
-<li>分析步骤</li>
-</ul>
-<ol>
-<li><p>确认应用程序是否在检索大量超过需要的数据。这通常意味着访问了太多的行，但有时候也是可能访问了太多的列</p>
-</li>
-<li><p>确认MySQL服务器层是否在分析大量超过需要的数据行</p>
-</li>
-</ol>
-<h3 id="是否向数据库请求了不需要的数据"><a href="#是否向数据库请求了不需要的数据" class="headerlink" title="是否向数据库请求了不需要的数据"></a>是否向数据库请求了不需要的数据</h3><ol>
-<li>查询不需要的记录（加上limit）</li>
-<li>多表关联时返回全部列（查询涉及三张表的时候，使用select *）</li>
-<li>总是取出全部列（无法使用索引覆盖扫描，慎用select*）</li>
-<li>重复查询相同的数据（缓存）</li>
-</ol>
-<h3 id="MySQL是否在扫描额外的记录"><a href="#MySQL是否在扫描额外的记录" class="headerlink" title="MySQL是否在扫描额外的记录"></a>MySQL是否在扫描额外的记录</h3><ul>
-<li><strong>衡量查询开销的三个指标：</strong></li>
-</ul>
-<ol>
-<li><p>响应时间：</p>
-<ul>
-<li>服务时间是指数据库处理这个查询花了多少时间</li>
-<li>排队时间是指服务器因为等待某些资源而没有真正执行查询的时间。可能是等I/O操作完成，等行锁</li>
-</ul>
-</li>
-<li><p>扫描的行数：</p>
-</li>
-<li><p>返回的行数：</p>
-</li>
-</ol>
-<p>这三个指标都会存放在MySQL的慢日志中，所以检查慢日志记录是找出扫描行数过多的查询的好办法。</p>
-<ul>
-<li><strong>访问类型：</strong></li>
-</ul>
-<p>全表扫描，索引扫描，范围扫描，唯一索引查询，常数引用</p>
-<ul>
-<li><strong>MySQL 应用 where ：</strong></li>
-</ul>
-<ol>
-<li>在索引中使用 where 条件来过滤不匹配的记录。在存储引擎层完成的。</li>
-<li>使用索引扫描(在 Extra 列中出现了 Using Index )来返回记录，直接从索引中过滤不需要的记录并返回命中结果。这是在 MySQL 服务器层完成的，但无须回表查询记录</li>
-<li>在数据表中返回数据，然后过滤不满足条件的记录(在 Extra 列中出现 Using Where)。这是在 MySQL 服务器层完成，MySQL 需要先从数据表读出记录然后过滤</li>
-</ol>
-<h2 id="重构查询的方式"><a href="#重构查询的方式" class="headerlink" title="重构查询的方式"></a>重构查询的方式</h2><ul>
-<li><p><strong>一个复杂的查询还是多个简单的查询</strong></p>
-</li>
-<li><p><strong>切分查询：</strong>大查询切分成小查询，每个查询功能完全一样，每次只完成一小部分</p>
-</li>
-<li><p><strong>分解关联查询：</strong></p>
-</li>
-</ul>
-<ol>
-<li><p>对每一个表进行一次单表查询，然后将结果在应用程序中进行关联</p>
-</li>
-<li><p>让缓存的效率更高  </p>
-</li>
-<li><p>将查询分解后，执行单个查询可以减少锁的竞争</p>
-</li>
-<li><p>在应用层做关联，可以更容易对数据库进行拆分，更容易做到高性能和可扩展</p>
-</li>
-</ol>
-<h2 id="查询执行的基础"><a href="#查询执行的基础" class="headerlink" title="查询执行的基础"></a>查询执行的基础</h2><ol>
-<li><p>客服端发送一条查询给服务器</p>
-</li>
-<li><p>服务器先检查查询缓存，如果命中缓存，则立即返回</p>
-</li>
-<li><p>服务器端进行SQL解析，预处理，再由优化器生成对应的执行计划</p>
-</li>
-<li><p>MySQL根据优化器生成的执行计划，调用存储引擎的API来执行查询</p>
-</li>
-<li><p>返回结果给客户端</p>
-</li>
-</ol>
-<h3 id="MySQL客户端-服务端通信协议：半双工"><a href="#MySQL客户端-服务端通信协议：半双工" class="headerlink" title="MySQL客户端/服务端通信协议：半双工"></a>MySQL客户端/服务端通信协议：半双工</h3><h3 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h3><h3 id="查询优化处理"><a href="#查询优化处理" class="headerlink" title="查询优化处理"></a>查询优化处理</h3><ol>
-<li><p>语法解析器和预处理：生成“解析树”并验证解析树是否合法，验证权限</p>
-</li>
-<li><p>查询优化器：基于成本的优化器</p>
-</li>
-<li><p>数据和索引统计信息：统计信息在存储引擎层，服务器层在执行查询优化的时候需要调用api</p>
-</li>
-<li><p>MySQL如何执行关联查询：嵌套循环关联操作</p>
-<ul>
-<li>MySQL先在一个表中循环取出单条数据，然后再嵌套循环到下一个表中寻找匹配的行，依次下去，直到找到所有表中匹配的行为止。然后根据各个表匹配的行，返回查询中需要的列。<ul>
-<li>如果是左外连接，取出单条数据遍历下一个表的时候，如果没有匹配，则输出当前行+NULL</li>
-<li>右连接改正等价的左外连接</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>执行计划：生成一颗查询的指令树</p>
-</li>
-<li><p>关联查询优化器：</p>
-</li>
-<li><p>排序优化：</p>
-<ul>
-<li><p>如果需要排序的数据量小于“排序缓冲区”，MySQL使用内存进行“快排”。如果内存不够，MySQL先将数据分块，每个独立的块使用快排然后刷到磁盘上，最后将各个排好序的块合并。</p>
-</li>
-<li><p>排序算法：</p>
-<ul>
-<li><p>两次传输排序：读取行指针和需要排序的字段，对其进行排序，然后根据排序结果读取所需要的数据行。优点是排序的时候存储尽可能少的数据，缺点是第二次数据传输的时候又大量的随机I/O</p>
-</li>
-<li><p>单次传输排序：先读取查询所需要的所有的列，然后再根据给定列进行排序，最后直接返回结果</p>
-</li>
-</ul>
-</li>
-<li><p>关联查询的时候如果需要排序：</p>
-<ul>
-<li>orderBy 子句中的所有列全部来自关联的第一个表，那么 MySQL 在关联处理第一个表时就进行文件排序。Extra：Using filesort</li>
-<li>除此之外，MySQL 都会将关联的结果存放在一个临时表中，在所有的关联都结束的时候，再进行文件排序。Extra：Using temporary；Using filesort</li>
-<li>有limit，也会对全量数据排序，然后返回较少的数据（5.6版本之后，对这个有优化，不再是全量数据排序）</li>
-</ul>
-</li>
-</ul>
-</li>
-</ol>
-<h3 id="查询执行引擎"><a href="#查询执行引擎" class="headerlink" title="查询执行引擎"></a>查询执行引擎</h3><ul>
-<li>解析和优化阶段，MySQL生成对应的执行计划(数据结构)</li>
-<li>查询中的每个表有一个handler的实例表示，存储引擎的接口称为handler API</li>
-</ul>
-<h3 id="返回结果给客户端：TCP"><a href="#返回结果给客户端：TCP" class="headerlink" title="返回结果给客户端：TCP"></a>返回结果给客户端：TCP</h3>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1368,7 +1352,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-count">41</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
