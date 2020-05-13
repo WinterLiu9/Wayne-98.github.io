@@ -3963,7 +3963,7 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
       </tags>
   </entry>
   <entry>
-    <title>Algorithms/May/剑指Offer复习</title>
+    <title>剑指Offer复习</title>
     <url>/2020/05/13/Algorithms/May/%E5%89%91%E6%8C%87Offer%E5%A4%8D%E4%B9%A0/</url>
     <content><![CDATA[<h2 id="栈"><a href="#栈" class="headerlink" title="栈"></a>栈</h2><ol>
 <li><a href="https://leetcode-cn.com/problems/yong-liang-ge-zhan-shi-xian-dui-lie-lcof/" target="_blank" rel="noopener">用两个栈实现队列</a></li>
@@ -3991,5 +3991,11 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MaxQueue</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    LinkedList&lt;Integer&gt; list;</span><br><span class="line">    LinkedList&lt;Integer&gt; maxList;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MaxQueue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        list = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        maxList = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">max_value</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(maxList.size() == <span class="number">0</span>) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> maxList.peekFirst();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">push_back</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">        list.offerLast(value);</span><br><span class="line">        <span class="keyword">while</span>(maxList.size() &gt; <span class="number">0</span> &amp;&amp; value &gt; maxList.peekLast())</span><br><span class="line">            maxList.pollLast();</span><br><span class="line">        maxList.offerLast(value);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">pop_front</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(list.size() == <span class="number">0</span>) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> t = list.pollFirst();</span><br><span class="line">        <span class="keyword">if</span>(t == maxList.peekFirst()) maxList.pollFirst();</span><br><span class="line">        <span class="keyword">return</span> t;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 ]]></content>
+      <categories>
+        <category>Algorithms</category>
+      </categories>
+      <tags>
+        <tag>Algorithms</tag>
+      </tags>
   </entry>
 </search>
