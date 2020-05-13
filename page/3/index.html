@@ -163,6 +163,270 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Internet/TCP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="记录成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Internet/TCP/" class="post-title-link" itemprop="url">TCP</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-13 11:43:30" itemprop="dateModified" datetime="2020-05-13T11:43:30+08:00">2020-05-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="TCP连接"><a href="#TCP连接" class="headerlink" title="TCP连接"></a>TCP连接</h2><p><strong>TCP连接的组成</strong><br>    一台主机上的缓存、变量和与进程连接的套接字 ，以及另一台主机上的另一组缓存、变量和与进程连接的套接字。</p>
+<ul>
+<li><strong>最大报文段长度</strong><br>TCP可以从缓存中取出并放入报文段中的数据数量受限于最大报文段长度(Maximum Segment Size)。MSS通常根据最初确定的由本地发送主机发送的最大链路层帧长度（Maximum Transmission Unit, MTU）来设置。</li>
+</ul>
+<hr>
+<h2 id="TCP报文段结构"><a href="#TCP报文段结构" class="headerlink" title="TCP报文段结构"></a>TCP报文段结构</h2><ul>
+<li>16比特的<strong>源端口号</strong>和<strong>目的端口号</strong></li>
+<li>16比特的<strong>校验和</strong>字段</li>
+<li>32比特的<strong>序号</strong>字段和<strong>确认号</strong>字段</li>
+<li>16比特的<strong>接收窗口</strong>字段</li>
+<li>4比特<strong>首部长度</strong>字段</li>
+<li>可选与变长的<strong>选项</strong>字段</li>
+<li>6比特的<strong>标志</strong>字段，ACK，RST，SYN，FIN</li>
+</ul>
+<ol>
+<li><p><strong>序号和确认号</strong></p>
+<p>TCP把数据看成一个无结构的、有序的字节流。序号是建立在传送的字节流上，而不是建立在传送的报文段的序列之上。<strong>一个报文段的序号</strong>因此是该报文段首字节的字节流编号。<br>确认号：A填充进报文段的确认号是主机A期望从主机B收到的下一个字节的序号。</p>
+<p>TCP只确认该流中至第一个丢失字节为止的字节，所以TCP被称为提供<strong>累计确认</strong>。</p>
+<p>接收方保留失序的字节，并等待缺少的字节以填补该间隔。</p>
+</li>
+<li><p><strong>往返时间的估计与超时</strong></p>
+</li>
+</ol>
+<p>EstimatedRTT = (1-a)EstimatedRTT + a * SampleRTT<br>            （a一般取0.125）SampleRTT的均值</p>
+<p>DevRTT = (1-b) * DevRTT + b * | SampleRTT - EstimatedRTT|<br>            （b一般取0.25）</p>
+<p>TimeoutInterval = EstimatedRTT +　４ * DevRTT<br>    （要求将超时间隔设为EstimatedRTT加上一定余量，当波动较大的时候，这个余量应该大一点）</p>
+<h2 id="可靠数据传输"><a href="#可靠数据传输" class="headerlink" title="可靠数据传输"></a>可靠数据传输</h2><p><strong>TCP发送方有3个与发送和重传有关的主要事件：</strong><br>       1. 从上层应用程序接收数据，将数据封装在一个报文段中，并把该报文段交给IP<br>       2. 当报文段被传给IP时，TCP就启动该定时器。（将定时器想象为与最早的未被确认的报文段相关联的）<br>       3. 来自接收方的确认报文段(ACK)。TCP将ACK的值y与它的变量SendBase进行比较(SendBase是最早未被确认的字节的序号，因此SendBase-1是指接收方已正确按序接收到的数据的最后一个字节的序号)。<br>           TCP采用累计确认，所以y确认了编号在y之前的所有字节都已经收到。</p>
+<p><strong>TCP接收方产生ACK：</strong></p>
+<ol>
+<li>具有所期望序号的按序报文段到达。所有在期望序号以及以前的数据都已经被确认。<ul>
+<li>延迟的ACK。对另一个按序报文段的到达最多等待500ms。如果下一个按序报文段在这个时间间隔内没有到达，则发送一个ACK</li>
+</ul>
+</li>
+<li>具有所期望序号的按序报文段到达。另一个按序报文段等待ACK传输。<ul>
+<li>立即发送单个累积ACK，以确认两个按序报文段</li>
+</ul>
+</li>
+<li>比期望序号大的失序报文段到达。检测出间隔 <ul>
+<li>立即发送冗余ACK，指示下一个期待字节的序号</li>
+</ul>
+</li>
+<li>能部分或者完全填充接收数据间隔的报文段到达<ul>
+<li>倘若该报文段起始于间隔的低端，则立即发送ACK</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><strong>超时间隔加倍</strong><br>TCP重传时都会将下一次的时间间隔设为先前值的两倍，而不是用从EstimateRTT和DevRTT推算出的值。提供了一个形式受限的拥塞控制</li>
+<li><strong>快速重传</strong></li>
+</ul>
+<p>超时触发重传存在的问题之一是超时周期可能相对较长，增加了端到端时延。幸运的是，发送方通常可在超时事件发生之前通过注意所谓冗余 ACK 来较好的检测到丢包情况。</p>
+<p>一旦收到3个冗余ACK，TCP 就执行快速重传，即在该报文段的定时器过期之前重传丢失的报文段。</p>
+<ul>
+<li><strong>是回退N步还是选择重传</strong></li>
+</ul>
+<p>TCP确认是累积的，正确接收但失序的报文段是不会被接收方逐个确认的。</p>
+<p>TCP发送方仅需维持已发送过但未被确认的字节的最小序号(SendBase)和下一个要发送的字节的序号(NextSeqNum)</p>
+<p>选择确认允许TCP接收方有选择的确认失序报文段，而不是累积地确认最后一个正确接收的有序报文段。</p>
+<p>TCP的差错恢复机制也是最好被分类为GBN协议与SR协议的混合体。</p>
+<h2 id="流量控制"><a href="#流量控制" class="headerlink" title="流量控制"></a>流量控制</h2><p><strong>流量控制</strong>用以消除发送方使接收方缓存溢出的可能性。TCP通过让发送方维护一个称为<strong>接受窗口</strong>的变量来提供流量控制。</p>
+<p>TCP发送方也可能因为IP网络的拥塞而被遏制，这种形式的发送方的控制被称为<strong>拥塞控制</strong>。</p>
+<p>LastByteSent - LastByteAcked &lt;= rwnd<br>rwnd = RcvBuffer - [LastByteRcvd - LastByteRead]</p>
+<p>LastByteSent - LastByteAcked &lt;= rwnd<br>主机A发送到连接中但未被确认的数据量小于等于主机B的缓存允许接收的数据量。</p>
+<h2 id="TCP-连接管理"><a href="#TCP-连接管理" class="headerlink" title="TCP 连接管理"></a>TCP 连接管理</h2><ul>
+<li><strong>三次握手</strong> <ol>
+<li>发送SYN(Synchronize Sequence Numbers)报文段(报文段的首部中的SYN标志位被置为1，此外客户会随机选择一个初始序号，放在序号字段中)。</li>
+<li>服务器提取出TCP SYN报文段，向该客户发送允许连接报文段。SYNACK报文段：这个报文段首部包含3个重要信息：SYN置为1，确认号字段被置为client_isn +１，服务器自己的初始序号。</li>
+<li>收到SYNACK报文段后，客户也要给该连接分配缓存和变量。 发送报文段，此TCP报文段的首部的确认字段的序号为server_isn + 1，SYN被置为0，可以携带客户到服务器的数据。服务器收到客户端的确认后，连接建立。</li>
+</ol>
+</li>
+<li><strong>三次握手的原因</strong> </li>
+</ul>
+<p>第三次握手是为了防止失效的连接请求到达服务器，让服务器错误打开连接。</p>
+<p>客户端发送的连接请求如果在网络中滞留，那么就会隔很长一段时间才能收到服务器端发回的连接确认。客户端等待一个超时重传时间之后，就会重新请求连接。但是这个滞留的连接请求最后还是会到达服务器，如果不进行三次握手，那么服务器就会打开两个连接。如果有第三次握手，客户端会忽略服务器之后发送的对滞留连接请求的连接确认，不进行第三次握手，因此就不会再次打开连接。</p>
+<ul>
+<li><strong>四次挥手</strong><ol>
+<li>客户应用进程发送一个特殊的报文段，其首部的FIN(finish)标志位被置为1</li>
+<li>服务器收到后回送一个ACK报文段，此时 TCP 属于半关闭状态，服务器能向客户端发送数据但是客户端不能向服务器发送数据。</li>
+<li>当服务器不再需要连接时，服务器发送它自己的终止报文段，其首部的FIN标志位也被置为1</li>
+<li>该客户对这个服务器的终止报文段进行确认。此时两台主机上用于该连接的所有资源都被释放了。</li>
+</ol>
+</li>
+<li><strong>四次挥手的原因</strong></li>
+</ul>
+<p>客户端发送了 FIN 连接释放报文之后，服务器收到了这个报文，就进入了 CLOSE-WAIT 状态。这个状态是为了让服务器端发送还未传送完毕的数据，传送完毕之后，服务器会发送 FIN 连接释放报文。</p>
+<ul>
+<li><strong>TIME_WAIT</strong></li>
+</ul>
+<p>客户端接收到服务器端的 FIN 报文后进入此状态，此时并不是直接进入 CLOSED 状态，还需要等待一个时间计时器<br>设置的时间 2MSL。这么做有两个理由：<br>       1. 确保最后一个确认报文能够到达。如果 B 没收到 A 发送来的确认报文，那么就会重新发送连接释放请求报文，A 等待一段时间就是为了处理这种情况的发生。<br>       2. 等待一段时间是为了让本连接持续时间内所产生的所有报文都从网络中消失，使得下一个新的连接不会出现旧的连接请求报文。</p>
+<ul>
+<li><strong>客户TCP经历的典型的TCP状态序列</strong></li>
+</ul>
+<p>建立：</p>
+<ol>
+<li>客户 TCP 开始时处于 CLOSE 状态</li>
+<li>发送 SYN 报文段后，进入 SYN_SENT 状态。然后等待服务器 TCP 的对客户所发报文段进行确认且 SYN 比特置为 1 的一个报文段</li>
+<li>收到来自服务器的确认后，客户 TCP 进入 ESTABLISHED 状态。TCP 客户就能发送和接收包含有效荷载数据的TCP报文段了</li>
+</ol>
+<p>拆除：</p>
+<ol>
+<li>客户 TCP 发送一个带有FIN比特被置为 1 的 TCP 报文段，并进入 FIN_WAIT_1 状态。客户 TCP 等待一个来自服务器的带有确认的 TCP 报文段。</li>
+<li>收到来自服务器的确认后，客户 TCP 进入 FIN_WAIT_2 状态。客户等待来自服务器的 FIN 比特被置为1的另一个报文段</li>
+<li>收到服务器的 FIN 比特被置为 1 的报文段后，客户 TCP 对服务器的报文段进行确认，然后进去 TIME_WAIT 状态。(假定 ACK 丢失，TIME_WAIT 状态使 TCP 客户重传最后的确认报文)</li>
+</ol>
+<ul>
+<li><strong>SYN洪泛攻击</strong></li>
+</ul>
+<p>SYN cookie</p>
+<ul>
+<li>服务器收到一个 SYN 报文段时，并不会立即生成一个半开连接，而是生成一个初始 TCP 序列号，该序列号是 SYN 报文段的源和目的 IP 地址与端口号以及仅有该服务器知道的秘密数的一个复杂函数。这种精心制作的初试序列号被称为 cookie。服务器并不记忆该 cookie 或任何对应于 SYN 的其他状态信息。</li>
+<li>如果客户合法，返回一个 ACK 报文段，这个合法的 ACK ，在确认字段中的值等于在 SYNACK 字段(此时为 cookie 的值)中的值 + 1 .</li>
+</ul>
+<h2 id="拥塞控制原理"><a href="#拥塞控制原理" class="headerlink" title="拥塞控制原理"></a>拥塞控制原理</h2><ul>
+<li><strong>拥塞网络的代价：</strong></li>
+</ul>
+<ol>
+<li>分组的到达速率接近链路容量时，分组经历巨大的排队时延。</li>
+<li>发送方必须执行重传以补偿因为缓存溢出而丢弃(丢失)的分组。</li>
+<li>发送方在遇到大时延时所进行的不必要的重传会引起路由器利用其链路带宽来转发不必要的副本。</li>
+<li>当一个分组沿一条路径被丢弃时，每个上游路由器用于转发该分组到丢弃该分组而使用的传输容量最终被浪费掉了。</li>
+</ol>
+<ul>
+<li><strong>拥塞控制方法</strong>：</li>
+</ul>
+<ol>
+<li>端到端拥塞控制：网络层没有为运输层拥塞控制提供显示支持，端系统通过对网络行为的观察(如分组丢失与时延)来推断之</li>
+<li>网络辅助的拥塞控制：路由器向发送方提供关于网络中拥塞状态的显示反馈信息。ATM可用比特率拥塞控制中，路由器显示的通知发送方它能在输出链路上支持的最大主机发送速率。<ul>
+<li>网络辅助的拥塞控制有两种方式：<ul>
+<li>直接网络反馈：由网络路由器发给发送方。（通常采用一种阻塞分组的形式）</li>
+<li>路由器标记或更新从发送方流向接受方的分组中的某个字段来指示拥塞的产生。（更为通用，但是要经过一个RTT）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="TCP拥塞控制"><a href="#TCP拥塞控制" class="headerlink" title="TCP拥塞控制"></a>TCP拥塞控制</h2><ul>
+<li><strong>TCP发送方如何限制它向其连接发送流量的速率呢？</strong></li>
+</ul>
+<p>TCP拥塞控制机制跟踪一个额外的变量，<strong>拥塞窗口cwnd</strong></p>
+<p>LastByteSent - LastByteAcked &lt;=min｛cwnd,rwnd｝</p>
+<p>通过限制了发送方中未被确认的数据量，间接的限制了发送方的发送速率。</p>
+<ul>
+<li><strong>TCP发送方如何感知它到目的地之间的路径上存在拥塞的呢？</strong></li>
+</ul>
+<p>“丢包事件”：超时事件和收到三个冗余的ACK。</p>
+<p>因为TCP使用确认来触发增大它的拥塞窗口长度，TCP被称做自计时的。</p>
+<ul>
+<li><strong>TCP发送方怎样确定它应当发送的速率呢？</strong></li>
+</ul>
+<ol>
+<li>一个丢失的报文段意味着拥塞，因此当丢失报文段时应当降低TCP发送方的速率。</li>
+<li>一个确认的报文段指示该网络正在向接受方交付发送方的报文段，因此，当对先前未确认报文段的确认到达时，能够增加发送方的速率。</li>
+<li>带宽探测，除非出现丢包才减慢速率，不然会一直加快。</li>
+</ol>
+<ul>
+<li><p><strong>TCP拥塞控制算法</strong></p>
+</li>
+<li><p><strong>慢启动</strong></p>
+</li>
+</ul>
+<ol>
+<li>初始cwnd设置为一个MSS，当该确认到达时，TCP将以指数形式增大拥塞窗口。</li>
+<li>何时结束指数增长：        <ul>
+<li>当出现由超时指示的丢包事件 TCP发送方将cwnd设置为1，并重新开始慢启动，并且将ssthresh(<strong>慢启动阈值</strong>)设置为cwnd/2。</li>
+<li>当cwnd到达或者超过ssthresh的值时，结束慢启动并且TCP转移到拥塞避免模式。</li>
+<li>当检测到3个冗余ACK，这时TCP将执行一种快速重传并进入快速恢复状态。</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><strong>拥塞避免</strong></li>
+</ul>
+<ol>
+<li>每个RTT只将cwnd的值增加一个MSS，发送方无论何时到达一个新的确认，就将cwnd增加一个MSS字节。</li>
+</ol>
+<ul>
+<li><strong>快速重传</strong></li>
+</ul>
+<ol>
+<li>把ssthresh设置为cwnd的一半 </li>
+<li>把cwnd再设置为ssthresh的值(具体实现有些为ssthresh+3) </li>
+<li>重新进入拥塞避免阶段。</li>
+</ol>
+<ul>
+<li><strong>快速恢复</strong></li>
+</ul>
+<ol>
+<li>收到3个重复ACK时，把ssthresh设置为cwnd的一半，把cwnd设置为ssthresh的值加3，然后重传丢失的报文段，加3的原因是因为收到3个重复的ACK，表明有3个“老”的数据包离开了网络。</li>
+<li>再收到重复的ACK时，拥塞窗口增加1。</li>
+<li>当收到新的数据包的ACK时，把cwnd设置为第一步中的ssthresh的值。原因是因为该ACK确认了新的数据，说明从重复ACK时的数据都已收到，该恢复过程已经结束，可以回到恢复之前的状态了，也即再次进入拥塞避免状态。</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Internet/HTTP/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1301,91 +1565,6 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Database/SQL/sql%20%E7%AC%94%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="记录成长">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Database/SQL/sql%20%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">SQL 语句</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:00:39" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/SQL/" itemprop="url" rel="index"><span itemprop="name">SQL</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 获取 Employee 表中第 n 高的薪水（Salary）</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">FUNCTION</span> getNthHighestSalary(N <span class="built_in">INT</span>) <span class="keyword">RETURNS</span> <span class="built_in">INT</span></span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">    <span class="keyword">set</span> n = N - <span class="number">1</span>;</span><br><span class="line">  RETURN (</span><br><span class="line">      <span class="comment"># Write your MySQL query statement below.</span></span><br><span class="line">            <span class="keyword">select</span> <span class="keyword">ifnull</span>( <span class="comment"># 如果第一个值为 null，则返回第二个值</span></span><br><span class="line">            (</span><br><span class="line">              <span class="keyword">select</span> <span class="keyword">distinct</span> salary </span><br><span class="line">              <span class="keyword">from</span> employee </span><br><span class="line">              <span class="keyword">order</span> <span class="keyword">by</span> salary <span class="keyword">desc</span></span><br><span class="line">               <span class="keyword">limit</span> n, <span class="number">1</span> <span class="comment"># 从第 n 行开始，返回一行数据</span></span><br><span class="line">            ), <span class="literal">null</span>)</span><br><span class="line">  );</span><br><span class="line"><span class="keyword">END</span></span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> Score, </span><br><span class="line">       <span class="keyword">dense_rank</span>() <span class="keyword">over</span>(<span class="keyword">order</span> <span class="keyword">by</span> score <span class="keyword">desc</span>) <span class="keyword">as</span> <span class="string">'Rank'</span></span><br><span class="line"><span class="keyword">from</span> Scores;</span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> Email</span><br><span class="line"><span class="keyword">from</span> person</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> Email</span><br><span class="line"><span class="keyword">having</span> <span class="keyword">count</span>(Email) &gt; <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="string">'Name'</span> <span class="keyword">as</span> Customers</span><br><span class="line"><span class="keyword">from</span> Customers a <span class="keyword">left</span> <span class="keyword">join</span> Orders b <span class="keyword">on</span> a.id = b.CustomerId <span class="keyword">where</span> b.id <span class="keyword">is</span> <span class="literal">null</span>;</span><br><span class="line"><span class="comment"># 要判断一个数是否等于NULL只能用 IS NULL 或者 IS NOT NULL 来判断</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> <span class="keyword">Name</span> <span class="keyword">as</span> Customers</span><br><span class="line"><span class="keyword">from</span> Customers</span><br><span class="line"><span class="keyword">where</span> <span class="keyword">id</span> <span class="keyword">not</span> <span class="keyword">in</span> (</span><br><span class="line">    <span class="keyword">select</span> <span class="keyword">distinct</span> CustomerId </span><br><span class="line">    <span class="keyword">from</span> orders</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span> p1</span><br><span class="line"><span class="keyword">from</span> (person p1 <span class="keyword">left</span> <span class="keyword">join</span> person p2 <span class="keyword">on</span> p1.email = p2.email )</span><br><span class="line"><span class="keyword">where</span> p1.id &gt; p2.id;</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1457,7 +1636,7 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-count">43</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

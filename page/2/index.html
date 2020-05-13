@@ -163,6 +163,293 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%B8%89%E9%83%A8%E5%88%86%EF%BC%9A%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%A7%E8%A1%8C%E5%AD%90%E7%B3%BB%E7%BB%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="记录成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%B8%89%E9%83%A8%E5%88%86%EF%BC%9A%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%A7%E8%A1%8C%E5%AD%90%E7%B3%BB%E7%BB%9F/" class="post-title-link" itemprop="url">深入理解Java虚拟机第三部分：虚拟机执行子系统</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:13:45" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="类文件结构"><a href="#类文件结构" class="headerlink" title="类文件结构"></a>类文件结构</h1><h2 id="无关系的基石"><a href="#无关系的基石" class="headerlink" title="无关系的基石"></a>无关系的基石</h2><p>实现语言无关性的基石是<strong>虚拟机</strong>和<strong>字节码存储格式</strong>。 Java 虚拟机不与任何包括 Java 在内的语言绑定，它只与“ Class 文件”这种特定的二进制文件格式所关联，Class 文件中包含了 Java 虚拟机指令集和符号表以及若干其他辅助信息。</p>
+<h2 id="Class类文件的结构"><a href="#Class类文件的结构" class="headerlink" title="Class类文件的结构"></a>Class类文件的结构</h2><p>Class文件是一组以8字节为基础单位的<strong>二进制流</strong>。// 包括但不限于磁盘文件、网络、数据库、内存或者动态产生等。</p>
+<p>Class文件格式采用一种类似于C语言结构体的伪结构来存储数据，这种伪结构中只有两种数据类型：</p>
+<ul>
+<li>无符号数：基本的数据类型，1,2,4,8个字节，可以用来描述数字、索引引用、数量值或者UTF-8编码构成字符串值。</li>
+<li>表：表是由多个无符号数或者其他表作为数据项构成的复合结构，习惯性地以“_info”结尾。表用于描述有层次关系的复合结构的数据，整个 Class 文件本质上就是一张表。</li>
+</ul>
+<h3 id="魔数和Class文件的版本"><a href="#魔数和Class文件的版本" class="headerlink" title="魔数和Class文件的版本"></a>魔数和Class文件的版本</h3><p>Class 文件的头四个字节称为 Magic Number，它的唯一的作用就是确定这个文件是否是一个能被虚拟机接收的Class 文件(类似于文件后缀的作用)。0xCAFEBABY</p>
+<p>紧接着魔数的4个字节存储的是 Class 文件的版本号，前两个字节是次版本，后两个是主版本。</p>
+<h3 id="常量池"><a href="#常量池" class="headerlink" title="常量池"></a>常量池</h3><p>主次版本号之后的是常量池入口，可以理解为 Class 文件之中的资源仓库，它是 Class 文件结构中与其他项目关联最多的数据类型，也是占用 Class 文件空间最大的数据项目之一，也是 Class 文件中第一个出现的表类型数据项目。</p>
+<p>常量池主要存放两大类常量：<strong>字面量</strong> (Literal) 和<strong>符号引用</strong> (Symbolic References)</p>
+<ul>
+<li><p>字面量接近于Java语言层面的常量概念，如文本字符串、声明为 final 的常量值。</p>
+</li>
+<li><p>符号引用则属于编译原理方面的概念：</p>
+<ul>
+<li>类和接口的全限定名</li>
+<li>字段的名称和描述符</li>
+<li>方法的名称和描述符</li>
+</ul>
+</li>
+</ul>
+<p>常量池的入口需要放置一项 u2 类型的数据，代表常量池容量计数值（constant_pool_count）。与Java中语言习惯不同，这个容量计数是从1而不是0开始的，这样做的目的在于，如果后面某些指向常量池的索引值的数据在特定情况下需要表达“不引用任何一个常量池项目”的含义，可以把索引值设置为0来表示。</p>
+<p>常量池中每一项常量都是一个表，截止 JDK13 常量表中分别有17种不同类型的常量，他们的表结构起始的第一位是个 u1 类型的标志位，代表着当前常量属于哪种常量类型。</p>
+<p>例如  u1 类型的标志位中为7，可知这个常量属于 CONSTANT_Class_info 类型，此类型的常量代表一个类或者接口的符号引用。他的结构为一个 u1 类型的 tag 和一个 u2 类型的 name_index。tag是标志位，它用于区分常量类型；name_index 是常量池的索引值，它指向常量池中一个 CONSTANT_Utf8_info 类型常量，此常量代表了这个类（或者接口）的全限定名。</p>
+<h3 id="访问标志"><a href="#访问标志" class="headerlink" title="访问标志"></a>访问标志</h3><p>在常量池结束之后，紧接着的2个字节代表访问标志（access_flags），这个标志用于识别一些类或者接口层次的访问信息，包括：这个 Class 是类还是接口；是否定义为 public 类型；是否定义为 abstract 类型；如果是类的话，是否被声明为 final 等</p>
+<h3 id="类索引、父类索引、接口索引集合"><a href="#类索引、父类索引、接口索引集合" class="headerlink" title="类索引、父类索引、接口索引集合"></a>类索引、父类索引、接口索引集合</h3><p>类索引和父类索引都是一个u2类型的数据，接口索引集合是一组u2类型的数据，Class文件中由这三项数据来确定该类型的继承关系。</p>
+<p>u2类型的数据指向一个CONSTANT_Class_info的类描述符常量，通过常量中的索引值可以找到定义在CONSTANT_Utf8_info类型的常量中的全限定名字符串。</p>
+<h3 id="字段表集合"><a href="#字段表集合" class="headerlink" title="字段表集合"></a>字段表集合</h3><p>字段表（field_info）用于描述接口或者类中声明的变量，包括类级变量以及实例变量，但是不包括方法内部声明的局部变量。</p>
+<p>字段表结构：依次包括访问标志（access_flags）、名称索引（name_index）、描述符索引（descriptor_index）、属性表集合（attributes）几项。</p>
+<p>字段可以包括的修饰符有字段的作用域（public、private、protected修饰符）、是实例变量还是类变量（static修饰符）、可变性（final）、并发可见性（volatile修饰符，是否强制从主内存读写）、可否被序列化（transient修饰符）、字段数据类型（基本类型、对象、数组）、字段名称。上述这些信息中，各个修饰符都是布尔值，要么有某个修饰符，要么没有，很适合使用标志位来表示。</p>
+<p>而字段叫做什么名字、字段被定义为什么数据类型，这些都是无法固定的，只能引用常量池中的常量来描述。</p>
+<ul>
+<li>全限定名，“org/fenixsoft/clazz/TestClass”</li>
+<li>简单名称(name_index)则就是指没有类型和参数修饰的方法或者字段名称，这个类中的inc()方法和m字段的简单名称分别就是“inc”和“m”。</li>
+<li>方法和字段的描述符：作用是用来描述字段的数据类型、方法的参数列表（包括数量、类型以及顺序）和返回值</li>
+</ul>
+<p>字段表所包含的固定数据项目到 descriptor_index 为止就全部结束了，不过在 descriptor_index 之后跟随着一个属性表集合，用于存储一些额外的信息，字段表可以在属性表中附加描述零至多项的额外信息。(ConstantValue)</p>
+<h3 id="方法表集合"><a href="#方法表集合" class="headerlink" title="方法表集合"></a>方法表集合</h3><p>结构和字段表几乎完全一致。</p>
+<p>方法里的 Java 代码，经过 Javac 编译器编译成字节码指令之后，存放在方法属性表集合中一个名为 “Code” 的属性里面。</p>
+<p>父类方法在子类中没有被重写，方法表集合中就不会出现来自父类的方法信息。</p>
+<h3 id="属性表集合"><a href="#属性表集合" class="headerlink" title="属性表集合"></a>属性表集合</h3><h2 id="字节码指令简介"><a href="#字节码指令简介" class="headerlink" title="字节码指令简介"></a>字节码指令简介</h2><h1 id="虚拟机类加载机制"><a href="#虚拟机类加载机制" class="headerlink" title="虚拟机类加载机制"></a>虚拟机类加载机制</h1><p>虚拟机把描述类的数据从 Class 文件加载到内存，并对数据进行校验、转换解析和初始化，最终形成可以被虚拟机直接使用的 Java 类型，这就是虚拟机的类加载机制。</p>
+<h2 id="类加载的时机"><a href="#类加载的时机" class="headerlink" title="类加载的时机"></a>类加载的时机</h2><ul>
+<li>类从被加载到虚拟机内存直到卸载出内存的<strong>生命周期</strong></li>
+</ul>
+<ol>
+<li>加载</li>
+<li>连接<ol>
+<li>验证</li>
+<li>准备</li>
+<li>解析：解析阶段不一定会按照顺序，为了支持 Java 语言的运行时绑定</li>
+</ol>
+</li>
+<li>使用</li>
+<li>卸载</li>
+</ol>
+<ul>
+<li>有且只有六种情况必须立即对类进行“初始化”</li>
+</ul>
+<ol>
+<li><p>遇到new、getstatic、putstatic或 invokestatic 这四条字节码指令时，如果类型没有进行过初始化，则需要先触发其初始化阶段。</p>
+<ol>
+<li>使用 new 关键字实例化对象的时候。</li>
+<li>读取或设置一个类型的静态字段（被 final 修饰、已在编译期把结果放入常量池的静态字段除外）的时候。</li>
+<li>调用一个类型的静态方法的时候。</li>
+</ol>
+</li>
+<li><p>使用 java.lang.reflect 包的方法进行反射调用时，如果类型没有进行过初始化，则需要先触发其初始化。</p>
+</li>
+<li><p>当初始化类的时候，如果发现其父类还没有进行过初始化，则需要先触发其父类的初始化。</p>
+</li>
+<li><p>当虚拟机启动时，用户需要指定一个要执行的主类（包含 main() 方法的那个类），虚拟机会先初始化这个主类。</p>
+</li>
+<li><p>当使用JDK 7新加入的动态语言支持时，如果一个 java.lang.invoke.MethodHandle 实例最后的解析结果为REF_getStatic、REF_putStatic、REF_invokeStatic、REF_newInvokeSpecial 四种类型的方法句柄，并且这个方法句柄对应的类没有进行过初始化，则需要先触发其初始化。</p>
+</li>
+<li><p>当一个接口中定义了JDK 8新加入的默认方法（被 default 关键字修饰的接口方法）时，如果有这个接口的实现类发生了初始化，那该接口要在其之前被初始化。</p>
+</li>
+</ol>
+<h2 id="类加载的过程"><a href="#类加载的过程" class="headerlink" title="类加载的过程"></a>类加载的过程</h2><h3 id="加载"><a href="#加载" class="headerlink" title="加载"></a>加载</h3><ol>
+<li>通过一个类的全限定名来获取定义此类的二进制字节流。</li>
+<li>将这个字节流所代表的静态存储结构转化为方法区的运行时数据结构。</li>
+<li>在内存中生成一个代表这个类的 java.lang.Class 对象，作为方法区这个类的各种数据的访问入口。</li>
+</ol>
+<h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><p>目的是为了确保 Class 文件的字节流中包含的信息符合当前虚拟机的要求，并且不会危害虚拟机自身的安全。文件格式验证之后，字节流会进入内存的方法区中，所有之后的验证都是基于方法区的存储结构进行的。</p>
+<ol>
+<li><p><strong>文件格式验证</strong></p>
+<ul>
+<li>是否以魔数 0xCAFEBABE 开头。</li>
+<li>主、次版本号是否在当前 Java 虚拟机接受范围之内。</li>
+<li>常量池的常量中是否有不被支持的常量类型（检查常量 tag 标志）。</li>
+<li>指向常量的各种索引值中是否有指向不存在的常量或不符合类型的常量。</li>
+<li>CONSTANT_Utf8_info 型的常量中是否有不符合 UTF-8 编码的数据。</li>
+<li>Class文件中各个部分及文件本身是否有被删除的或附加的其他信息。</li>
+</ul>
+</li>
+<li><p><strong>元数据验证：对字节码描述的信息进行语义分析，保证符合 Java 语义规范</strong></p>
+<ul>
+<li>这个类是否有父类（除了 java.lang.Object 之外，所有的类都应当有父类）。</li>
+<li>这个类的父类是否继承了不允许被继承的类（被 final 修饰的类）。</li>
+<li>如果这个类不是抽象类，是否实现了其父类或接口之中要求实现的所有方法。</li>
+<li>类中的字段、方法是否与父类产生矛盾（例如覆盖了父类的 final 字段，或者出现不符合规则的方法重载，例如方法参数都一致，但返回值类型却不同等）。</li>
+</ul>
+</li>
+<li><p><strong>字节码验证：目的是通过数据流和控制流分析，确定程序语义是合法的、符合逻辑的</strong></p>
+<ul>
+<li>保证任意时刻操作数栈的数据类型与指令代码序列都能配合工作，例如不会出现类似于“在操作栈放置了一个int类型的数据，使用时却按 long 类型来加载入本地变量表中”这样的情况。</li>
+<li>保证任何跳转指令都不会跳转到方法体以外的字节码指令上。</li>
+<li>保证方法体中的类型转换总是有效的，例如可以把一个子类对象赋值给父类数据类型，这是安全的，但是把父类对象赋值给子类数据类型，甚至把对象赋值给与它毫无继承关系、完全不相干的一个数据类型，则是危险和不合法的。</li>
+</ul>
+</li>
+<li><p><strong>符号引用验证：发生在虚拟机将符号引用转化为直接引用的时候，这个转化动作将在连接的第三阶段-解析阶段发生，可以看做是对类自身以外的信息(常量池中的各种符号引用)进行匹配校验</strong></p>
+<ul>
+<li>符号引用中通过字符串描述的全限定名是否能找到对应的类。</li>
+<li>在指定类中是否存在符合方法的字段描述符及简单名称所描述的方法和字段。</li>
+<li>符号引用中的类、字段、方法的可访问性（private、protected、public、<package>）是否可被当<br>前类访问。</li>
+</ul>
+</li>
+</ol>
+<h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><p><strong>准备阶段是正式为类中定义的变量（即静态变量，被static修饰的变量）分配内存并设置类变量初始值的阶段</strong>。从概念上讲，这些变量所使用的内存都应当在<strong>方法区</strong>中进行分配，但必须注意到方法区本身是一个<strong>逻辑</strong>上的区域。在JDK 7及之前，HotSpot 使用永久代来实现方法区时，实现是完全符合这种逻辑概念的；而在JDK 8及之后，类变量则会随着 Class 对象一起存放在 Java 堆中，这时候“类变量在方法区”就完全是一种对逻辑概念的表述了。</p>
+<ul>
+<li>这时候进行内存分配的仅包括类变量，而不包括实例变量，实例变量将会在对象实例化时随着对象一起分配在 Java 堆中。初始值“通常情况”下是数据类型的零值，如果类字段的字段属性表中存在 ConstantValue 属性，那在准备阶段变量值就会被初始化为ConstantValue属性所指定的初始值。final</li>
+</ul>
+<h3 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h3><p>解析阶段是 Java 虚拟机将常量池内的符号引用替换为直接引用的过程。</p>
+<ul>
+<li>符号引用（Symbolic References）：符号引用以一组符号来描述所引用的目标，符号可以是任何形式的字面量，只要使用时能无歧义地定位到目标即可。符号引用与虚拟机实现的内存布局无关，引用的目标并不一定是已经加载到虚拟机内存当中的内容。</li>
+<li>直接引用（Direct References）：直接引用是可以直接指向目标的指针、相对偏移量或者是一个能间接定位到目标的句柄。直接引用是和虚拟机实现的内存布局直接相关的，同一个符号引用在不同虚 拟机实例上翻译出来的直接引用一般不会相同。</li>
+</ul>
+<p>虚拟机可以根据需要选择在类被加载器加载时就对常量池中的符号引用进行解析，还是等到一个符号引用将要被使用前才去解析它。</p>
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>初始化阶段就是执行类构造器<clinit>()方法的过程。<clinit>()并不是程序员在Java代码中直接编写的方法，它是Javac编译器的自动生成物。</p>
+<p><clinit>()方法是由编译器自动收集类中的所有类变量的赋值动作和静态语句块（static{}块）中的语句合并产生的。</p>
+<h2 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h2><p>类加载阶段中的“通过一个类的全限定名来获取描述此类的二进制字节流”，是在 Java 虚拟机外部实现，以便让应用程序自己决定如何去获取所需要的类。实现这个动作的代码模块称为“类加载器”。</p>
+<h3 id="类与类加载器"><a href="#类与类加载器" class="headerlink" title="类与类加载器"></a>类与类加载器</h3><p>对于任意一个类，都需要由加载它的类加载器和这个类本身一同确立其在 Java 虚拟机中的唯一性，每一个类加载器，都拥有一个独立的类名称空间。</p>
+<h3 id="双亲委派模型"><a href="#双亲委派模型" class="headerlink" title="双亲委派模型"></a>双亲委派模型</h3><ul>
+<li><p>从 Java 虚拟机角度，只存在两种不同的类加载器：</p>
+<ol>
+<li>启动类加载器，由C++语言实现，是虚拟机自身的一部分</li>
+<li>其他所有的类加载器，由 Java 语言实现，独立于虚拟机外部，并且全部都继承自抽象类java.lang.ClassLoader</li>
+</ol>
+</li>
+<li><p>Java开发人员的角度：</p>
+<ol>
+<li>启动类加载器：负责将存放在<JAVA_HOME>\lib目录中的，或者被-Xbootclasspath参数所指定的路径中的，并且被虚拟机识别的类库加载到虚拟机内存中。</li>
+<li>扩展类加载器：负责加载<JAVA_HOME>\lib\ext目录中的，或者被java.ext.dirs系统变量所指定的路径中的所有的类，开发者可以直接使用扩展类加载器。</li>
+<li>应用程序类加载器（系统类加载器）：负责加载用户类路径上所指定的类库，开发者可以直接使用应用程序类加载器。应用程序中如果没有自定义过自己的类加载器，一般情况下这个就是程序中的默认类加载器。</li>
+</ol>
+</li>
+</ul>
+<p>不过这里类加载器之间的父子关系一般不是以继承（Inheritance）的关系来实现的，而是通常使用组合（Composition）关系来复用父加载器的代码。</p>
+<p><strong>双亲委派模型的工作过程</strong>：</p>
+<p>如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把这个请求委派给父类加载器去完成，每一个层次的类加载器都是如此，因此所有的加载请求最终都应该传送到最顶层的启动类加载器中，只有当父加载器反馈自己无法完成这个加载请求（它的搜索范围中没有找到所需的类）时，子加载器才会尝试自己去完成加载。</p>
+<p><strong>双亲委派模型的优点</strong>：</p>
+<p>使用双亲委派模型来组织类加载器之间的关系，一个显而易见的好处就是 Java 中的类随着它的类加载器一起具备了一种带有优先级的层次关系。</p>
+<hr>
+<h1 id="虚拟机字节码执行引擎"><a href="#虚拟机字节码执行引擎" class="headerlink" title="虚拟机字节码执行引擎"></a>虚拟机字节码执行引擎</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>不同的虚拟机实现里面，执行引擎在执行Java代码的时候可能会有解释执行（通过解释器执行）和编译执行（通过即时编译器产生本地代码执行）两种选择或者两者兼备，但是从外观上看所有的Java虚拟机的执行引擎都是一致的：输入的是字节码文件，处理过程是字节码解析的等效过程，输出的是执行结果。</p>
+<h2 id="运行时栈帧结构"><a href="#运行时栈帧结构" class="headerlink" title="运行时栈帧结构"></a>运行时栈帧结构</h2><p>Java 虚拟机以方法作为最基本的执行单元，栈帧是用于支持虚拟机进行方法调用和方法执行的数据结构，它是虚拟机运行时数据区中的虚拟机栈的栈元素。</p>
+<ul>
+<li><p>每一个栈帧都包括了局部变量表，操作数栈，动态连接，方法返回地址和一些额外的附加信息。</p>
+</li>
+<li><p>栈帧中需要多大的局部变量表，多深的操作数栈在编译程序代码之后就已经完全确定了，并且写入方法表的Code属性之中。</p>
+</li>
+<li><p>对于执行引擎来说，在活动线程中，只有位于栈顶的栈帧才是有效的，称为当前栈帧。 </p>
+</li>
+</ul>
+<h3 id="局部变量表"><a href="#局部变量表" class="headerlink" title="局部变量表"></a>局部变量表</h3><p>局部变量表是一组变量值的存储空间，用于存放方法参数和方法内部定义的局部变量。</p>
+<p>局部变量表的容量以变量槽(VariableSlot, Slot)为最小单位，虚拟机通过索引定位的方式使用局部变量表，索引值的范围是从0开始至局部变量表最大的 Slot 数量。(在 Java 程序被编译为 Class 文件时，就在方法的 Code 属性的max_locals数据项中确定了该方法所需分配的局部变量表的最大容量)</p>
+<h3 id="操作数栈"><a href="#操作数栈" class="headerlink" title="操作数栈"></a>操作数栈</h3><p>做算术运算是通过操作数栈来进行的，又或者在调用其他方法的时候是通过操作数栈来进行参数传递的</p>
+<h3 id="动态连接"><a href="#动态连接" class="headerlink" title="动态连接"></a>动态连接</h3><p>每个栈帧都包含一个指向运行时常量池中该栈帧所属方法的引用，持有这个引用是为了支持方法调用过程中的动态连接。</p>
+<p>Class 文件的常量池中存有大量的符号引用，<strong>字节码中的方法调用指令</strong>就以常量池里指向方法的<strong>符号引用</strong>作为参数。这些符号引用一部分会在类加载阶段或者第一次使用的时候就被转化为直接引用，这种转化被称为<strong>静态解析</strong>。<br>另外一部分将在每一次运行期间都转化为直接引用，这部分就称为<strong>动态连接</strong>。</p>
+<h3 id="方法返回地址"><a href="#方法返回地址" class="headerlink" title="方法返回地址"></a>方法返回地址</h3><p>正常完成出口：一般来说，方法正常退出时，调用者的PC计数器的值可以作为返回地址，栈帧中很可能会保存这个计数器值。</p>
+<p>异常完成出口：方法异常退出时，返回地址是要通过异常处理器表来确定的，栈帧中一般不会保存这部分信息。</p>
+<p>方法退出的过程实际上就等同于把当前栈帧出栈，因此退出时可能执行的操作有：</p>
+<ol>
+<li><p>恢复上层方法的局部变量表和操作数栈</p>
+</li>
+<li><p>把返回值压入调用者栈帧的操作数栈中</p>
+</li>
+<li><p>调整PC计数器的值以指向方法调用指令后面的一条指令</p>
+</li>
+</ol>
+<h2 id="方法调用"><a href="#方法调用" class="headerlink" title="方法调用"></a>方法调用</h2><p>方法调用并不等同于方法执行，方法调用阶段唯一的任务就是<strong>确定被调用的版本</strong>，暂时还不涉及方法内部的具体运行过程。</p>
+<p>Class 文件的编译过程中不包含传统编译中的连接步骤，一切方法调用在 Class 文件里面存储的都只是符号引用，而不是方法在实际运行时内存布局的入口地址(直接引用),这个特性给 Java 带来了更强大的动态扩展能力。</p>
+<h3 id="解析-1"><a href="#解析-1" class="headerlink" title="解析"></a>解析</h3><p>所有方法调用的目标方法在 Class 文件里面都是一个常量池中的<strong>符号引用</strong>，在类加载的<strong>解析</strong>阶段，会将其中的一<strong>部分符号引用转化为直接引用</strong>。</p>
+<p>这种解析能够成立的前提是：该方法“<strong>编译期可知，运行期不可变</strong>”，主要有静态方法和私有方法两大类，前者与类型直接关联，后者在外部不可被访问，这两种方法各自的特点决定了它们都不可能通过继承或别的方式重写出其他版本，因此它们都适合在类加载阶段进行解析。</p>
+<p>在Java虚拟机支持以下5条方法调用字节码指令，分别是：</p>
+<ol>
+<li>invokestatic。用于调用静态方法。</li>
+<li>invokespecial。用于调用实例构造器<init>()方法、私有方法和父类中的方法。</li>
+<li>invokevirtual。用于调用所有的虚方法。</li>
+<li>invokeinterface。用于调用接口方法，会在运行时再确定一个实现该接口的对象。</li>
+<li>invokedynamic。先在运行时动态解析出调用点限定符所引用的方法，然后再执行该方法。前面4条调用指令，分派逻辑都固化在Java虚拟机内部，而invokedynamic指令的分派逻辑是由用户设定的引导方法来决定的。</li>
+</ol>
+<p>只要能被<strong>invokestatic</strong>和<strong>invokespecial</strong>指令调用的方法，都可以在<strong>解析阶段中确定唯一的调用版本</strong>，Java语言里符合这个条件的方法共有<strong>静态方法</strong>、<strong>私有方法</strong>、<strong>实例构造器</strong>、<strong>父类</strong>方法4种，再加上被<strong>final</strong>修饰的方法（尽管它使用invokevirtual指令调用），<strong>这5种方法调用会在类加载的时候就可以把符号引用解析为该方法的直接引用</strong>。这些方法统称为“非虚方法”（Non-Virtual Method），与之相反，其他方法就被称为“虚方法”（Virtual Method）。</p>
+<h3 id="分派"><a href="#分派" class="headerlink" title="分派"></a>分派</h3><ul>
+<li><strong>静态分派</strong></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.fenixsoft.polymorphic;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 方法静态分派演示</span></span><br><span class="line"><span class="comment">* <span class="doctag">@author</span> zzm</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StaticDispatch</span> </span>&#123;</span><br><span class="line">	<span class="keyword">static</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Human</span> </span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Man</span> <span class="keyword">extends</span> <span class="title">Human</span> </span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Woman</span> <span class="keyword">extends</span> <span class="title">Human</span> </span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">(Human guy)</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"hello,guy!"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">(Man guy)</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"hello,gentleman!"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">(Woman guy)</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"hello,lady!"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		Human man = <span class="keyword">new</span> Man();</span><br><span class="line">		Human woman = <span class="keyword">new</span> Woman();</span><br><span class="line">		StaticDispatch sr = <span class="keyword">new</span> StaticDispatch();</span><br><span class="line">		sr.sayHello(man);	<span class="comment">//hello,guy!</span></span><br><span class="line">		sr.sayHello(woman);	<span class="comment">//hello,guy!</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>静态类型和实际类型在程序中都可能会发生变化，区别是静态类型的变化仅仅在使用时发生，<strong>变量本身的静态类型不会被改变</strong>，并且最终的静态类型是在编译期可知的；而实际类型变化的结果在运行期才可确定，编译器在编译程序的时候并不知道一个对象的实际类型是什么。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 实际类型变化</span></span><br><span class="line">Human human = (<span class="keyword">new</span> Random()).nextBoolean() ? <span class="keyword">new</span> Man() : <span class="keyword">new</span> Woman();</span><br><span class="line"><span class="comment">// 静态类型变化</span></span><br><span class="line">sr.sayHello((Man) human)</span><br><span class="line">sr.sayHello((Woman) human)</span><br><span class="line"><span class="comment">//human的静态类型是Human，也可以在使用时（如sayHello()方法中的强制转型）临时改变这个类型，但这个改变仍是在编译期是可知的，两次sayHello()方法的调用，在编译期完全可以明确转型的是Man还是Woman。</span></span><br></pre></td></tr></table></figure>
+
+<p>编译器在重载时是通过参数的静态类型而不是实际类型作为判定依据的。由于静态类型在编译期可知，所以在编译阶段，Javac 编译器就根据参数的静态类型决定了会使用哪个重载版本，因此选择了 sayHello(Human) 作为调用目标，并把这个方法的符号引用写到 main() 方法里的两条 invokevirtual 指令的参数中。</p>
+<p>所有<strong>依赖静态类型来决定方法执行版本的分派动作，都称为静态分派</strong>。静态分派的最典型应用表现就是<strong>方法重载</strong>。静态分派发生在编译阶段。</p>
+<ul>
+<li><strong>动态分派</strong></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 方法动态分派演示</span></span><br><span class="line"><span class="comment">* <span class="doctag">@author</span> zzm</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DynamicDispatch</span> </span>&#123;</span><br><span class="line">	<span class="keyword">static</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Human</span> </span>&#123;</span><br><span class="line">		<span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span></span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Man</span> <span class="keyword">extends</span> <span class="title">Human</span> </span>&#123;</span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			System.out.println(<span class="string">"man say hello"</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Woman</span> <span class="keyword">extends</span> <span class="title">Human</span> </span>&#123;</span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">			System.out.println(<span class="string">"woman say hello"</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		Human man = <span class="keyword">new</span> Man();</span><br><span class="line">		Human woman = <span class="keyword">new</span> Woman();</span><br><span class="line">		man.sayHello();<span class="comment">//man say hello</span></span><br><span class="line">		woman.sayHello();<span class="comment">//woman say hello</span></span><br><span class="line">		man = <span class="keyword">new</span> Woman();</span><br><span class="line">		man.sayHello();<span class="comment">//woman say hello</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>invokevirtual 指令的运行时解析过程：</p>
+<ol>
+<li>找到操作数栈顶的第一个元素所指向的对象的实际类型，记作C。</li>
+<li>如果在类型C中找到与常量中的描述符和简单名称都相符的方法，则进行访问权限校验，如果通过则返回这个方法的直接引用，查找过程结束；不通过则返回 java.lang.IllegalAccessError 异常。</li>
+<li>否则，按照继承关系从下往上依次对 C 的各个父类进行第二步的搜索和验证过程。</li>
+<li>如果始终没有找到合适的方法，则抛出 java.lang.AbstractMethodError 异常。</li>
+</ol>
+<p>正是因为 invokevirtual 指令执行的第一步就是在运行期确定接收者的实际类型，所以两次调用中的 invokevirtual指令并不是把常量池中方法的符号引用解析到直接引用上就结束了，还会<strong>根据方法接收者的实际类型来选择方法版本</strong>，这个过程就是Java语言中方法<strong>重写</strong>的本质。我们把这种在<strong>运行期根据实际类型确定方法执行版本的分派过程称为动态分派</strong>。</p>
+<h3 id="虚拟机动态分派的实现"><a href="#虚拟机动态分派的实现" class="headerlink" title="虚拟机动态分派的实现"></a>虚拟机动态分派的实现</h3><p>动态分派是执行非常频繁的动作，而且动态分派的方法版本选择过程需要运行时在接收者类型的方法元数据中搜索合适的目标方法，因此，Java虚拟机实现基于执行性能的考虑，真正运行时一般不会如此频繁地去反复搜索类型元数据。面对这种情况，一种基础而且常见的优化手段是为类型在方法区中建立一个虚方法表（Virtual Method Table，也称为vtable，与此对应的，在invokeinterface执行时也会用到接口方法表——Interface Method Table，简称itable），使用虚方法表索引来代替元数据查找以提高性能。虚方法表中存放着各个方法的实际入口地址。</p>
+<h2 id="基于栈的字节码解释执行引擎"><a href="#基于栈的字节码解释执行引擎" class="headerlink" title="基于栈的字节码解释执行引擎"></a>基于栈的字节码解释执行引擎</h2><h3 id="解释执行"><a href="#解释执行" class="headerlink" title="解释执行"></a>解释执行</h3><p>Javac 编译器完成了程序代码经过词法分析、语法分析到抽象语法树，再遍历语法树生成线性的字节码指令流的过程。因为这一部分动作是在Java虚拟机之外进行的，而解释器在虚拟机的内部，所以Java程序的编译就是半独立的实现。</p>
+<h3 id="基于栈的指令集与基于寄存器的指令集"><a href="#基于栈的指令集与基于寄存器的指令集" class="headerlink" title="基于栈的指令集与基于寄存器的指令集"></a>基于栈的指令集与基于寄存器的指令集</h3><p>基于栈的指令集主要优点是可移植，程序不直接依赖这些硬件寄存器，避免受到硬件的约束。</p>
+<p>栈架构指令集的主要缺点是理论上执行速度相对来说会稍慢一些，不过这里的执行速度是要局限在解释执行的状态下，如果经过即时编译器输出成物理机上的汇编指令流，那就与虚拟机采用哪种指令集架构没有什么关系了。</p>
+<p>在解释执行时，<strong>栈架构</strong>指令集的代码虽然紧凑，但是完成相同功能所需的<strong>指令数量</strong>一般会比寄存器架构来得更多，因为出栈、入栈操作本身就产生了相当大量的指令。<strong>更重要的是栈实现在内存中</strong>，频繁的栈访问也就意味着频繁的内存访问，相对于处理器来说，内存始终是执行速度的瓶颈。尽管虚拟机可以采取<strong>栈顶缓存</strong>的优化方法，把最常用的操作映射到寄存器中避免直接内存访问，但这也只是优化措施而不是解决本质问题的方法。因此由于<strong>指令数量和内存访问的原因</strong>，导致了栈架构指令集的执行速度会相对慢上一点。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/HashMap/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1328,270 +1615,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Internet/TCP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="记录成长">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Internet/TCP/" class="post-title-link" itemprop="url">TCP</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-13 11:43:30" itemprop="dateModified" datetime="2020-05-13T11:43:30+08:00">2020-05-13</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="TCP连接"><a href="#TCP连接" class="headerlink" title="TCP连接"></a>TCP连接</h2><p><strong>TCP连接的组成</strong><br>    一台主机上的缓存、变量和与进程连接的套接字 ，以及另一台主机上的另一组缓存、变量和与进程连接的套接字。</p>
-<ul>
-<li><strong>最大报文段长度</strong><br>TCP可以从缓存中取出并放入报文段中的数据数量受限于最大报文段长度(Maximum Segment Size)。MSS通常根据最初确定的由本地发送主机发送的最大链路层帧长度（Maximum Transmission Unit, MTU）来设置。</li>
-</ul>
-<hr>
-<h2 id="TCP报文段结构"><a href="#TCP报文段结构" class="headerlink" title="TCP报文段结构"></a>TCP报文段结构</h2><ul>
-<li>16比特的<strong>源端口号</strong>和<strong>目的端口号</strong></li>
-<li>16比特的<strong>校验和</strong>字段</li>
-<li>32比特的<strong>序号</strong>字段和<strong>确认号</strong>字段</li>
-<li>16比特的<strong>接收窗口</strong>字段</li>
-<li>4比特<strong>首部长度</strong>字段</li>
-<li>可选与变长的<strong>选项</strong>字段</li>
-<li>6比特的<strong>标志</strong>字段，ACK，RST，SYN，FIN</li>
-</ul>
-<ol>
-<li><p><strong>序号和确认号</strong></p>
-<p>TCP把数据看成一个无结构的、有序的字节流。序号是建立在传送的字节流上，而不是建立在传送的报文段的序列之上。<strong>一个报文段的序号</strong>因此是该报文段首字节的字节流编号。<br>确认号：A填充进报文段的确认号是主机A期望从主机B收到的下一个字节的序号。</p>
-<p>TCP只确认该流中至第一个丢失字节为止的字节，所以TCP被称为提供<strong>累计确认</strong>。</p>
-<p>接收方保留失序的字节，并等待缺少的字节以填补该间隔。</p>
-</li>
-<li><p><strong>往返时间的估计与超时</strong></p>
-</li>
-</ol>
-<p>EstimatedRTT = (1-a)EstimatedRTT + a * SampleRTT<br>            （a一般取0.125）SampleRTT的均值</p>
-<p>DevRTT = (1-b) * DevRTT + b * | SampleRTT - EstimatedRTT|<br>            （b一般取0.25）</p>
-<p>TimeoutInterval = EstimatedRTT +　４ * DevRTT<br>    （要求将超时间隔设为EstimatedRTT加上一定余量，当波动较大的时候，这个余量应该大一点）</p>
-<h2 id="可靠数据传输"><a href="#可靠数据传输" class="headerlink" title="可靠数据传输"></a>可靠数据传输</h2><p><strong>TCP发送方有3个与发送和重传有关的主要事件：</strong><br>       1. 从上层应用程序接收数据，将数据封装在一个报文段中，并把该报文段交给IP<br>       2. 当报文段被传给IP时，TCP就启动该定时器。（将定时器想象为与最早的未被确认的报文段相关联的）<br>       3. 来自接收方的确认报文段(ACK)。TCP将ACK的值y与它的变量SendBase进行比较(SendBase是最早未被确认的字节的序号，因此SendBase-1是指接收方已正确按序接收到的数据的最后一个字节的序号)。<br>           TCP采用累计确认，所以y确认了编号在y之前的所有字节都已经收到。</p>
-<p><strong>TCP接收方产生ACK：</strong></p>
-<ol>
-<li>具有所期望序号的按序报文段到达。所有在期望序号以及以前的数据都已经被确认。<ul>
-<li>延迟的ACK。对另一个按序报文段的到达最多等待500ms。如果下一个按序报文段在这个时间间隔内没有到达，则发送一个ACK</li>
-</ul>
-</li>
-<li>具有所期望序号的按序报文段到达。另一个按序报文段等待ACK传输。<ul>
-<li>立即发送单个累积ACK，以确认两个按序报文段</li>
-</ul>
-</li>
-<li>比期望序号大的失序报文段到达。检测出间隔 <ul>
-<li>立即发送冗余ACK，指示下一个期待字节的序号</li>
-</ul>
-</li>
-<li>能部分或者完全填充接收数据间隔的报文段到达<ul>
-<li>倘若该报文段起始于间隔的低端，则立即发送ACK</li>
-</ul>
-</li>
-</ol>
-<ul>
-<li><strong>超时间隔加倍</strong><br>TCP重传时都会将下一次的时间间隔设为先前值的两倍，而不是用从EstimateRTT和DevRTT推算出的值。提供了一个形式受限的拥塞控制</li>
-<li><strong>快速重传</strong></li>
-</ul>
-<p>超时触发重传存在的问题之一是超时周期可能相对较长，增加了端到端时延。幸运的是，发送方通常可在超时事件发生之前通过注意所谓冗余 ACK 来较好的检测到丢包情况。</p>
-<p>一旦收到3个冗余ACK，TCP 就执行快速重传，即在该报文段的定时器过期之前重传丢失的报文段。</p>
-<ul>
-<li><strong>是回退N步还是选择重传</strong></li>
-</ul>
-<p>TCP确认是累积的，正确接收但失序的报文段是不会被接收方逐个确认的。</p>
-<p>TCP发送方仅需维持已发送过但未被确认的字节的最小序号(SendBase)和下一个要发送的字节的序号(NextSeqNum)</p>
-<p>选择确认允许TCP接收方有选择的确认失序报文段，而不是累积地确认最后一个正确接收的有序报文段。</p>
-<p>TCP的差错恢复机制也是最好被分类为GBN协议与SR协议的混合体。</p>
-<h2 id="流量控制"><a href="#流量控制" class="headerlink" title="流量控制"></a>流量控制</h2><p><strong>流量控制</strong>用以消除发送方使接收方缓存溢出的可能性。TCP通过让发送方维护一个称为<strong>接受窗口</strong>的变量来提供流量控制。</p>
-<p>TCP发送方也可能因为IP网络的拥塞而被遏制，这种形式的发送方的控制被称为<strong>拥塞控制</strong>。</p>
-<p>LastByteSent - LastByteAcked &lt;= rwnd<br>rwnd = RcvBuffer - [LastByteRcvd - LastByteRead]</p>
-<p>LastByteSent - LastByteAcked &lt;= rwnd<br>主机A发送到连接中但未被确认的数据量小于等于主机B的缓存允许接收的数据量。</p>
-<h2 id="TCP-连接管理"><a href="#TCP-连接管理" class="headerlink" title="TCP 连接管理"></a>TCP 连接管理</h2><ul>
-<li><strong>三次握手</strong> <ol>
-<li>发送SYN(Synchronize Sequence Numbers)报文段(报文段的首部中的SYN标志位被置为1，此外客户会随机选择一个初始序号，放在序号字段中)。</li>
-<li>服务器提取出TCP SYN报文段，向该客户发送允许连接报文段。SYNACK报文段：这个报文段首部包含3个重要信息：SYN置为1，确认号字段被置为client_isn +１，服务器自己的初始序号。</li>
-<li>收到SYNACK报文段后，客户也要给该连接分配缓存和变量。 发送报文段，此TCP报文段的首部的确认字段的序号为server_isn + 1，SYN被置为0，可以携带客户到服务器的数据。服务器收到客户端的确认后，连接建立。</li>
-</ol>
-</li>
-<li><strong>三次握手的原因</strong> </li>
-</ul>
-<p>第三次握手是为了防止失效的连接请求到达服务器，让服务器错误打开连接。</p>
-<p>客户端发送的连接请求如果在网络中滞留，那么就会隔很长一段时间才能收到服务器端发回的连接确认。客户端等待一个超时重传时间之后，就会重新请求连接。但是这个滞留的连接请求最后还是会到达服务器，如果不进行三次握手，那么服务器就会打开两个连接。如果有第三次握手，客户端会忽略服务器之后发送的对滞留连接请求的连接确认，不进行第三次握手，因此就不会再次打开连接。</p>
-<ul>
-<li><strong>四次挥手</strong><ol>
-<li>客户应用进程发送一个特殊的报文段，其首部的FIN(finish)标志位被置为1</li>
-<li>服务器收到后回送一个ACK报文段，此时 TCP 属于半关闭状态，服务器能向客户端发送数据但是客户端不能向服务器发送数据。</li>
-<li>当服务器不再需要连接时，服务器发送它自己的终止报文段，其首部的FIN标志位也被置为1</li>
-<li>该客户对这个服务器的终止报文段进行确认。此时两台主机上用于该连接的所有资源都被释放了。</li>
-</ol>
-</li>
-<li><strong>四次挥手的原因</strong></li>
-</ul>
-<p>客户端发送了 FIN 连接释放报文之后，服务器收到了这个报文，就进入了 CLOSE-WAIT 状态。这个状态是为了让服务器端发送还未传送完毕的数据，传送完毕之后，服务器会发送 FIN 连接释放报文。</p>
-<ul>
-<li><strong>TIME_WAIT</strong></li>
-</ul>
-<p>客户端接收到服务器端的 FIN 报文后进入此状态，此时并不是直接进入 CLOSED 状态，还需要等待一个时间计时器<br>设置的时间 2MSL。这么做有两个理由：<br>       1. 确保最后一个确认报文能够到达。如果 B 没收到 A 发送来的确认报文，那么就会重新发送连接释放请求报文，A 等待一段时间就是为了处理这种情况的发生。<br>       2. 等待一段时间是为了让本连接持续时间内所产生的所有报文都从网络中消失，使得下一个新的连接不会出现旧的连接请求报文。</p>
-<ul>
-<li><strong>客户TCP经历的典型的TCP状态序列</strong></li>
-</ul>
-<p>建立：</p>
-<ol>
-<li>客户 TCP 开始时处于 CLOSE 状态</li>
-<li>发送 SYN 报文段后，进入 SYN_SENT 状态。然后等待服务器 TCP 的对客户所发报文段进行确认且 SYN 比特置为 1 的一个报文段</li>
-<li>收到来自服务器的确认后，客户 TCP 进入 ESTABLISHED 状态。TCP 客户就能发送和接收包含有效荷载数据的TCP报文段了</li>
-</ol>
-<p>拆除：</p>
-<ol>
-<li>客户 TCP 发送一个带有FIN比特被置为 1 的 TCP 报文段，并进入 FIN_WAIT_1 状态。客户 TCP 等待一个来自服务器的带有确认的 TCP 报文段。</li>
-<li>收到来自服务器的确认后，客户 TCP 进入 FIN_WAIT_2 状态。客户等待来自服务器的 FIN 比特被置为1的另一个报文段</li>
-<li>收到服务器的 FIN 比特被置为 1 的报文段后，客户 TCP 对服务器的报文段进行确认，然后进去 TIME_WAIT 状态。(假定 ACK 丢失，TIME_WAIT 状态使 TCP 客户重传最后的确认报文)</li>
-</ol>
-<ul>
-<li><strong>SYN洪泛攻击</strong></li>
-</ul>
-<p>SYN cookie</p>
-<ul>
-<li>服务器收到一个 SYN 报文段时，并不会立即生成一个半开连接，而是生成一个初始 TCP 序列号，该序列号是 SYN 报文段的源和目的 IP 地址与端口号以及仅有该服务器知道的秘密数的一个复杂函数。这种精心制作的初试序列号被称为 cookie。服务器并不记忆该 cookie 或任何对应于 SYN 的其他状态信息。</li>
-<li>如果客户合法，返回一个 ACK 报文段，这个合法的 ACK ，在确认字段中的值等于在 SYNACK 字段(此时为 cookie 的值)中的值 + 1 .</li>
-</ul>
-<h2 id="拥塞控制原理"><a href="#拥塞控制原理" class="headerlink" title="拥塞控制原理"></a>拥塞控制原理</h2><ul>
-<li><strong>拥塞网络的代价：</strong></li>
-</ul>
-<ol>
-<li>分组的到达速率接近链路容量时，分组经历巨大的排队时延。</li>
-<li>发送方必须执行重传以补偿因为缓存溢出而丢弃(丢失)的分组。</li>
-<li>发送方在遇到大时延时所进行的不必要的重传会引起路由器利用其链路带宽来转发不必要的副本。</li>
-<li>当一个分组沿一条路径被丢弃时，每个上游路由器用于转发该分组到丢弃该分组而使用的传输容量最终被浪费掉了。</li>
-</ol>
-<ul>
-<li><strong>拥塞控制方法</strong>：</li>
-</ul>
-<ol>
-<li>端到端拥塞控制：网络层没有为运输层拥塞控制提供显示支持，端系统通过对网络行为的观察(如分组丢失与时延)来推断之</li>
-<li>网络辅助的拥塞控制：路由器向发送方提供关于网络中拥塞状态的显示反馈信息。ATM可用比特率拥塞控制中，路由器显示的通知发送方它能在输出链路上支持的最大主机发送速率。<ul>
-<li>网络辅助的拥塞控制有两种方式：<ul>
-<li>直接网络反馈：由网络路由器发给发送方。（通常采用一种阻塞分组的形式）</li>
-<li>路由器标记或更新从发送方流向接受方的分组中的某个字段来指示拥塞的产生。（更为通用，但是要经过一个RTT）</li>
-</ul>
-</li>
-</ul>
-</li>
-</ol>
-<h2 id="TCP拥塞控制"><a href="#TCP拥塞控制" class="headerlink" title="TCP拥塞控制"></a>TCP拥塞控制</h2><ul>
-<li><strong>TCP发送方如何限制它向其连接发送流量的速率呢？</strong></li>
-</ul>
-<p>TCP拥塞控制机制跟踪一个额外的变量，<strong>拥塞窗口cwnd</strong></p>
-<p>LastByteSent - LastByteAcked &lt;=min｛cwnd,rwnd｝</p>
-<p>通过限制了发送方中未被确认的数据量，间接的限制了发送方的发送速率。</p>
-<ul>
-<li><strong>TCP发送方如何感知它到目的地之间的路径上存在拥塞的呢？</strong></li>
-</ul>
-<p>“丢包事件”：超时事件和收到三个冗余的ACK。</p>
-<p>因为TCP使用确认来触发增大它的拥塞窗口长度，TCP被称做自计时的。</p>
-<ul>
-<li><strong>TCP发送方怎样确定它应当发送的速率呢？</strong></li>
-</ul>
-<ol>
-<li>一个丢失的报文段意味着拥塞，因此当丢失报文段时应当降低TCP发送方的速率。</li>
-<li>一个确认的报文段指示该网络正在向接受方交付发送方的报文段，因此，当对先前未确认报文段的确认到达时，能够增加发送方的速率。</li>
-<li>带宽探测，除非出现丢包才减慢速率，不然会一直加快。</li>
-</ol>
-<ul>
-<li><p><strong>TCP拥塞控制算法</strong></p>
-</li>
-<li><p><strong>慢启动</strong></p>
-</li>
-</ul>
-<ol>
-<li>初始cwnd设置为一个MSS，当该确认到达时，TCP将以指数形式增大拥塞窗口。</li>
-<li>何时结束指数增长：        <ul>
-<li>当出现由超时指示的丢包事件 TCP发送方将cwnd设置为1，并重新开始慢启动，并且将ssthresh(<strong>慢启动阈值</strong>)设置为cwnd/2。</li>
-<li>当cwnd到达或者超过ssthresh的值时，结束慢启动并且TCP转移到拥塞避免模式。</li>
-<li>当检测到3个冗余ACK，这时TCP将执行一种快速重传并进入快速恢复状态。</li>
-</ul>
-</li>
-</ol>
-<ul>
-<li><strong>拥塞避免</strong></li>
-</ul>
-<ol>
-<li>每个RTT只将cwnd的值增加一个MSS，发送方无论何时到达一个新的确认，就将cwnd增加一个MSS字节。</li>
-</ol>
-<ul>
-<li><strong>快速重传</strong></li>
-</ul>
-<ol>
-<li>把ssthresh设置为cwnd的一半 </li>
-<li>把cwnd再设置为ssthresh的值(具体实现有些为ssthresh+3) </li>
-<li>重新进入拥塞避免阶段。</li>
-</ol>
-<ul>
-<li><strong>快速恢复</strong></li>
-</ul>
-<ol>
-<li>收到3个重复ACK时，把ssthresh设置为cwnd的一半，把cwnd设置为ssthresh的值加3，然后重传丢失的报文段，加3的原因是因为收到3个重复的ACK，表明有3个“老”的数据包离开了网络。</li>
-<li>再收到重复的ACK时，拥塞窗口增加1。</li>
-<li>当收到新的数据包的ACK时，把cwnd设置为第一步中的ssthresh的值。原因是因为该ACK确认了新的数据，说明从重复ACK时的数据都已收到，该恢复过程已经结束，可以回到恢复之前的状态了，也即再次进入拥塞避免状态。</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1663,7 +1686,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">42</span>
+          <span class="site-state-item-count">43</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
