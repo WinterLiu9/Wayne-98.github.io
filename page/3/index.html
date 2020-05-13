@@ -162,6 +162,199 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Internet/HTTP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="记录成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Internet/HTTP/" class="post-title-link" itemprop="url">HTTP</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:09:33" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <ul>
+<li><p><strong>无状态协议</strong><br>HTTP服务器并不保存关于客户的任何信息，所以我们说 HTTP 是一个无状态协议（stateless protocol）</p>
+</li>
+<li><p><strong>怎么实现有状态呢？</strong><br>Cookie 和 Session 保存会话状态，用 Session 来唯一标识用户，用 Cookie 当作用户通行证。</p>
+<p>session 有如用户信息档案表, 里面包含了用户的认证信息和登录状态等信息. 而 cookie 就是用户通行证。</p>
+</li>
+</ul>
+<ol>
+<li><p><strong>cookie</strong>(客户端)</p>
+<ul>
+<li>cookie 的4个技术组件：</li>
+</ul>
+<ol>
+<li>在 HTTP 响应报文中的一个 cookie 首部行</li>
+<li>在 HTTP 请求报文中的一个 cookie 首部行</li>
+<li>在用户端系统中保留有一个 cookie 文件，并由用户的浏览器进行管理</li>
+</ol>
+</li>
+<li><p>位于 Web 站点的一个后端数据库<br> <img src="https://github.com/Wayne-98/image/blob/master/Internet/Cookie.png?raw=true" alt=""></p>
+</li>
+</ol>
+<ol start="2">
+<li><strong>session</strong>(服务端)</li>
+</ol>
+<p>Session 是服务器在和客户端建立连接时添加客户端连接标志，最终会在服务器软件（Apache、Tomcat、JBoss）转化为一个临时 Cookie 发送给给客户端，当客户端第一请求时服务器会检查是否携带了这个Session（临时 Cookie ），如果没有则会添加 Session，如果有就拿出这个 Session 来做相关操作</p>
+<ul>
+<li>session 安全性的保证<ul>
+<li>HttpOnly 属性<br>Cookie 的 HttpOnly 属性是 Cookie 的扩展功能，它使 JavaScript 脚本无法获得 Cookie。其主要目的为防止跨站脚本攻击（Cross-site scripting，XSS）对 Cookie 的信息窃取。</li>
+<li>HTTPS传输</li>
+</ul>
+</li>
+</ul>
+<ol start="3">
+<li><strong>token</strong></li>
+</ol>
+<p>token 也称作令牌，由 uid + time + sign[+固定参数]</p>
+<p><strong>token认证流程</strong></p>
+<ul>
+<li>token 的认证流程与 cookie 很相似，用户登录成功后服务器返回 Token 给客户端。</li>
+<li>客户端收到数据后保存在客户端</li>
+<li>再次访问服务器，将 token 放入 headers 中</li>
+<li>服务器端采用 filter 过滤器校验。校验成功则返回请求数据，校验失败则返回错误码。</li>
+</ul>
+<p><strong>区别和联系</strong><br>session 存储于服务器，可以理解为一个状态列表，拥有一个唯一识别符号 sessionId，通常存放于 cookie 中。服务器收到 cookie 后解析出 sessionId ，再去 session 列表中查找，才能找到相应 session ，依赖cookie。cookie 类似一个令牌，装有 sessionId ，存储在客户端，浏览器通常会自动添加。token 也类似一个令牌，无状态，用户信息都被加密到 token 中，服务器收到 token 后解密就可知道是哪个用户。需要开发者手动添加。</p>
+<hr>
+<ul>
+<li><strong>非持续性</strong>连接和<strong>持续性</strong>连接<br>每个请求/响应对是经一个单独的TCP连接发送，还是所有的请求及响应经相同的TCP连接发送呢？<br>前者是非持续性连接，后者是持续性连接。（HTTP在其默认方式下使用持续性连接）<ul>
+<li>非持续连接的缺点<ol>
+<li>每个连接，在客户和服务器中都要分配TCP的缓冲区和保持TCP变量，浪费资源</li>
+<li>每个对象经受2倍的RTT(Round-Trip Time，往返时间),一个RTT用于创建TCP,一个RTT用于请求和接收一个对象。</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<ul>
+<li><strong>HTTP报文格式</strong></li>
+<li>HTTP请求报文<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">GET &#x2F;somedir&#x2F;page.html HTTP&#x2F;1.1</span><br><span class="line">Host: www.someschool.edu</span><br><span class="line">Connection: close</span><br><span class="line">User-agent: Mozilla&#x2F;5.0     &#x2F;&#x2F;浏览器类型</span><br><span class="line">Accept-language: fr</span><br></pre></td></tr></table></figure>
+HTTP请求报文的第一行叫做请求行（request line），其后继的行叫做首部行（header line）</li>
+</ul>
+<ol>
+<li><strong>请求行</strong></li>
+</ol>
+<ul>
+<li>方法字段：方法字段可以取不同的值：<ol>
+<li>GET：实体体为空</li>
+<li>POST：实体体中包含的就是用户在表单字段中的输入值。</li>
+</ol>
+<ul>
+<li>当用户向搜索引擎提供搜索关键词时，使用post报文时，用户仍可以向服务器请求一个Web界面，但Web界面的特定内容依赖于用户在表单字段中输入的内容。  </li>
+<li>GET方法也可以提交表单，在所请求的URL中包括输入的数据。<br><code>www.somesite.com/animalsearch?monkey&amp;bananas</code></li>
+</ul>
+<ol start="3">
+<li>HEAD：HEAD方法类似与GET方法。当服务器收到一个使用HEAD方法的请求时，将会用一个HTTP报文进行响应，但是并不返回对象。应用程序开发者常用HEAD方法进行调试跟踪，用于确认 URL 的有效性以及资源更新的日期时间等。</li>
+<li>PUT：它允许用户上传对象到指定的Web服务器上指定的路径。由于自身不带验证机制，任何人都可以上传文件，因此存在安全性问题，一般不使用该方法。</li>
+<li>PATCH：修改资源，PATCH 允许部分修改。</li>
+<li>DELETE：允许用户或者应用程序删除Web服务器上的对象。并且同样不带验证机制。</li>
+<li>OPTIONS：查询指定的 URL 能够支持的方法。</li>
+<li>CONNECT：要求在与代理服务器通信时建立隧道</li>
+</ol>
+</li>
+<li>URL字段：URL字段带有请求对象的标识</li>
+<li>HTTP版本字段</li>
+</ul>
+<ol start="2">
+<li><strong>首部行</strong><br> Host：指明了对象所在的主机。（为什么已经有一条TCP连接存在了，还需要这个字段呢，因为Web代理高速缓存需要该首部行提供的信息）<br> Connection：close首部行，该浏览器告诉服务器不要麻烦地使用持续连接，它要求服务器在发送完被请求的对象后就关闭这条连接。</li>
+</ol>
+<ul>
+<li>HTTP响应报文<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">HTTP&#x2F;1.1 200 OK</span><br><span class="line">Connection: close</span><br><span class="line">Date: Tue, 18 Aug 2015 15:44:04 GMT</span><br><span class="line">Server: Apache&#x2F;2.2.3 (CentOS)</span><br><span class="line">Last-Modified: Tue, 18 Aug 2015 15:11:04 GMT</span><br><span class="line">Content-Length: 6821</span><br><span class="line">Content-Type: text&#x2F;html</span><br><span class="line"></span><br><span class="line">(data data data data ....)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<ol>
+<li>初始状态行(status line)<br> 协议版本字段，状态码和相应状态信息<ul>
+<li>200 OK ：请求成功，信息在返回的响应报文中</li>
+<li>301 Moved Permanently：请求的对象已经被永久转移了，新的URL定义在响应报文的Location：首部行中。客户软件将自动获取新的URL</li>
+<li>400 Bad Request：一个通用差错代码，指示该请求不能被服务器理解</li>
+<li>404 Not Found：被请求的文档不在服务器上</li>
+<li>505 HTTP Version Not Supported：服务器不支持请求报文使用的HTTP协议版本。</li>
+</ul>
+</li>
+<li>6个首部行(header line)<ul>
+<li>Connection: close：首部行告诉客户，发送完报文后关闭该TCP连接</li>
+<li>Date：首部行指示服务器产生并发送该响应报文的日期和时间。（不是指这个对象创建或者最后修改的时间，而是服务器从它的文件系统中检索到该对象，将该对象插入响应报文，并发送该响应报文的时间）</li>
+<li>Server</li>
+<li>Last-Modified：指示了这个对象创建或者最后修改的时间。(对既可能在本地客户也可能在网络缓存服务器上的对象缓存来说非常重要)</li>
+<li>Length：指示了被发送对象中的字节数</li>
+<li>Content-Type：</li>
+</ul>
+</li>
+<li>实体体(entity body)</li>
+</ol>
+<hr>
+<ul>
+<li>Web缓存<br>Web缓存器(Web cache)也叫代理服务器(proxy server)，它是能够代表初始Web服务器来满足HTTP请求的网络实体。<ul>
+<li>可以配置用户的浏览器，使得用户所有的HTTP请求首先指向Web缓存器。</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>浏览器建立一个到web缓存器的TCP连接，并向web缓存器发送一个请求报文；</li>
+<li>web缓存器检查本地是否存储了该对象的拷贝：如果有，向初始服务器发送一个条件GET请求报文（if-modified-since标记），检查本地拷贝是否是最新的：服务器会返回一个响应报文，如果是最新的，响应报文中不会包含请求对象(304 Not Modified)；如果不是最新的，响应报文中会包含请求对象，web缓存器更新其本地存储及相应的if-modified-since标记。如果没有，向初始服务器发送一个请求报文，收到请求后，更新本地存储。发送响应报文给客户端浏览器。</li>
+</ol>
+<p>GET /fruit/kiwi.gif HTTP/1.1<br>Host: <a href="http://www.exotiquecuisine.com" target="_blank" rel="noopener">www.exotiquecuisine.com</a></p>
+<p>HTTP/1.1 200 Ok<br>Date: Sat, 3 Oct 2015 15:39:29<br>Server: Apache/1.3.0 (Unix)<br>Last-Modified: Wed, 9 Sep 2015 09:23:24<br>Content-Type: image/gif<br>(data data data data … ) </p>
+<p>GET /fruit/kiwi.gif HTTP/1.1<br>Host: <a href="http://www.exotiquecuisine.com" target="_blank" rel="noopener">www.exotiquecuisine.com</a><br>If-modified-since：Wed, 9 Sep 2015 09:23:24</p>
+<p>HTTP/1.1 304 Not Modified<br>Date: Sat, 10 Oct 2015 15:39:29<br>Server: Apache/1.3.0 (Unix)<br>(empty entity body)</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Internet/DNS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1192,95 +1385,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E5%8D%81%E7%AB%A0%EF%BC%9A%E5%A4%8D%E5%88%B6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="记录成长">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E5%8D%81%E7%AB%A0%EF%BC%9A%E5%A4%8D%E5%88%B6/" class="post-title-link" itemprop="url">高性能MySQL第十章：复制</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：21:59:33" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%AB%98%E6%80%A7%E8%83%BDMySQL/" itemprop="url" rel="index"><span itemprop="name">高性能MySQL</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="复制概述"><a href="#复制概述" class="headerlink" title="复制概述"></a>复制概述</h2><p>基于行的复制和基于语句的复制，都是通过在主库上记录二进制日志，在备库重放日志的方式来实现异步的数据复制。</p>
-<h3 id="复制解决的问题"><a href="#复制解决的问题" class="headerlink" title="复制解决的问题"></a>复制解决的问题</h3><ol>
-<li>数据分布</li>
-<li>负载均衡</li>
-<li>备份</li>
-<li>高可用性和故障切换</li>
-<li>MySQL升级测试</li>
-</ol>
-<h3 id="复制如何工作"><a href="#复制如何工作" class="headerlink" title="复制如何工作"></a>复制如何工作</h3><ul>
-<li>在主库上把数据更改记录到二进制日志中</li>
-</ul>
-<p>在每次准备提交事务完成数据更新前，主库将数据更新的事件记录到二进制日志中。</p>
-<ul>
-<li>备库将主库上的日志复制到自己的中继日志中</li>
-</ul>
-<p>首先，备库会启动一个 I/O 线程，该线程和主库建立一个普通的客户端连接</p>
-<p>然后在主库中建立启动一个特殊的二进制转储线程，该线程会读取主库上二进制日志中的事件。（wait，notify）</p>
-<ul>
-<li>备库读取中继日志中的事件，将其重放到备库数据之上</li>
-</ul>
-<p>这种复制架构实现了事件的获取和重返事件的解耦，允许这两个过程异步进行。也就是 I/O 线程能够独立于 SQL 线程之外工作。</p>
-<p>主库上并发运行的查询到备库上只能串行化执行，因为只有一个 SQL 线程来重放中继日志中的事件</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1352,7 +1456,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-count">42</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
