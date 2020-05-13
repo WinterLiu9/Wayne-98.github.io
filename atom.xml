@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Wayne</title>
+  
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://wayne-98.github.io/"/>
+  <updated>2020-05-13T10:08:35.203Z</updated>
+  <id>http://wayne-98.github.io/</id>
+  
+  <author>
+    <name>Wayne</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>剑指Offer复习</title>
+    <link href="http://wayne-98.github.io/2020/05/13/Algorithms/May/%E5%89%91%E6%8C%87Offer%E5%A4%8D%E4%B9%A0/"/>
+    <id>http://wayne-98.github.io/2020/05/13/Algorithms/May/%E5%89%91%E6%8C%87Offer%E5%A4%8D%E4%B9%A0/</id>
+    <published>2020-05-13T08:52:56.009Z</published>
+    <updated>2020-05-13T10:08:35.203Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;栈&quot;&gt;&lt;a href=&quot;#栈&quot; class=&quot;headerlink&quot; title=&quot;栈&quot;&gt;&lt;/a&gt;栈&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;&lt;a href=&quot;https://leetcode-cn.com/problems/yong-liang-ge-zhan-shi-xia
+      
+    
+    </summary>
+    
+    
+      <category term="Algorithms" scheme="http://wayne-98.github.io/categories/Algorithms/"/>
+    
+    
+      <category term="Algorithms" scheme="http://wayne-98.github.io/tags/Algorithms/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>自顶向下方法：网络层-控制平面</title>
+    <link href="http://wayne-98.github.io/2020/05/12/Internet/%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%EF%BC%9A%E7%BD%91%E7%BB%9C%E5%B1%82-%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/"/>
+    <id>http://wayne-98.github.io/2020/05/12/Internet/%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%EF%BC%9A%E7%BD%91%E7%BB%9C%E5%B1%82-%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/</id>
+    <published>2020-05-12T02:50:57.947Z</published>
+    <updated>2020-05-12T03:33:34.605Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;路由选择算法&quot;&gt;&lt;a href=&quot;#路由选择算法&quot; class=&quot;headerlink&quot; title=&quot;路由选择算法&quot;&gt;&lt;/a&gt;路由选择算法&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;集中式路由选择算法：拥有关于连通性和链路开销的全部完整信息。&lt;ul&gt;
+&lt;li&gt;链路状态(Link
+      
+    
+    </summary>
+    
+    
+      <category term="计算机网络" scheme="http://wayne-98.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"/>
+    
+    
+      <category term="计算机网络" scheme="http://wayne-98.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>自顶向下方法：网络层-数据平面</title>
+    <link href="http://wayne-98.github.io/2020/05/12/Internet/%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%EF%BC%9A%E7%BD%91%E7%BB%9C%E5%B1%82-%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/"/>
+    <id>http://wayne-98.github.io/2020/05/12/Internet/%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%EF%BC%9A%E7%BD%91%E7%BB%9C%E5%B1%82-%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/</id>
+    <published>2020-05-12T00:56:53.938Z</published>
+    <updated>2020-05-12T02:56:02.146Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;路由器工作原理&quot;&gt;&lt;a href=&quot;#路由器工作原理&quot; class=&quot;headerlink&quot; title=&quot;路由器工作原理&quot;&gt;&lt;/a&gt;路由器工作原理&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;输入端口&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;最长前缀匹配规则：在路由表中寻找最长的匹配项，
+      
+    
+    </summary>
+    
+    
+      <category term="计算机网络" scheme="http://wayne-98.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"/>
+    
+    
+      <category term="计算机网络" scheme="http://wayne-98.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>5.5 ~ 5.12 学习计划</title>
+    <link href="http://wayne-98.github.io/2020/05/10/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/5.5%20~%205.12%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/"/>
+    <id>http://wayne-98.github.io/2020/05/10/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/5.5%20~%205.12%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/</id>
+    <published>2020-05-10T14:18:16.513Z</published>
+    <updated>2020-05-10T14:18:51.426Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;5-5-5-12-学习计划&quot;&gt;&lt;a href=&quot;#5-5-5-12-学习计划&quot; class=&quot;headerlink&quot; title=&quot;5.5 ~ 5.12 学习计划&quot;&gt;&lt;/a&gt;5.5 ~ 5.12 学习计划&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;每天写 LeetCode，复习 
+      
+    
+    </summary>
+    
+    
+      <category term="学习记录" scheme="http://wayne-98.github.io/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>需要提升的点</title>
+    <link href="http://wayne-98.github.io/2020/05/10/%E9%9D%A2%E8%AF%95/%E9%9C%80%E8%A6%81%E6%8F%90%E5%8D%87%E7%9A%84%E7%82%B9/"/>
+    <id>http://wayne-98.github.io/2020/05/10/%E9%9D%A2%E8%AF%95/%E9%9C%80%E8%A6%81%E6%8F%90%E5%8D%87%E7%9A%84%E7%82%B9/</id>
+    <published>2020-05-10T13:39:10.600Z</published>
+    <updated>2020-05-10T14:15:52.022Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Collections.sort() 原理：归并&lt;/p&gt;
+&lt;p&gt;图的一些算法，需要复习一下&lt;/p&gt;
+&lt;p&gt;JVM 调优 参数&lt;/p&gt;
+&lt;p&gt;设计模式： 单例模式（懒汉饿汉） 工厂方法模式  观察者模式   责任链模式&lt;/p&gt;
+&lt;p&gt;红黑树&lt;/p&gt;
+&lt;p&gt;ThreadLoca
+      
+    
+    </summary>
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Socket I/O</title>
+    <link href="http://wayne-98.github.io/2020/05/10/Scoket/socket%20IO/"/>
+    <id>http://wayne-98.github.io/2020/05/10/Scoket/socket%20IO/</id>
+    <published>2020-05-10T13:39:10.589Z</published>
+    <updated>2020-05-10T14:15:22.255Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;One basic concept of Linux (actually Unix) is the rule that everything in Unix/Linux is a file. Each process has a table of file descript
+      
+    
+    </summary>
+    
+    
+      <category term="I/O" scheme="http://wayne-98.github.io/categories/I-O/"/>
+    
+    
+      <category term="I/O" scheme="http://wayne-98.github.io/tags/I-O/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>简单操作系统概念</title>
+    <link href="http://wayne-98.github.io/2020/05/10/Operating%20System/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/"/>
+    <id>http://wayne-98.github.io/2020/05/10/Operating%20System/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/</id>
+    <published>2020-05-10T13:39:10.577Z</published>
+    <updated>2020-05-10T14:14:52.059Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;1-操作系统概述&quot;&gt;&lt;a href=&quot;#1-操作系统概述&quot; class=&quot;headerlink&quot; title=&quot;1. 操作系统概述&quot;&gt;&lt;/a&gt;1. 操作系统概述&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;操作系统的特征&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong
+      
+    
+    </summary>
+    
+    
+      <category term="Operating System" scheme="http://wayne-98.github.io/categories/Operating-System/"/>
+    
+    
+      <category term="Operating System" scheme="http://wayne-98.github.io/tags/Operating-System/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深入理解Java虚拟机第四部分：程序编译与代码优化</title>
+    <link href="http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E5%9B%9B%E9%83%A8%E5%88%86%EF%BC%9A%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/"/>
+    <id>http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E5%9B%9B%E9%83%A8%E5%88%86%EF%BC%9A%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/</id>
+    <published>2020-05-10T13:39:10.563Z</published>
+    <updated>2020-05-10T14:13:59.999Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;前端编译与优化&quot;&gt;&lt;a href=&quot;#前端编译与优化&quot; class=&quot;headerlink&quot; title=&quot;前端编译与优化&quot;&gt;&lt;/a&gt;前端编译与优化&lt;/h1&gt;&lt;p&gt;Java中即时编译器在运行期的优化过程对于程序运行来说更重要，而前端编译器在编译期的优化过程对于程序
+      
+    
+    </summary>
+    
+    
+      <category term="JVM" scheme="http://wayne-98.github.io/categories/JVM/"/>
+    
+    
+      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深入理解Java虚拟机第二部分：走进内存管理</title>
+    <link href="http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%EF%BC%9A%E8%B5%B0%E8%BF%9B%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/"/>
+    <id>http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%EF%BC%9A%E8%B5%B0%E8%BF%9B%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</id>
+    <published>2020-05-10T13:39:10.556Z</published>
+    <updated>2020-05-10T14:13:28.618Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;Java内存区域与内存溢出异常&quot;&gt;&lt;a href=&quot;#Java内存区域与内存溢出异常&quot; class=&quot;headerlink&quot; title=&quot;Java内存区域与内存溢出异常&quot;&gt;&lt;/a&gt;Java内存区域与内存溢出异常&lt;/h1&gt;&lt;h2 id=&quot;运行时数据区域&quot;&gt;&lt;a h
+      
+    
+    </summary>
+    
+    
+      <category term="JVM" scheme="http://wayne-98.github.io/categories/JVM/"/>
+    
+    
+      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深入理解Java虚拟机第三部分：虚拟机执行子系统</title>
+    <link href="http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%B8%89%E9%83%A8%E5%88%86%EF%BC%9A%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%A7%E8%A1%8C%E5%AD%90%E7%B3%BB%E7%BB%9F/"/>
+    <id>http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%B8%89%E9%83%A8%E5%88%86%EF%BC%9A%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%A7%E8%A1%8C%E5%AD%90%E7%B3%BB%E7%BB%9F/</id>
+    <published>2020-05-10T13:39:10.549Z</published>
+    <updated>2020-05-10T14:13:45.441Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;类文件结构&quot;&gt;&lt;a href=&quot;#类文件结构&quot; class=&quot;headerlink&quot; title=&quot;类文件结构&quot;&gt;&lt;/a&gt;类文件结构&lt;/h1&gt;&lt;h2 id=&quot;无关系的基石&quot;&gt;&lt;a href=&quot;#无关系的基石&quot; class=&quot;headerlink&quot; title=&quot;无
+      
+    
+    </summary>
+    
+    
+      <category term="JVM" scheme="http://wayne-98.github.io/categories/JVM/"/>
+    
+    
+      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>HashMap</title>
+    <link href="http://wayne-98.github.io/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/HashMap/"/>
+    <id>http://wayne-98.github.io/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/HashMap/</id>
+    <published>2020-05-10T13:39:10.535Z</published>
+    <updated>2020-05-10T14:13:04.131Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;java.util.Map 的实现类主要有四个常用的：HashMap、Hashtable、LinkedHashMap和TreeMap&lt;/p&gt;
+&lt;p&gt;(1) HashMap：&lt;strong&gt;遍历顺序不确定&lt;/strong&gt;， HashMap最多只&lt;strong&gt;允许一条记录的
+      
+    
+    </summary>
+    
+    
+      <category term="Java 容器" scheme="http://wayne-98.github.io/categories/Java-%E5%AE%B9%E5%99%A8/"/>
+    
+    
+      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ConcurrentHashMap</title>
+    <link href="http://wayne-98.github.io/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/ConcurrentHashMap/"/>
+    <id>http://wayne-98.github.io/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/ConcurrentHashMap/</id>
+    <published>2020-05-10T13:39:10.527Z</published>
+    <updated>2020-05-10T14:12:53.263Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;JDK1.8版本的ConcurrentHashMap的数据结构已经接近HashMap，相对而言，ConcurrentHashMap只是增加了同步的操作来控制并发，从JDK1.7版本的ReentrantLock+Segment+HashEntry，到JDK1.8版本中sync
+      
+    
+    </summary>
+    
+    
+      <category term="Java 容器" scheme="http://wayne-98.github.io/categories/Java-%E5%AE%B9%E5%99%A8/"/>
+    
+    
+      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java并发编程的艺术 第二章：Java并发机制的底层实现原理</title>
+    <link href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%20%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9AJava%E5%B9%B6%E5%8F%91%E6%9C%BA%E5%88%B6%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/"/>
+    <id>http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%20%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9AJava%E5%B9%B6%E5%8F%91%E6%9C%BA%E5%88%B6%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</id>
+    <published>2020-05-10T13:39:10.517Z</published>
+    <updated>2020-05-10T14:12:01.934Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;Java并发编程的艺术-第二章&quot;&gt;&lt;a href=&quot;#Java并发编程的艺术-第二章&quot; class=&quot;headerlink&quot; title=&quot;Java并发编程的艺术 第二章&quot;&gt;&lt;/a&gt;Java并发编程的艺术 第二章&lt;/h1&gt;&lt;p&gt;Java代码在编译后会变成Java字
+      
+    
+    </summary>
+    
+    
+      <category term="Java Concurrent" scheme="http://wayne-98.github.io/categories/Java-Concurrent/"/>
+    
+    
+      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java并发编程的艺术 第三章：Java内存模型</title>
+    <link href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%20%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/"/>
+    <id>http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%20%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/</id>
+    <published>2020-05-10T13:39:10.509Z</published>
+    <updated>2020-05-10T14:11:19.899Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;3-Java内存模型&quot;&gt;&lt;a href=&quot;#3-Java内存模型&quot; class=&quot;headerlink&quot; title=&quot;3. Java内存模型&quot;&gt;&lt;/a&gt;3. Java内存模型&lt;/h1&gt;&lt;p&gt;Java线程之间的通信对程序员完全透明，内存可见性问题很容易困扰Java
+      
+    
+    </summary>
+    
+    
+      <category term="Java Concurrent" scheme="http://wayne-98.github.io/categories/Java-Concurrent/"/>
+    
+    
+      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java中的线程池</title>
+    <link href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/"/>
+    <id>http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/</id>
+    <published>2020-05-10T13:39:10.502Z</published>
+    <updated>2020-05-12T12:52:39.131Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;&lt;strong&gt;线程池的优点：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;降低资源消耗&lt;/strong&gt;。通过重复利用已创建的线程降低线程创建和销毁造成的消耗&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;提高响应速度&lt;/strong&gt;。当任务到达时，任务可以不需要等
+      
+    
+    </summary>
+    
+    
+      <category term="Java Concurrent" scheme="http://wayne-98.github.io/categories/Java-Concurrent/"/>
+    
+    
+      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java中的并发工具类</title>
+    <link href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E4%B8%AD%E7%9A%84%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E7%B1%BB/"/>
+    <id>http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E4%B8%AD%E7%9A%84%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E7%B1%BB/</id>
+    <published>2020-05-10T13:39:10.490Z</published>
+    <updated>2020-05-10T14:11:41.892Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;等待多线程完成的CountDownLatch&quot;&gt;&lt;a href=&quot;#等待多线程完成的CountDownLatch&quot; class=&quot;headerlink&quot; title=&quot;等待多线程完成的CountDownLatch&quot;&gt;&lt;/a&gt;等待多线程完成的CountDownLat
+      
+    
+    </summary>
+    
+    
+      <category term="Java Concurrent" scheme="http://wayne-98.github.io/categories/Java-Concurrent/"/>
+    
+    
+      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Condition</title>
+    <link href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Condition/"/>
+    <id>http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Condition/</id>
+    <published>2020-05-10T13:39:10.478Z</published>
+    <updated>2020-05-10T14:10:39.014Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;Condition接口与示例&quot;&gt;&lt;a href=&quot;#Condition接口与示例&quot; class=&quot;headerlink&quot; title=&quot;Condition接口与示例&quot;&gt;&lt;/a&gt;Condition接口与示例&lt;/h1&gt;&lt;figure class=&quot;highlight 
+      
+    
+    </summary>
+    
+    
+      <category term="Java Concurrent" scheme="http://wayne-98.github.io/categories/Java-Concurrent/"/>
+    
+    
+      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>AQS</title>
+    <link href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/AQS/"/>
+    <id>http://wayne-98.github.io/2020/05/10/Java%20Concurrent/AQS/</id>
+    <published>2020-05-10T13:39:10.467Z</published>
+    <updated>2020-05-10T14:10:23.902Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;&lt;a href=&quot;https://segmentfault.com/a/1190000017372067&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;AQS&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;AbstractQueuedSynchronizer&lt;/p&gt;
+&lt;p&gt;Syn
+      
+    
+    </summary>
+    
+    
+      <category term="Java Concurrent" scheme="http://wayne-98.github.io/categories/Java-Concurrent/"/>
+    
+    
+      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>可靠传输原理</title>
+    <link href="http://wayne-98.github.io/2020/05/10/Internet/%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86/"/>
+    <id>http://wayne-98.github.io/2020/05/10/Internet/%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86/</id>
+    <published>2020-05-10T13:39:10.454Z</published>
+    <updated>2020-05-10T14:09:51.880Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;可靠传输原理&quot;&gt;&lt;a href=&quot;#可靠传输原理&quot; class=&quot;headerlink&quot; title=&quot;可靠传输原理&quot;&gt;&lt;/a&gt;可靠传输原理&lt;/h2&gt;&lt;h3 id=&quot;流水线可靠数据传输协议&quot;&gt;&lt;a href=&quot;#流水线可靠数据传输协议&quot; class=&quot;header
+      
+    
+    </summary>
+    
+    
+      <category term="计算机网络" scheme="http://wayne-98.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"/>
+    
+    
+      <category term="计算机网络" scheme="http://wayne-98.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>TCP</title>
+    <link href="http://wayne-98.github.io/2020/05/10/Internet/TCP/"/>
+    <id>http://wayne-98.github.io/2020/05/10/Internet/TCP/</id>
+    <published>2020-05-10T13:39:10.451Z</published>
+    <updated>2020-05-13T03:43:30.874Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;TCP连接&quot;&gt;&lt;a href=&quot;#TCP连接&quot; class=&quot;headerlink&quot; title=&quot;TCP连接&quot;&gt;&lt;/a&gt;TCP连接&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;TCP连接的组成&lt;/strong&gt;&lt;br&gt;    一台主机上的缓存、变量和与进程连接的套接字 ，以及
+      
+    
+    </summary>
+    
+    
+      <category term="计算机网络" scheme="http://wayne-98.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"/>
+    
+    
+      <category term="计算机网络" scheme="http://wayne-98.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"/>
+    
+  </entry>
+  
+</feed>
