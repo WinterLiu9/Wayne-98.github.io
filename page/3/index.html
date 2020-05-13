@@ -163,6 +163,195 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/AQS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="记录成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Java%20Concurrent/AQS/" class="post-title-link" itemprop="url">AQS</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:10:23" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java-Concurrent/" itemprop="url" rel="index"><span itemprop="name">Java Concurrent</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a href="https://segmentfault.com/a/1190000017372067" target="_blank" rel="noopener">AQS</a></p>
+<p>AbstractQueuedSynchronizer</p>
+<p>Sync extends AbstractQueuedSynchronizer</p>
+<p>Sync 有两个主要的实现类 NofairSync，FailSync</p>
+<h2 id="NofairSync-lock"><a href="#NofairSync-lock" class="headerlink" title="NofairSync.lock()"></a>NofairSync.lock()</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (compareAndSetState(<span class="number">0</span>, <span class="number">1</span>)) <span class="comment">//通过cas操作来修改state状态，表示争抢锁的操作</span></span><br><span class="line">		setExclusiveOwnerThread(Thread.currentThread());<span class="comment">//设置当前获得锁状态的线程</span></span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		acquire(<span class="number">1</span>); <span class="comment">//尝试去获取锁</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">acquire</span><span class="params">(<span class="keyword">int</span> arg)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (!tryAcquire(arg) &amp;&amp; acquireQueued(addWaiter(Node.EXCLUSIVE), arg))</span><br><span class="line">		selfInterrupt();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">tryAcquire</span><span class="params">(<span class="keyword">int</span> acquires)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> nonfairTryAcquire(acquires);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">nonfairTryAcquire</span><span class="params">(<span class="keyword">int</span> acquires)</span> </span>&#123;</span><br><span class="line">	<span class="comment">//获得当前执行的线程</span></span><br><span class="line">	<span class="keyword">final</span> Thread current = Thread.currentThread();</span><br><span class="line">	<span class="keyword">int</span> c = getState(); <span class="comment">//获得state的值</span></span><br><span class="line">	<span class="keyword">if</span> (c == <span class="number">0</span>) &#123; <span class="comment">//state=0说明当前是无锁状态</span></span><br><span class="line">		<span class="comment">//通过cas操作来替换state的值改为1</span></span><br><span class="line">		<span class="keyword">if</span> (compareAndSetState(<span class="number">0</span>, acquires)) &#123;</span><br><span class="line">			<span class="comment">//保存当前获得锁的线程</span></span><br><span class="line">			setExclusiveOwnerThread(current);</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//这段逻辑就很简单了。如果是同一个线程来获得锁，则直接增加重入次数</span></span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (current == getExclusiveOwnerThread()) &#123;</span><br><span class="line">		<span class="keyword">int</span> nextc = c + acquires; <span class="comment">//增加重入次数</span></span><br><span class="line">		<span class="keyword">if</span> (nextc &lt; <span class="number">0</span>) <span class="comment">// overflow</span></span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"Maximum lock count exceeded"</span>);</span><br><span class="line">		setState(nextc);</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> Node <span class="title">enq</span><span class="params">(<span class="keyword">final</span> Node node)</span> </span>&#123;</span><br><span class="line">	<span class="comment">//自旋</span></span><br><span class="line">	<span class="keyword">for</span> (;;) &#123;</span><br><span class="line">		Node t = tail; <span class="comment">//如果是第一次添加到队列，那么tail=null</span></span><br><span class="line">		<span class="keyword">if</span> (t == <span class="keyword">null</span>) &#123; <span class="comment">// Must initialize</span></span><br><span class="line">			<span class="comment">//CAS的方式创建一个空的Node作为头结点</span></span><br><span class="line">			<span class="keyword">if</span> (compareAndSetHead(<span class="keyword">new</span> Node()))</span><br><span class="line">			<span class="comment">//此时队列中只一个头结点，所以tail也指向它</span></span><br><span class="line">			tail = head;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">//进行第二次循环时，tail不为null，进入else区域。将当前线程的Node结点的prev指向tail，然后使用CAS将tail指向Node</span></span><br><span class="line">			node.prev = t;</span><br><span class="line">			<span class="keyword">if</span> (compareAndSetTail(t, node)) &#123;</span><br><span class="line">			<span class="comment">//t此时指向tail,所以可以CAS成功，将tail重新指向Node。此时t为更新前的tail的值，即指向空的头结点，t.next=node，就将头结点的后续结点指向Node，返回头结点</span></span><br><span class="line">				t.next = node;</span><br><span class="line">				<span class="keyword">return</span> t;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Node <span class="title">addWaiter</span><span class="params">(Node mode)</span> </span>&#123; <span class="comment">//mode=Node.EXCLUSIVE</span></span><br><span class="line">	<span class="comment">//将当前线程封装成Node，并且mode为独占锁</span></span><br><span class="line">	Node node = <span class="keyword">new</span> Node(Thread.currentThread(), mode);</span><br><span class="line">	<span class="comment">// Try the fast path of enq; backup to full enq on failure</span></span><br><span class="line">	<span class="comment">// tail是AQS的中表示同步队列队尾的属性，刚开始为null，所以进行enq(node)方法</span></span><br><span class="line">	Node pred = tail;</span><br><span class="line">	<span class="keyword">if</span> (pred != <span class="keyword">null</span>) &#123; <span class="comment">//tail不为空的情况，说明队列中存在节点数据</span></span><br><span class="line">		node.prev = pred; <span class="comment">//讲当前线程的Node的prev节点指向tail</span></span><br><span class="line">		<span class="keyword">if</span> (compareAndSetTail(pred, node)) &#123;<span class="comment">//通过cas讲node添加到AQS队列</span></span><br><span class="line">			pred.next = node;<span class="comment">//cas成功，把旧的tail的next指针指向新的tail</span></span><br><span class="line">			<span class="keyword">return</span> node;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	enq(node); <span class="comment">//tail=null，将node添加到同步队列中</span></span><br><span class="line">	<span class="keyword">return</span> node;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">acquireQueued</span><span class="params">(<span class="keyword">final</span> Node node, <span class="keyword">int</span> arg)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span> failed = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">boolean</span> interrupted = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">            <span class="keyword">final</span> Node p = node.predecessor();<span class="comment">// 获取prev节点,若为null即刻抛出NullPointException</span></span><br><span class="line">            <span class="keyword">if</span> (p == head &amp;&amp; tryAcquire(arg)) &#123;<span class="comment">// 如果前驱为head才有资格进行锁的抢夺</span></span><br><span class="line">                setHead(node); <span class="comment">// 获取锁成功后就不需要再进行同步操作了,获取锁成功的线程作为新的head节点</span></span><br><span class="line"><span class="comment">//凡是head节点,head.thread与head.prev永远为null, 但是head.next不为null</span></span><br><span class="line">                p.next = <span class="keyword">null</span>; <span class="comment">// help GC</span></span><br><span class="line">                failed = <span class="keyword">false</span>; <span class="comment">//获取锁成功</span></span><br><span class="line">                <span class="keyword">return</span> interrupted;</span><br><span class="line">            &#125;</span><br><span class="line"><span class="comment">//如果获取锁失败，则根据节点的waitStatus决定是否需要挂起线程</span></span><br><span class="line">            <span class="keyword">if</span> (shouldParkAfterFailedAcquire(p, node) &amp;&amp;</span><br><span class="line">                parkAndCheckInterrupt())<span class="comment">// 若前面为true,则执行挂起,待下次唤醒的时候检测中断的标志</span></span><br><span class="line">                interrupted = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (failed) <span class="comment">// 如果抛出异常则取消锁的获取,进行出队(sync queue)操作</span></span><br><span class="line">            cancelAcquire(node);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">shouldParkAfterFailedAcquire</span><span class="params">(Node pred, Node node)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> ws = pred.waitStatus; <span class="comment">//前继节点的状态</span></span><br><span class="line">    <span class="keyword">if</span> (ws == Node.SIGNAL)<span class="comment">//如果是SIGNAL状态，意味着当前线程需要被unpark唤醒</span></span><br><span class="line">               <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line"><span class="comment">//如果前节点的状态大于0，即为CANCELLED状态时，则会从前节点开始逐步循环找到一个没有被“CANCELLED”节点设置为当前节点的前节点，返回false。在下次循环执行shouldParkAfterFailedAcquire时，返回true。这个操作实际是把队列中CANCELLED的节点剔除掉。</span></span><br><span class="line">    <span class="keyword">if</span> (ws &gt; <span class="number">0</span>) &#123;<span class="comment">// 如果前继节点是“取消”状态，则设置 “当前节点”的 “当前前继节点” 为 “‘原前继节点'的前继节点”。</span></span><br><span class="line">       </span><br><span class="line">        <span class="keyword">do</span> &#123;</span><br><span class="line">            node.prev = pred = pred.prev;</span><br><span class="line">        &#125; <span class="keyword">while</span> (pred.waitStatus &gt; <span class="number">0</span>);</span><br><span class="line">        pred.next = node;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">// 如果前继节点为“0”或者“共享锁”状态，则设置前继节点为SIGNAL状态。</span></span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         * waitStatus must be 0 or PROPAGATE.  Indicate that we</span></span><br><span class="line"><span class="comment">         * need a signal, but don't park yet.  Caller will need to</span></span><br><span class="line"><span class="comment">         * retry to make sure it cannot acquire before parking.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        compareAndSetWaitStatus(pred, ws, Node.SIGNAL);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">parkAndCheckInterrupt</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        LockSupport.park(<span class="keyword">this</span>);</span><br><span class="line">        <span class="keyword">return</span> Thread.interrupted();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="ReentrantLock-unlock"><a href="#ReentrantLock-unlock" class="headerlink" title="ReentrantLock.unlock"></a>ReentrantLock.unlock</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">release</span><span class="params">(<span class="keyword">int</span> arg)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (tryRelease(arg)) &#123;</span><br><span class="line">        Node h = head;</span><br><span class="line">        <span class="keyword">if</span> (h != <span class="keyword">null</span> &amp;&amp; h.waitStatus != <span class="number">0</span>)</span><br><span class="line">            unparkSuccessor(h);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">tryRelease</span><span class="params">(<span class="keyword">int</span> releases)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> c = getState() - releases; <span class="comment">// 这里是将锁的数量减1</span></span><br><span class="line">    <span class="keyword">if</span> (Thread.currentThread() != getExclusiveOwnerThread())<span class="comment">// 如果释放的线程和获取锁的线程不是同一个，抛出非法监视器状态异常</span></span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalMonitorStateException();</span><br><span class="line">    <span class="keyword">boolean</span> free = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">if</span> (c == <span class="number">0</span>) &#123; </span><br><span class="line"><span class="comment">// 由于重入的关系，不是每次释放锁c都等于0，</span></span><br><span class="line">    <span class="comment">// 直到最后一次释放锁时，才会把当前线程释放</span></span><br><span class="line">        free = <span class="keyword">true</span>;</span><br><span class="line">        setExclusiveOwnerThread(<span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    setState(c);</span><br><span class="line">    <span class="keyword">return</span> free;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">unparkSuccessor</span><span class="params">(Node node)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> ws = node.waitStatus;</span><br><span class="line">    <span class="keyword">if</span> (ws &lt; <span class="number">0</span>)</span><br><span class="line">        compareAndSetWaitStatus(node, ws, <span class="number">0</span>);</span><br><span class="line">    Node s = node.next;</span><br><span class="line">    <span class="keyword">if</span> (s == <span class="keyword">null</span> || s.waitStatus &gt; <span class="number">0</span>) &#123;<span class="comment">//判断后继节点是否为空或者是否是取消状态,</span></span><br><span class="line">        s = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">for</span> (Node t = tail; t != <span class="keyword">null</span> &amp;&amp; t != node; t = t.prev)</span><br><span class="line">            <span class="keyword">if</span> (t.waitStatus &lt;= <span class="number">0</span>) <span class="comment">//然后从队列尾部向前遍历找到最前面的一个waitStatus小于0的节点, 至于为什么从尾部开始向前遍历，因为在doAcquireInterruptibly.cancelAcquire方法的处理过程中只设置了next的变化，没有设置prev的变化，在最后有这样一行代码：node.next = node，如果这时执行了unparkSuccessor方法，并且向后遍历的话，就成了死循环了，所以这时只有prev是稳定的</span></span><br><span class="line">                s = t;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//内部首先会发生的动作是获取head节点的next节点，如果获取到的节点不为空，则直接通过：“LockSupport.unpark()”方法来释放对应的被挂起的线程，这样一来将会有一个节点唤醒后继续进入循环进一步尝试tryAcquire()方法来获取锁</span></span><br><span class="line">    <span class="keyword">if</span> (s != <span class="keyword">null</span>)</span><br><span class="line">        LockSupport.unpark(s.thread); <span class="comment">//释放许可</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Internet/%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="记录成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Internet/%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86/" class="post-title-link" itemprop="url">可靠传输原理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:09:51" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="可靠传输原理"><a href="#可靠传输原理" class="headerlink" title="可靠传输原理"></a>可靠传输原理</h2><h3 id="流水线可靠数据传输协议"><a href="#流水线可靠数据传输协议" class="headerlink" title="流水线可靠数据传输协议"></a>流水线可靠数据传输协议</h3><ul>
+<li>增加序号范围</li>
+<li>协议的发送方和接收方两端需要缓存分组。(发送方最低限度应当能缓冲那些已经发送但是没有被确认的分组，接收方需要缓存那些已正确接收的分组)</li>
+</ul>
+<h3 id="回退N步-GBN-滑动窗口协议"><a href="#回退N步-GBN-滑动窗口协议" class="headerlink" title="回退N步(GBN)滑动窗口协议"></a>回退N步(GBN)滑动窗口协议</h3><ul>
+<li>GBN 发送方需要响应的三种类型的事件：<ol>
+<li>上层的调用: 发送方需要检查发送窗口是否已满，既是否有 N 个已发送但未被确认的分组。</li>
+<li>收到一个 ACK: GBN 协议中，对序号为N的分组的确认采取<strong>累积确认</strong>的方式，表明接收方已正确接收到序号为 N 的以前且包括 N 在内的所有的分组</li>
+<li>超时事件: 如果出现超时，发送方重传所有已发送但还未被确认过的分组。(只采用了一个定时器，在 base 处)</li>
+</ol>
+</li>
+<li>GBN 接收方：<br>如果一个序号为 N 的分组被正确接收，并且按序(既上一次交付给上层的数据是序号为 N - 1 的分组),则接收方为分组 N 发送一个 ACK ，并将该分组中的数据部分交付给上层。在所有其他情况下，接收方丢弃该分组，并为最近按序接收的分组重新发送 ACK 。<br>(接收方不需要缓存任何失序分组。因为发送方会重传所有已发送但还未被确认过的分组)</li>
+</ul>
+<h3 id="选择重传-SR"><a href="#选择重传-SR" class="headerlink" title="选择重传(SR)"></a>选择重传(SR)</h3><p>当窗口长度和时延带宽积都很大的时候，在流水线中会有很多分组更是如此。单个分组的差错就能够引起 GBN 重传大量分组，很多分组根本没必要重传。<br>选择重传协议通过让发送方仅重传那些它怀疑在接收方出错的分组而避免了不必要的重传。</p>
+<ul>
+<li>SR 发送方的事件和动作：</li>
+</ul>
+<ol>
+<li>从上层收到数据：发送方需要检查发送窗口是否已满，既是否有N个已发送但未被确认的分组。</li>
+<li>收到 ACK : 如果收到 ACK ，倘若该分组序号在窗口内，则 SR 发送方将那个被确认的分组标记为已接受。如果该分组的序号等于 send_base ，则窗口基序号向前移动到具有最小序号的未确认分组处。</li>
+<li>超时事件：每个分组都必须拥有其自己的逻辑定时器。</li>
+</ol>
+<ul>
+<li>SR接收方的事件和动作：</li>
+</ul>
+<ol>
+<li>序号在 [ rcv_base, rcv_base + N - 1 ] 内的分组被正确接受。在此情况下，收到的分组落在接收方的窗口内，一个选择 ACK 被回送给发送方。如果该分组以前没收到过，则缓存该分组。如果该分组的序号等于接受窗口的基序号，则该分组以及以前缓存的序号连续的分组交付给上层。然后接受窗口按向前移动分组的编号向上交付这些分组。</li>
+<li>序号在 [ rcv_base - N, rcv_base - 1 ] 内的分组被正确接收到。在此情况下，必须产生一个 ACK ，即使该分组是接收方以前已确认过的分组。</li>
+<li>其他情况，忽略该分组。</li>
+</ol>
+<ul>
+<li>窗口长度必须小于等于序号空间大小的一半</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Internet/TCP/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1369,202 +1558,6 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Database/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%AE%BA/%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="记录成长">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Database/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%AE%BA/%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6/" class="post-title-link" itemprop="url">并发控制</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:01:46" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%AE%BA/" itemprop="url" rel="index"><span itemprop="name">数据库系统概论</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <ul>
-<li>封锁协议：</li>
-</ul>
-<ol>
-<li>一级封锁协议：事务 T 在修改数据 R 之前必须先对其加 X 锁，直到事务结束才释放。（解决了丢失修改）</li>
-<li>二级封锁协议：在一级封锁协议的基础上增加事务 T 在读取数据 R 之前必须先对其加 S 锁，读完后即可释放 S 锁。（解决了 读“脏”数据）</li>
-<li>三级封锁协议：在一级封锁协议的基础上增加事务 T 在读取数据 R 之前必须先对其加 S 锁，直到事务结束才释放。（解决了不可重复读）</li>
-</ol>
-<ul>
-<li>活锁：类似于操作系统“饿死进程”的情况，解决方案 先来先服务</li>
-<li>死锁：</li>
-</ul>
-<ul>
-<li><p>并发调度的可串行性：多个事务的并发执行是正确的，当且仅当其结果与按某一次序串行地执行这些事务时的结果相同，称这种调度策略为可串行化调度。</p>
-<p>可串行化是并发事务正确调度的准则。</p>
-</li>
-</ul>
-<ul>
-<li>两段锁协议：所有事务必须分两个阶段对数据项进行加锁和解锁<ul>
-<li>在对任何数据进行读、写之前，首先要申请并获得对该数据的封锁</li>
-<li>在释放一个封锁之后，事务不再申请和获得任何其他封锁。</li>
-</ul>
-</li>
-</ul>
-<p>事务遵守两段锁协议是可串行化调度的充分不必要条件。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Database/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%AE%BA/%E5%85%B3%E7%B3%BB%E6%95%B0%E6%8D%AE%E7%90%86%E8%AE%BA/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="记录成长">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Database/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%AE%BA/%E5%85%B3%E7%B3%BB%E6%95%B0%E6%8D%AE%E7%90%86%E8%AE%BA/" class="post-title-link" itemprop="url">关系数据理论</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:02:00" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%AE%BA/" itemprop="url" rel="index"><span itemprop="name">数据库系统概论</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="不规范的模式存在的问题"><a href="#不规范的模式存在的问题" class="headerlink" title="不规范的模式存在的问题"></a>不规范的模式存在的问题</h1><ol>
-<li>数据冗余</li>
-<li>更新异常</li>
-<li>插入异常</li>
-<li>删除异常</li>
-</ol>
-<h1 id="规范化"><a href="#规范化" class="headerlink" title="规范化"></a>规范化</h1><h2 id="函数依赖"><a href="#函数依赖" class="headerlink" title="函数依赖"></a>函数依赖</h2><p>定义：设 R(U) 是属性集 U 上的关系模式，X, Y 是 U 的子集。若对于 R(U) 的任意一个可能的关系r, r中不可能存在两个元组在 X 上的属性值相等，而在 Y 上的属性值不相等，则称 <strong>X 函数决定于 Y 或 Y 函数依赖于 X</strong>, 记作 X –&gt; Y</p>
-<p>X 函数决定于 Y, 但 Y ∉ X，则称 X 函数决定于 Y 是非平凡的函数依赖。</p>
-<p>X 函数决定于 Y, 但 Y ∈ X，则称X 函数决定于 Y 是平凡的函数依赖。(必然成立)</p>
-<p>在 R(U) 中，如果 X 函数决定于 Y, 并且对于 X 的任意一个真子集 X’, 都有 X‘ 不能函数决定于 Y, 则称 Y 对 X <strong>完全函数依赖</strong>。</p>
-<p>在 R(U)中，如果 X 函数决定于 Y (Y ∉ X)，Y 不函数决定于 X，Y 函数决定于 Z，Z ∉ Y 则称 Z 对 X 传递函数依赖。 </p>
-<h2 id="范式"><a href="#范式" class="headerlink" title="范式"></a>范式</h2><p>第一范式：二维表中每一个分量必须是不可分的数据项。</p>
-<hr>
-<p><strong>第二范式</strong>：若 R ∈ 1 NF, 并且每一个非主属性完全函数依赖于任何一个候选键。</p>
-<p>例如 S-L-C(<u>Sno</u>, Sdept, Sloc, <u>Cno</u>, Grade)</p>
-<p>函数依赖有</p>
-<p>(Sno, Cno) –&gt; Grande 完全函数依赖</p>
-<p>Sno –&gt; Sdept</p>
-<p>Sno –&gt; Sloc</p>
-<p>Sdept –&gt; Sloc</p>
-<p>(Sno, Cno) –&gt; Sdept 部分函数依赖</p>
-<p>(Sno, Cno) –&gt; Sloc 部分函数依赖</p>
-<p>则 S-L-C 不属于第二范式，因为非主属性 Sdept, Sloc 并不完全函数依赖于键。</p>
-<p>因此可能产生的问题：</p>
-<ol>
-<li><p>插入异常：如果此学生还未选课，则不能插入。因为键值一部分为空。</p>
-</li>
-<li><p>删除异常：如果一个学生只选了一门课，则他退课的时候，所有关于该生的信息都删除了。</p>
-</li>
-<li><p>修改复杂：如果一个学生转系了，则需要更新所有的 Sdept, Sloc。</p>
-</li>
-</ol>
-<p>进行模式分解：SC(<u>Sno, Cno</u>, Grade) 和 SL(<u>Sno</u>, Sdept, Sloc)</p>
-<hr>
-<p><strong>第三范式</strong>：若 R 属于第三范式，则每一个非主属性既不传递依赖于键，也不部分依赖于键。</p>
-<p>例如 SL(<u>Sno</u>, Sdept, Sloc), 其中 Sloc 传递依赖于 Sno，因此SL不属于第三范式。</p>
-<p>继续模式分解：SD(Sno, Sdept) 和 DL(Sdept, Sloc)</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1636,20 +1629,20 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-count">45</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

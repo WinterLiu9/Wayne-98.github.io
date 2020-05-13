@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://wayne-98.github.io/"/>
-  <updated>2020-05-13T13:25:43.439Z</updated>
+  <updated>2020-05-13T15:09:28.173Z</updated>
   <id>http://wayne-98.github.io/</id>
   
   <author>
@@ -15,6 +15,55 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>减脂心得</title>
+    <link href="http://wayne-98.github.io/2020/05/13/Life/%E8%AE%B0%E5%BD%95%E6%9C%80%E8%BF%91%E4%B8%89%E4%B8%AA%E6%9C%88%E7%9A%84%E5%87%8F%E8%84%82/"/>
+    <id>http://wayne-98.github.io/2020/05/13/Life/%E8%AE%B0%E5%BD%95%E6%9C%80%E8%BF%91%E4%B8%89%E4%B8%AA%E6%9C%88%E7%9A%84%E5%87%8F%E8%84%82/</id>
+    <published>2020-05-13T14:37:48.961Z</published>
+    <updated>2020-05-13T15:09:28.173Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;减脂最重要的点&quot;&gt;&lt;a href=&quot;#减脂最重要的点&quot; class=&quot;headerlink&quot; title=&quot;减脂最重要的点&quot;&gt;&lt;/a&gt;减脂最重要的点&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;如果只是单纯的减脂，做好饮食就可以成功。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;饮食要遵循
+      
+    
+    </summary>
+    
+    
+      <category term="Life" scheme="http://wayne-98.github.io/categories/Life/"/>
+    
+    
+      <category term="Life" scheme="http://wayne-98.github.io/tags/Life/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>amanda减脂餐</title>
+    <link href="http://wayne-98.github.io/2020/05/13/Life/amanda%E5%87%8F%E8%84%82%E9%A4%90/"/>
+    <id>http://wayne-98.github.io/2020/05/13/Life/amanda%E5%87%8F%E8%84%82%E9%A4%90/</id>
+    <published>2020-05-13T14:35:14.398Z</published>
+    <updated>2020-05-13T14:37:12.111Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;amanda-减脂便当&quot;&gt;&lt;a href=&quot;#amanda-减脂便当&quot; class=&quot;headerlink&quot; title=&quot;amanda 减脂便当&quot;&gt;&lt;/a&gt;amanda 减脂便当&lt;/h1&gt;&lt;p&gt;火腿口蘑毛豆糙米饭（两餐量）：糙米、口蘑、火腿、姜末煮饭，结束十分钟
+      
+    
+    </summary>
+    
+    
+      <category term="Life" scheme="http://wayne-98.github.io/categories/Life/"/>
+    
+    
+      <category term="Life" scheme="http://wayne-98.github.io/tags/Life/"/>
+    
+  </entry>
   
   <entry>
     <title>5.13 ~ 5.18 学习计划</title>
@@ -458,56 +507,6 @@
     
     
       <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>AQS</title>
-    <link href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/AQS/"/>
-    <id>http://wayne-98.github.io/2020/05/10/Java%20Concurrent/AQS/</id>
-    <published>2020-05-10T13:39:10.467Z</published>
-    <updated>2020-05-10T14:10:23.902Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;&lt;a href=&quot;https://segmentfault.com/a/1190000017372067&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;AQS&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;AbstractQueuedSynchronizer&lt;/p&gt;
-&lt;p&gt;Syn
-      
-    
-    </summary>
-    
-    
-      <category term="Java Concurrent" scheme="http://wayne-98.github.io/categories/Java-Concurrent/"/>
-    
-    
-      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>可靠传输原理</title>
-    <link href="http://wayne-98.github.io/2020/05/10/Internet/%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86/"/>
-    <id>http://wayne-98.github.io/2020/05/10/Internet/%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86/</id>
-    <published>2020-05-10T13:39:10.454Z</published>
-    <updated>2020-05-10T14:09:51.880Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h2 id=&quot;可靠传输原理&quot;&gt;&lt;a href=&quot;#可靠传输原理&quot; class=&quot;headerlink&quot; title=&quot;可靠传输原理&quot;&gt;&lt;/a&gt;可靠传输原理&lt;/h2&gt;&lt;h3 id=&quot;流水线可靠数据传输协议&quot;&gt;&lt;a href=&quot;#流水线可靠数据传输协议&quot; class=&quot;header
-      
-    
-    </summary>
-    
-    
-      <category term="计算机网络" scheme="http://wayne-98.github.io/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"/>
-    
-    
-      <category term="计算机网络" scheme="http://wayne-98.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"/>
     
   </entry>
   
