@@ -2,11 +2,11 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>Wayne</title>
   
-  
+  <subtitle>Love Yourz</subtitle>
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://wayne-98.github.io/"/>
-  <updated>2020-05-14T01:52:40.693Z</updated>
+  <updated>2020-05-14T07:08:31.683Z</updated>
   <id>http://wayne-98.github.io/</id>
   
   <author>
@@ -18,10 +18,10 @@
   
   <entry>
     <title>减脂心得</title>
-    <link href="http://wayne-98.github.io/2020/05/13/Life/%E5%87%8F%E8%84%82%E5%BF%83%E5%BE%97/"/>
-    <id>http://wayne-98.github.io/2020/05/13/Life/%E5%87%8F%E8%84%82%E5%BF%83%E5%BE%97/</id>
+    <link href="http://wayne-98.github.io/2020/05/13/LIFE/%E5%87%8F%E8%84%82%E5%BF%83%E5%BE%97/"/>
+    <id>http://wayne-98.github.io/2020/05/13/LIFE/%E5%87%8F%E8%84%82%E5%BF%83%E5%BE%97/</id>
     <published>2020-05-13T14:37:48.961Z</published>
-    <updated>2020-05-14T01:52:40.693Z</updated>
+    <updated>2020-05-14T07:08:31.683Z</updated>
     
     <summary type="html">
     
@@ -34,19 +34,19 @@
     </summary>
     
     
-      <category term="Life" scheme="http://wayne-98.github.io/categories/Life/"/>
+      <category term="LIFE" scheme="http://wayne-98.github.io/categories/LIFE/"/>
     
     
-      <category term="Life" scheme="http://wayne-98.github.io/tags/Life/"/>
+      <category term="LIFE" scheme="http://wayne-98.github.io/tags/LIFE/"/>
     
   </entry>
   
   <entry>
     <title>amanda减脂餐</title>
-    <link href="http://wayne-98.github.io/2020/05/13/Life/amanda%E5%87%8F%E8%84%82%E9%A4%90/"/>
-    <id>http://wayne-98.github.io/2020/05/13/Life/amanda%E5%87%8F%E8%84%82%E9%A4%90/</id>
+    <link href="http://wayne-98.github.io/2020/05/13/LIFE/amanda%E5%87%8F%E8%84%82%E9%A4%90/"/>
+    <id>http://wayne-98.github.io/2020/05/13/LIFE/amanda%E5%87%8F%E8%84%82%E9%A4%90/</id>
     <published>2020-05-13T14:35:14.398Z</published>
-    <updated>2020-05-13T14:37:12.111Z</updated>
+    <updated>2020-05-14T07:08:36.223Z</updated>
     
     <summary type="html">
     
@@ -58,10 +58,10 @@
     </summary>
     
     
-      <category term="Life" scheme="http://wayne-98.github.io/categories/Life/"/>
+      <category term="LIFE" scheme="http://wayne-98.github.io/categories/LIFE/"/>
     
     
-      <category term="Life" scheme="http://wayne-98.github.io/tags/Life/"/>
+      <category term="LIFE" scheme="http://wayne-98.github.io/tags/LIFE/"/>
     
   </entry>
   
@@ -118,7 +118,7 @@
     <link href="http://wayne-98.github.io/2020/05/12/Internet/%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%EF%BC%9A%E7%BD%91%E7%BB%9C%E5%B1%82-%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/"/>
     <id>http://wayne-98.github.io/2020/05/12/Internet/%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%EF%BC%9A%E7%BD%91%E7%BB%9C%E5%B1%82-%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/</id>
     <published>2020-05-12T02:50:57.947Z</published>
-    <updated>2020-05-12T03:33:34.605Z</updated>
+    <updated>2020-05-14T05:23:03.639Z</updated>
     
     <summary type="html">
     
