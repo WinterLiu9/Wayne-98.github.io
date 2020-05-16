@@ -164,6 +164,80 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Condition/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Java%20Concurrent/Condition/" class="post-title-link" itemprop="url">Condition</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:10:39" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java-Concurrent/" itemprop="url" rel="index"><span itemprop="name">Java Concurrent</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Condition接口与示例"><a href="#Condition接口与示例" class="headerlink" title="Condition接口与示例"></a>Condition接口与示例</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BoundedQueue</span>&lt;<span class="title">T</span>&gt; </span>&#123;    </span><br><span class="line">    <span class="keyword">private</span> Object[] items;    <span class="comment">// 添加的下标，删除的下标和数组当前数量    </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> addIndex, removeIndex, count;    </span><br><span class="line">    <span class="keyword">private</span> Lock lock = <span class="keyword">new</span> ReentrantLock();    </span><br><span class="line">    <span class="keyword">private</span> Condition notEmpty = lock.newCondition();    </span><br><span class="line">    <span class="keyword">private</span> Condition notFull = lock.newCondition();    </span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BoundedQueue</span><span class="params">(<span class="keyword">int</span> size)</span> </span>&#123;        </span><br><span class="line">        items = <span class="keyword">new</span> Object[size];    </span><br><span class="line">    &#125;   </span><br><span class="line">    <span class="comment">// 添加一个元素，如果数组满，则添加线程进入等待状态，直到有"空位"    </span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(T t)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;        </span><br><span class="line">        lock.lock();<span class="comment">//首先需要获得锁，目的是确保数组修改的可见性和排他性</span></span><br><span class="line">        <span class="keyword">try</span> &#123;            </span><br><span class="line">            <span class="keyword">while</span> (count == items.length)                </span><br><span class="line">                notFull.await();            </span><br><span class="line">            items[addIndex] = t;            </span><br><span class="line">            <span class="keyword">if</span> (++addIndex == items.length)                </span><br><span class="line">                addIndex = <span class="number">0</span>;            </span><br><span class="line">            ++count;            </span><br><span class="line">            notEmpty.signal();        </span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;            </span><br><span class="line">            lock.unlock();        </span><br><span class="line">            &#125;   </span><br><span class="line">&#125;    </span><br><span class="line"><span class="comment">// 由头部删除一个元素，如果数组空，则删除线程进入等待状态，直到有新添加元素    @SuppressWarnings("unchecked")    </span></span><br><span class="line"><span class="function"><span class="keyword">public</span> T <span class="title">remove</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    lock.lock();        </span><br><span class="line">    <span class="keyword">try</span> &#123;            </span><br><span class="line">        <span class="keyword">while</span> (count == <span class="number">0</span>)                </span><br><span class="line">            notEmpty.await();            </span><br><span class="line">        Object x = items[removeIndex];            </span><br><span class="line">        <span class="keyword">if</span> (++removeIndex == items.length)                </span><br><span class="line">            removeIndex = <span class="number">0</span>;            </span><br><span class="line">        --count;            </span><br><span class="line">        notFull.signal();            </span><br><span class="line">        <span class="keyword">return</span> (T) x;        </span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;            </span><br><span class="line">        lock.unlock();        </span><br><span class="line">        &#125;    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Condition定义了等待/通知两种类型的方法，当前线程调用这些方法时，需要提前获取到Condition对象关联的锁。Condition对象是由Lock对象（调用Lock对象的newCondition()方法）创建出来的，换句话说，Condition是依赖Lock对象的。</p>
+<p>Condition的使用方式比较简单，需要注意在调用方法前获取锁。当调用await()方法后，当前线程会释放锁并在此等待，而其他线程调用Condition对象的signal()方法，通知当前线程后，当前线程才从await()方法返回，并且在返回前已经获取了锁。</p>
+<h1 id="Condition的实现分析"><a href="#Condition的实现分析" class="headerlink" title="Condition的实现分析"></a>Condition的实现分析</h1><ol>
+<li>等待队列</li>
+</ol>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/ConditionQueue.png?raw=true" alt=""><br>如果从队列（同步队列和等待队列）的角度看await()方法，当调用await()方法时，相当于同步队列的首节点（获取了锁的节点）移动到Condition的等待队列中。<br><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/JoinConditionQueue.png?raw=true" alt=""><br>调用Condition的signal()方法，将会唤醒在等待队列中等待时间最长的节点（首节点），在唤醒节点之前，会将节点移到同步队列中。<br><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/removeFromConditionQueue.png?raw=true" alt=""></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/AQS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -640,10 +714,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:09:33" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-14 20:16:50" itemprop="dateModified" datetime="2020-05-14T20:16:50+08:00">2020-05-14</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -681,9 +761,8 @@
 <li>在 HTTP 响应报文中的一个 cookie 首部行</li>
 <li>在 HTTP 请求报文中的一个 cookie 首部行</li>
 <li>在用户端系统中保留有一个 cookie 文件，并由用户的浏览器进行管理</li>
+<li>位于 Web 站点的一个后端数据库<br><img src="https://github.com/Wayne-98/image/blob/master/Internet/Cookie.png?raw=true" alt=""></li>
 </ol>
-</li>
-<li><p>位于 Web 站点的一个后端数据库<br> <img src="https://github.com/Wayne-98/image/blob/master/Internet/Cookie.png?raw=true" alt=""></p>
 </li>
 </ol>
 <ol start="2">
@@ -1456,109 +1535,6 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Design%20Pattern/Head%20First%20Design%20Pattern/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Design%20Pattern/Head%20First%20Design%20Pattern/" class="post-title-link" itemprop="url">Head First Desig Pattern</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:06:04" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Desig-Pattern/" itemprop="url" rel="index"><span itemprop="name">Desig Pattern</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="设计模式入门"><a href="#设计模式入门" class="headerlink" title="设计模式入门"></a>设计模式入门</h1><p><strong>设计原则</strong>：</p>
-<ol>
-<li>找出应用中可能需要变化之处，把它们独立出来，不要和那些不需要变化的代码混在一起。</li>
-<li>针对接口编程，而不是针对实现编程。</li>
-<li>多用组合，少用继承。</li>
-<li>为了交互对象之间的松耦合而努力。</li>
-<li>类应该对扩展开放，对修改关闭。</li>
-<li>要依赖抽象，不要依赖具体实现类。（依赖倒置原则）</li>
-</ol>
-<h2 id="策略模式"><a href="#策略模式" class="headerlink" title="策略模式"></a><a href="https://github.com/Wayne-98/Note/tree/master/Design%20Pattern/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F/Duck" target="_blank" rel="noopener">策略模式</a></h2><p>策略模式定义了算法族，分别封装起来，让它们之间可以互相替换，此模式让算法的变化独立于使用算法的客户。</p>
-<h2 id="观察者模式"><a href="#观察者模式" class="headerlink" title="观察者模式"></a><a href="https://github.com/Wayne-98/Note/tree/master/Design%20Pattern/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/Weather" target="_blank" rel="noopener">观察者模式</a></h2><p>观察者模式定义了对象之间的一对多依赖，这样一来，当一个对象改变状态时，它的所有的依赖者都会收到通知并自动更新。</p>
-<p>当两个对象之间松耦合，它们依然可以交互，但是不太清楚彼此的细节。</p>
-<p>观察者模式提供了一种对象设计，让主题和观察者之间松耦合。</p>
-<h2 id="装饰者模式"><a href="#装饰者模式" class="headerlink" title="装饰者模式"></a><a href="https://github.com/Wayne-98/Note/tree/master/Design%20Pattern/%E8%A3%85%E9%A5%B0%E8%80%85%E6%A8%A1%E5%BC%8F/Beverage" target="_blank" rel="noopener">装饰者模式</a></h2><p>装饰者模式动态地将责任附加到对象上。若要扩展功能，装饰者提供了比继承更有弹性的替代方案。</p>
-<p>装饰者和被装饰对象都有相同的超类型。</p>
-<p>可以用一个或多个装饰者包装一个对象</p>
-<p>既然装饰者和被装饰对象有相同的超类型，所以在任何需要原始对象(被包装的)的场合，可以用装饰过的对象替代它。</p>
-<p>装饰者可以在所委托被装饰者的行为之前 与/或 之后，加上自己的行为，以达到特定的目的。</p>
-<p>对象可以在任何时候被装饰，所以在运行时动态地、不限量地用你喜欢的装饰者来装饰对象</p>
-<h2 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a><a href="https://github.com/Wayne-98/Note/tree/master/Design%20Pattern/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/Pizza" target="_blank" rel="noopener">工厂模式</a></h2><p>所有<strong>工厂模式</strong>都用来封装对象的创建。工厂方法模式通过让子类决定该创建的对象是什么，来达到将对象创建的过程封装的目的。</p>
-<p>抽象的<strong>创建者类</strong>：</p>
-<ol>
-<li><p>定义了<strong>一个抽象的工厂方法</strong>，所有的子类必须实现此方法制造产品。</p>
-<ol start="2">
-<li>通常会包含<strong>依赖于抽象产品的代码</strong>，而这些抽象产品由子类制造。创建者不需要真的知道在制造哪种具体产品。</li>
-</ol>
-</li>
-</ol>
-<p><strong>工厂方法模式</strong>定义了一个创建对象的接口，但由子类决定要实例化的类是哪一个，工厂方法让类把实例化推迟到子类。</p>
-<p><strong>抽象工厂模式</strong>提供一个接口，用于创建相关或依赖对象的家族，而不需要明确指定具体类。</p>
-<h2 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h2><p>单例模式确保一个类只有一个实例，并提供一个全局访问点。</p>
-<p>全局变量 VS 单例模式</p>
-<ol>
-<li>急切实例化 VS 延迟实例化</li>
-<li>全局变量可以提供全局访问，但是不能确保只有一个实例。</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1630,7 +1606,7 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-count">46</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

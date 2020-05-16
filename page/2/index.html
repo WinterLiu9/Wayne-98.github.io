@@ -164,6 +164,240 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Operating%20System/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Operating%20System/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/" class="post-title-link" itemprop="url">简单操作系统概念</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:14:52" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Operating-System/" itemprop="url" rel="index"><span itemprop="name">Operating System</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="1-操作系统概述"><a href="#1-操作系统概述" class="headerlink" title="1. 操作系统概述"></a>1. 操作系统概述</h1><ul>
+<li>操作系统的特征</li>
+</ul>
+<ol>
+<li><p><strong>并发</strong>：并发是指两个或多个事件在同一时间间隔内发生。</p>
+</li>
+<li><p><strong>共享</strong>：即资源共享，是指系统中的资源可供内存中多个并发执行的程序共同使用。</p>
+</li>
+<li><p>虚拟：是指把一个物理上的实体虚拟成多个逻辑上的对应物。</p>
+<ul>
+<li>虚拟技术：时分复用技术，空分复用技术</li>
+</ul>
+</li>
+<li><p>异步：在多道程序环境下，允许多个程序并发执行，但由于资源有限，进程的执行不是一贯到底，而是走走停停，以不可预知的速度向前推进，这就是操作系统的异步性。</p>
+</li>
+</ol>
+<ul>
+<li><strong>内核</strong>（核心态）</li>
+</ul>
+<ol>
+<li>时钟管理：提供系统时间、实现进程切换</li>
+<li>中断机制：提高 CPU 的利用率</li>
+<li>原语</li>
+<li>系统控制的数据结构及处理</li>
+</ol>
+<ul>
+<li><strong>中断</strong>：当中断或者异常发生的时候， 运行用户态的 CPU 会立即进入核心态，通过硬件实现的</li>
+<li><strong>系统调用</strong>：是用户在程序中调用操作系统提供的一些子功能。系统中的各种共享资源都是由操作系统统一掌管，因此在用户程序中，凡是与资源有关的操作（存储分配、进行 I/O 传输、管理文件），都必须通过系统调用的方式向操作系统提出服务请求，并由操作系统代为完成。</li>
+</ul>
+<h1 id="2-1-进程管理"><a href="#2-1-进程管理" class="headerlink" title="2.1 进程管理"></a>2.1 进程管理</h1><p>进程映像：程序段、相关数据段和 PCB (静态的)</p>
+<p>进程：进程是进程映像的运行过程，是系统进行资源分配和调度的一个独立单位。（描述<strong>动态</strong>）</p>
+<p>进程状态：创建 就绪 运行 阻塞(等待) 结束</p>
+<p>进程之间的通信：</p>
+<ol>
+<li><p>共享存储</p>
+<ol start="2">
+<li>消息传递</li>
+<li>管道通信</li>
+</ol>
+</li>
+</ol>
+<p>线程与进程的区别：调度、拥有资源、并发性、系统开销、地址空间和其他资源、通信方面</p>
+<p>线程的实现方式：</p>
+<pre><code>1. 用户级线程：将多个用户级线程映射到一个内核级线程，线程管理在用户空间完成。此模型中，用户级线程对操作系统不可见。
+* 优点：线程管理是在用户级空间进行的，因而效率比较高
+* 缺点：当一个线程在使用内核服务的时候被阻塞，那么整个进程就会被阻塞；多个线程不能并行的运行在多处理机上。
+2. 内核级线程：将每个用户级线程映射到一个内核级线程
+* 优点：当一个线程被阻塞的时候，另一个线程继续执行，并发能力强
+* 缺点：每创建一个用户级线程都需要创建一个内核级线程与之对应，创建线程的开销比较大，会影响到用户程序的性能。</code></pre><p><img src="https://github.com/Wayne-98/image/blob/master/Operating%20System/Process.png?raw=true" alt=""></p>
+<h1 id="2-2-处理机调度"><a href="#2-2-处理机调度" class="headerlink" title="2.2 处理机调度"></a>2.2 处理机调度</h1><ul>
+<li>调度的层次（三级调度）</li>
+</ul>
+<ol>
+<li>作业调度：内存与辅存之间的调度，每个作业只调入和调出一次。</li>
+<li>中级调度(内存调度)：引入是为了提高内存的利用率和系统的吞吐量。将暂时不能运行的进程，调至外存等待，把此时的进程状态称为挂起态。</li>
+<li>进程调度：按照某种方法和策略从就绪队列中选取一个进程，将处理机分配给它。</li>
+</ol>
+<p>作业调度为进程活动做准备，进程调度使进程正常活动起来，中级调度将暂时不能运行的进程挂起，中级调度处于作业调度和进程调度之间。</p>
+<ul>
+<li>调度的时机、切换与过程</li>
+</ul>
+<p>不能进程进程调度与切换的几种情况：</p>
+<ol>
+<li><p>处理中断的过程中</p>
+<ol start="2">
+<li>进程在操作系统内核临界区中</li>
+<li>其他需要完全屏蔽中断的原子操作过程中</li>
+</ol>
+</li>
+</ol>
+<p>应当进行进程调度与切换的情况有：</p>
+<ol>
+<li><p>发生引起调度条件，并且当前进程无法继续执行下去，可以马上进行调度与切换。(非剥夺调度)</p>
+<ol start="2">
+<li>当中断处理结束或自陷处理结束后，返回被中断进程的用户态执行现场前。若置上请求调度标志，即可马上进行进程的调度与切换(剥夺式调度)</li>
+</ol>
+</li>
+</ol>
+<ul>
+<li>调度的基本准则</li>
+</ul>
+<ol>
+<li>CPU 利用率 2. 系统吞吐量 3. 周转时间 4. 等待时间 5. 响应时间</li>
+</ol>
+<ul>
+<li>典型的调度算法</li>
+</ul>
+<ol>
+<li>先来先服务 </li>
+<li>短作业优先 </li>
+<li>优先级调度 </li>
+<li>高响应比优先调度 （响应比 = （等待时间 + 要求服务时间） / 要求服务时间）</li>
+<li>时间片轮转调度</li>
+<li>多级反馈队列调度 </li>
+</ol>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Operating%20System/%E8%B0%83%E5%BA%A6.png?raw=true" alt=""></p>
+<h2 id="2-3-进程同步"><a href="#2-3-进程同步" class="headerlink" title="2.3 进程同步"></a>2.3 进程同步</h2><ul>
+<li>同步和互斥</li>
+</ul>
+<ol>
+<li><p>同步：直接制约关系，指为完成某个任务而建立的两个或多个进程，这些进程因为需要在某些位置上协调它们的工作次序而等待、传递消息所产生的制约关系。进程间的直接制约关系，源于它们之间的合作。</p>
+</li>
+<li><p>互斥：简介制约关系，当一个进程进入临界区使用资源的时候，另一个进程必须等待，当占用临界资源的进程退出临界区后，另一个进程才允许去访问此临界资源。</p>
+</li>
+</ol>
+<ul>
+<li>生产者消费者、读者写者、哲学家进餐</li>
+</ul>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Operating%20System/%E8%BF%9B%E7%A8%8B%E5%90%8C%E6%AD%A5.png?raw=true" alt=""></p>
+<h2 id="2-4-死锁"><a href="#2-4-死锁" class="headerlink" title="2.4 死锁"></a>2.4 死锁</h2><ul>
+<li><p>死锁：多个进程因竞争资源而造成的一种僵局，若无外力作用，这些进程都将无法向前推进。</p>
+</li>
+<li><p>死锁产生的必要条件：</p>
+<ol>
+<li>互斥</li>
+<li>不可剥夺</li>
+<li>请求和保持</li>
+<li>循环等待条件：存在一种进程资源的循环等待链，链中每一个进程已获得的资源同时被链中下一个进程所请求。</li>
+</ol>
+</li>
+<li><p>死锁的处理策略：</p>
+<ol>
+<li><p>预防死锁：破坏 4 个条件其中之一。</p>
+</li>
+<li><p>避免死锁：银行家</p>
+</li>
+<li><p>死锁的检测以及解除</p>
+</li>
+</ol>
+</li>
+<li><p>死锁预防</p>
+<ol>
+<li>破坏互斥：不可行</li>
+<li>破坏不可剥夺：不可行</li>
+<li>破坏请求和保持：一次分配所有资源，浪费资源，申请不到所有资源可能会出现“饥饿”现象</li>
+<li>破坏循环等待：给资源编序号，按序申请。</li>
+</ol>
+</li>
+<li><p>死锁避免：</p>
+<ol>
+<li>系统安全状态：系统能够按照某种进程推进顺序，为每个进程分配其所需资源，使每个进程多可以顺利的完成。</li>
+<li>银行家算法：<ul>
+<li>可用资源矢量</li>
+<li>最大需求矩阵</li>
+<li>分配矩阵</li>
+<li>需求矩阵</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p>死锁的检测与解除</p>
+<ol>
+<li>资源分配图</li>
+</ol>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Operating%20System/%E8%B5%84%E6%BA%90%E5%88%86%E9%85%8D%E5%9B%BE.png?raw=true" alt=""></p>
+<ol start="2">
+<li>死锁定理：S 为死锁的条件是当且仅当 S 状态的资源分配图是不可完全简化的，该条件为死锁定理</li>
+<li>死锁解除：<ol>
+<li>资源剥夺法：挂起某些死锁进程，抢占它的资源</li>
+<li>资源撤销法：按照进程的优先级和撤销进程的代价的高低，强制撤销部分、甚至全部死锁进程并剥夺这些进程的资源</li>
+<li>进程回退法：让一个或多个进程回退到足以回避死锁的地步，进程自愿释放资源而不是被剥夺。要求系统保持进程的历史信息，设置还原点。</li>
+</ol>
+</li>
+</ol>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Operating%20System/%E6%AD%BB%E9%94%81.png?raw=true" alt=""></p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E5%9B%9B%E9%83%A8%E5%88%86%EF%BC%9A%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1851,80 +2085,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Condition/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Java%20Concurrent/Condition/" class="post-title-link" itemprop="url">Condition</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:10:39" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java-Concurrent/" itemprop="url" rel="index"><span itemprop="name">Java Concurrent</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Condition接口与示例"><a href="#Condition接口与示例" class="headerlink" title="Condition接口与示例"></a>Condition接口与示例</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BoundedQueue</span>&lt;<span class="title">T</span>&gt; </span>&#123;    </span><br><span class="line">    <span class="keyword">private</span> Object[] items;    <span class="comment">// 添加的下标，删除的下标和数组当前数量    </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> addIndex, removeIndex, count;    </span><br><span class="line">    <span class="keyword">private</span> Lock lock = <span class="keyword">new</span> ReentrantLock();    </span><br><span class="line">    <span class="keyword">private</span> Condition notEmpty = lock.newCondition();    </span><br><span class="line">    <span class="keyword">private</span> Condition notFull = lock.newCondition();    </span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BoundedQueue</span><span class="params">(<span class="keyword">int</span> size)</span> </span>&#123;        </span><br><span class="line">        items = <span class="keyword">new</span> Object[size];    </span><br><span class="line">    &#125;   </span><br><span class="line">    <span class="comment">// 添加一个元素，如果数组满，则添加线程进入等待状态，直到有"空位"    </span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(T t)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;        </span><br><span class="line">        lock.lock();<span class="comment">//首先需要获得锁，目的是确保数组修改的可见性和排他性</span></span><br><span class="line">        <span class="keyword">try</span> &#123;            </span><br><span class="line">            <span class="keyword">while</span> (count == items.length)                </span><br><span class="line">                notFull.await();            </span><br><span class="line">            items[addIndex] = t;            </span><br><span class="line">            <span class="keyword">if</span> (++addIndex == items.length)                </span><br><span class="line">                addIndex = <span class="number">0</span>;            </span><br><span class="line">            ++count;            </span><br><span class="line">            notEmpty.signal();        </span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;            </span><br><span class="line">            lock.unlock();        </span><br><span class="line">            &#125;   </span><br><span class="line">&#125;    </span><br><span class="line"><span class="comment">// 由头部删除一个元素，如果数组空，则删除线程进入等待状态，直到有新添加元素    @SuppressWarnings("unchecked")    </span></span><br><span class="line"><span class="function"><span class="keyword">public</span> T <span class="title">remove</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    lock.lock();        </span><br><span class="line">    <span class="keyword">try</span> &#123;            </span><br><span class="line">        <span class="keyword">while</span> (count == <span class="number">0</span>)                </span><br><span class="line">            notEmpty.await();            </span><br><span class="line">        Object x = items[removeIndex];            </span><br><span class="line">        <span class="keyword">if</span> (++removeIndex == items.length)                </span><br><span class="line">            removeIndex = <span class="number">0</span>;            </span><br><span class="line">        --count;            </span><br><span class="line">        notFull.signal();            </span><br><span class="line">        <span class="keyword">return</span> (T) x;        </span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;            </span><br><span class="line">        lock.unlock();        </span><br><span class="line">        &#125;    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Condition定义了等待/通知两种类型的方法，当前线程调用这些方法时，需要提前获取到Condition对象关联的锁。Condition对象是由Lock对象（调用Lock对象的newCondition()方法）创建出来的，换句话说，Condition是依赖Lock对象的。</p>
-<p>Condition的使用方式比较简单，需要注意在调用方法前获取锁。当调用await()方法后，当前线程会释放锁并在此等待，而其他线程调用Condition对象的signal()方法，通知当前线程后，当前线程才从await()方法返回，并且在返回前已经获取了锁。</p>
-<h1 id="Condition的实现分析"><a href="#Condition的实现分析" class="headerlink" title="Condition的实现分析"></a>Condition的实现分析</h1><ol>
-<li>等待队列</li>
-</ol>
-<p><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/ConditionQueue.png?raw=true" alt=""><br>如果从队列（同步队列和等待队列）的角度看await()方法，当调用await()方法时，相当于同步队列的首节点（获取了锁的节点）移动到Condition的等待队列中。<br><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/JoinConditionQueue.png?raw=true" alt=""><br>调用Condition的signal()方法，将会唤醒在等待队列中等待时间最长的节点（首节点），在唤醒节点之前，会将节点移到同步队列中。<br><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/removeFromConditionQueue.png?raw=true" alt=""></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1996,7 +2156,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-count">46</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
