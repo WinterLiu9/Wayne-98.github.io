@@ -28,7 +28,7 @@
 <meta property="og:description" content="类文件结构无关系的基石实现语言无关性的基石是虚拟机和字节码存储格式。 Java 虚拟机不与任何包括 Java 在内的语言绑定，它只与“ Class 文件”这种特定的二进制文件格式所关联，Class 文件中包含了 Java 虚拟机指令集和符号表以及若干其他辅助信息。 Class类文件的结构Class文件是一组以8字节为基础单位的二进制流。&#x2F;&#x2F; 包括但不限于磁盘文件、网络、数据库、内存或者动态产生等。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-05-10T13:39:10.549Z">
-<meta property="article:modified_time" content="2020-05-10T14:13:45.441Z">
+<meta property="article:modified_time" content="2020-05-16T02:58:04.319Z">
 <meta property="article:author" content="Wayne">
 <meta property="article:tag" content="Java">
 <meta name="twitter:card" content="summary">
@@ -190,10 +190,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:13:45" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-16 10:58:04" itemprop="dateModified" datetime="2020-05-16T10:58:04+08:00">2020-05-16</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -343,8 +349,8 @@
 <li>直接引用（Direct References）：直接引用是可以直接指向目标的指针、相对偏移量或者是一个能间接定位到目标的句柄。直接引用是和虚拟机实现的内存布局直接相关的，同一个符号引用在不同虚 拟机实例上翻译出来的直接引用一般不会相同。</li>
 </ul>
 <p>虚拟机可以根据需要选择在类被加载器加载时就对常量池中的符号引用进行解析，还是等到一个符号引用将要被使用前才去解析它。</p>
-<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>初始化阶段就是执行类构造器<clinit>()方法的过程。<clinit>()并不是程序员在Java代码中直接编写的方法，它是Javac编译器的自动生成物。</p>
-<p><clinit>()方法是由编译器自动收集类中的所有类变量的赋值动作和静态语句块（static{}块）中的语句合并产生的。</p>
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>初始化阶段就是执行类构造器clinit()方法的过程。clinit()并不是程序员在Java代码中直接编写的方法，它是Javac编译器的自动生成物。</p>
+<p>clinit()方法是由编译器自动收集类中的所有类变量的赋值动作和静态语句块（static{}块）中的语句合并产生的。</p>
 <h2 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h2><p>类加载阶段中的“通过一个类的全限定名来获取描述此类的二进制字节流”，是在 Java 虚拟机外部实现，以便让应用程序自己决定如何去获取所需要的类。实现这个动作的代码模块称为“类加载器”。</p>
 <h3 id="类与类加载器"><a href="#类与类加载器" class="headerlink" title="类与类加载器"></a>类与类加载器</h3><p>对于任意一个类，都需要由加载它的类加载器和这个类本身一同确立其在 Java 虚拟机中的唯一性，每一个类加载器，都拥有一个独立的类名称空间。</p>
 <h3 id="双亲委派模型"><a href="#双亲委派模型" class="headerlink" title="双亲委派模型"></a>双亲委派模型</h3><ul>

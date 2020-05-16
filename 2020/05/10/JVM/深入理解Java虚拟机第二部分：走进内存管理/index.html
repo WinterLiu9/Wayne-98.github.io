@@ -28,7 +28,7 @@
 <meta property="og:description" content="Java内存区域与内存溢出异常运行时数据区域 程序计数器   定义：是一块较小的内存空间，它可以看作是当前线程所执行的字节码的行号指示器。 作用：为了线程切换后能恢复到正确的执行位置，每条线程都需要有一个独立的程序计数器。 如果线程执行Java方法，程序计数器记录的是正在执行的虚拟机字节码指令的地址；如果是Native方法，则为空。 异常：程序计数器区域是唯一一个在Java虚拟机规范中没有规定任何">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-05-10T13:39:10.556Z">
-<meta property="article:modified_time" content="2020-05-10T14:13:28.618Z">
+<meta property="article:modified_time" content="2020-05-16T01:31:10.738Z">
 <meta property="article:author" content="Wayne">
 <meta property="article:tag" content="Java">
 <meta name="twitter:card" content="summary">
@@ -190,10 +190,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:13:28" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-16 09:31:10" itemprop="dateModified" datetime="2020-05-16T09:31:10+08:00">2020-05-16</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -308,7 +314,7 @@
 </li>
 <li><strong>可达性分析算法</strong><br>通过一系列的称为 “GC Roots” 的对象作为起始点，从这些节点开始向下搜索，搜索所走过的路径成为引用链，当一个对象到 GC Roots 没有任何的引用链相连时，则证明此对象是不可用的<ul>
 <li>可作为 GC Roots 的对象[全局性的引用(常量和静态属性)执行上下文(栈帧中的本地变量表)]<ol>
-<li>虚拟机栈(栈帧中的本地变量表)中引用的对象，譬如各个线程被调用的方法堆栈中使用到的<br>参数、局部变量、临时变量等。</li>
+<li>虚拟机栈(栈帧中的本地变量表)中引用的对象，譬如各个线程被调用的方法堆栈中使用到的参数、局部变量、临时变量等。</li>
 <li>方法区中类静态属性引用的对象，譬如 Java 类的引用类型静态变量。</li>
 <li>方法区中常量引用的对象，譬如字符串常量池（String Table）里的引用。</li>
 <li>本地方法栈中 JNI (一般来说的 Native 方法)引用的对象</li>
@@ -378,18 +384,15 @@
 <li>灰色：表示对象已经被垃圾收集器访问过，但这个对象上至少存在一个引用还没有被扫描过。</li>
 </ul>
 <ul>
-<li><p>因为用户线程与收集器是并发工作。收集器在对象图上标记颜色，同时用户线程在修改引用关系——即修改对象图的结构，这样可能出现两种后果：</p>
-<pre><code>1. 把原本消亡的对象错误标记为存活，产生了一点逃过本次收集的浮动垃圾而已，下次收集清理掉就好。</code></pre><ol start="2">
+<li>因为用户线程与收集器是并发工作。收集器在对象图上标记颜色，同时用户线程在修改引用关系——即修改对象图的结构，这样可能出现两种后果：<pre><code>1. 把原本消亡的对象错误标记为存活，产生了一点逃过本次收集的浮动垃圾而已，下次收集清理掉就好。</code></pre><ol start="2">
 <li>把原本存活的对象错误标记为已消亡，这就是非常致命的后果了，程序肯定会因此发生错误。</li>
 </ol>
 </li>
-<li><p>导致“对象消失”的问题的两个条件：</p>
-<pre><code>1. 赋值器插入了一条或多条从黑色对象到白色对象的新引用；</code></pre><ol start="2">
+<li>导致“对象消失”的问题的两个条件：<pre><code>1. 赋值器插入了一条或多条从黑色对象到白色对象的新引用；</code></pre><ol start="2">
 <li>赋值器删除了全部从灰色对象到该白色对象的直接或间接引用。</li>
 </ol>
 </li>
-<li><p>两种解决方案：增量更新（Incremental Update）和原始快照（Snapshot At The Beginning，SATB）。<br>（CMS 采用增量更新，G1 采用原始快照）  </p>
-<ol>
+<li>两种解决方案：增量更新（Incremental Update）和原始快照（Snapshot At The Beginning，SATB）。<br>（CMS 采用增量更新，G1 采用原始快照）  <ol>
 <li>增量更新要破坏的是第一个条件，当黑色对象插入新的指向白色对象的引用关系时，就将这个新插入的引用记录下来，等并发扫描结束之后，再将这些记录过的引用关系中的黑色对象为根，重新扫描一次。这可以简化理解为，黑色对象一旦新插入了指向白色对象的引用之后，它就变回灰色对象了。</li>
 <li>原始快照要破坏的是第二个条件，当灰色对象要删除指向白色对象的引用关系时，就将这个要删除的引用记录下来，在并发扫描结束之后，再将这些记录过的引用关系中的灰色对象为根，重新扫描一次。这也可以简化理解为，无论引用关系删除与否，都会按照刚刚开始扫描那一刻的对象图快照来进行搜索。</li>
 </ol>
@@ -448,7 +451,7 @@
 <li>JVM 是如何避免 Minor GC 时扫描全堆的？卡表的具体策略是将老年代的空间分成大小为512B的若干张卡（card）。卡表本身是单字节数组，数组中的每个元素对应着一张卡，当发生老年代引用新生代时，虚拟机将该卡对应的卡表元素设置为适当的值。卡表被标记为脏（卡表还有另外的作用，标识并发标记阶段哪些块被修改过），之后 Minor GC 时通过扫描卡表就可以很快的识别哪些卡中存在老年代指向新生代的引用。这样虚拟机通过空间换时间的方式，避免了全堆扫描。</li>
 <li>什么时候可能会触发 STW 的 FullGC 呢？<ol>
 <li>Perm空间不足；</li>
-<li>CMS GC 时出现 promotionfailed 和 concurrentmodefailure（concurrentmodefailure发生的原因一般是 CMS 正在进行，但是由于老年代空间不足，需要尽快回收老年代里面的不再被使用的对象，这时停止所有的线程，同时终止 CMS ，直接进行 SerialOld GC）；</li>
+<li>CMS GC 时出现 promotionfailed 和 concurrentmodefailure（发生的原因一般是 CMS 正在进行，但是由于老年代空间不足，需要尽快回收老年代里面的不再被使用的对象，这时停止所有的线程，同时终止 CMS ，直接进行 SerialOld GC）；</li>
 <li>统计得到的 YoungGC 晋升到老年代的平均大小大于老年代的剩余空间</li>
 <li>主动触发 Full GC（执行jmap-histo:live [pid]）来避免碎片问题。</li>
 </ol>
@@ -502,14 +505,17 @@
 </ul>
 <hr>
 <h2 id="内存分配与回收策略"><a href="#内存分配与回收策略" class="headerlink" title="内存分配与回收策略"></a>内存分配与回收策略</h2><ul>
-<li><strong>对象优先在Eden分配</strong><br>1Eden2Survivor，其中1Eden1Survivor用来分配，剩下的一个Survivor用来GC的时候复制。同时老年代区域为新生代区域担保。<br>当Eden区没有足够的空间进行分配，虚拟机会进行一次Minor GC</li>
-<li><strong>大对象直接进入老年代</strong></li>
-</ul>
-<p>-XX:PretenureSizeThreshold,令大于这个设置值的对象直接在老年代分配<br>目的就是避免在Eden区及两个Survivor区之间来回复制，产生大量的内存复制操作。</p>
-<ul>
-<li><strong>长期存活的对象将进入老年代</strong><br>虚拟机给每个对象定义了一个对象年龄计数器。如果对象在Eden出生并经过第一次Minor GC后仍然存活，并且能被Survivor容纳的话，将被移动到Survivor空间中，并且对象的年龄设为1，对象在Survivor区中每“熬过”一次Minor GC，年龄就增加一岁。–XX:MaxTenuringThreshold</li>
-<li><strong>动态对象年龄判定</strong><br>并不是永远地要求对象的年龄必须达到MaxTenuringThreshold才能晋升老年代，如果在Survivor空间中相同年龄所有对象的大小超过Survivor空间的一半，那么年龄大于等于该年龄的对象就可以直接进入老年代</li>
-<li><strong>空间分配担保</strong></li>
+<li><p><strong>对象优先在Eden分配</strong><br>1Eden2Survivor，其中1Eden1Survivor用来分配，剩下的一个Survivor用来GC的时候复制。同时老年代区域为新生代区域担保。<br>当Eden区没有足够的空间进行分配，虚拟机会进行一次Minor GC</p>
+</li>
+<li><p><strong>大对象直接进入老年代</strong></p>
+<p>-XX:PretenureSizeThreshold,令大于这个设置值的对象直接在老年代分配。<br>目的就是避免在Eden区及两个Survivor区之间来回复制，产生大量的内存复制操作。</p>
+</li>
+<li><p><strong>长期存活的对象将进入老年代</strong><br>虚拟机给每个对象定义了一个对象年龄计数器。如果对象在Eden出生并经过第一次Minor GC后仍然存活，并且能被Survivor容纳的话，将被移动到Survivor空间中，并且对象的年龄设为1，对象在Survivor区中每“熬过”一次Minor GC，年龄就增加一岁。–XX:MaxTenuringThreshold</p>
+</li>
+<li><p><strong>动态对象年龄判定</strong><br>并不是永远地要求对象的年龄必须达到MaxTenuringThreshold才能晋升老年代，如果在Survivor空间中相同年龄所有对象的大小超过Survivor空间的一半，那么年龄大于等于该年龄的对象就可以直接进入老年代</p>
+</li>
+<li><p><strong>空间分配担保</strong></p>
+</li>
 </ul>
 <ol>
 <li><p>发生 Minor GC 之前，虚拟机会检查老年代最大可用的连续空间是否大于新生代所有对象总空间，如果成立，那么 Minor GC 是绝对安全的。</p>
