@@ -41,55 +41,6 @@
   </entry>
   
   <entry>
-    <title>减脂心得</title>
-    <link href="http://wayne-98.github.io/2020/05/13/LIFE/%E5%87%8F%E8%84%82%E5%BF%83%E5%BE%97/"/>
-    <id>http://wayne-98.github.io/2020/05/13/LIFE/%E5%87%8F%E8%84%82%E5%BF%83%E5%BE%97/</id>
-    <published>2020-05-13T14:37:48.961Z</published>
-    <updated>2020-05-17T10:56:30.848Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h2 id=&quot;减脂最重要的点&quot;&gt;&lt;a href=&quot;#减脂最重要的点&quot; class=&quot;headerlink&quot; title=&quot;减脂最重要的点&quot;&gt;&lt;/a&gt;减脂最重要的点&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;如果只是单纯的减脂，做好饮食就可以成功。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;饮食要遵循
-      
-    
-    </summary>
-    
-    
-      <category term="life" scheme="http://wayne-98.github.io/categories/life/"/>
-    
-    
-      <category term="life" scheme="http://wayne-98.github.io/tags/life/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>amanda减脂餐</title>
-    <link href="http://wayne-98.github.io/2020/05/13/LIFE/amanda%E5%87%8F%E8%84%82%E9%A4%90/"/>
-    <id>http://wayne-98.github.io/2020/05/13/LIFE/amanda%E5%87%8F%E8%84%82%E9%A4%90/</id>
-    <published>2020-05-13T14:35:14.398Z</published>
-    <updated>2020-05-17T11:03:19.678Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;amanda-减脂便当&quot;&gt;&lt;a href=&quot;#amanda-减脂便当&quot; class=&quot;headerlink&quot; title=&quot;amanda 减脂便当&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://www.bilibili.com/video/BV1EV411C7hu&quot;
-      
-    
-    </summary>
-    
-    
-      <category term="life" scheme="http://wayne-98.github.io/categories/life/"/>
-    
-    
-      <category term="life" scheme="http://wayne-98.github.io/tags/life/"/>
-    
-  </entry>
-  
-  <entry>
     <title>5.13 ~ 5.18 学习计划</title>
     <link href="http://wayne-98.github.io/2020/05/13/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/5.13%20~%205.18%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/"/>
     <id>http://wayne-98.github.io/2020/05/13/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/5.13%20~%205.18%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/</id>
@@ -498,6 +449,56 @@
       
       
         &lt;h2 id=&quot;等待多线程完成的CountDownLatch&quot;&gt;&lt;a href=&quot;#等待多线程完成的CountDownLatch&quot; class=&quot;headerlink&quot; title=&quot;等待多线程完成的CountDownLatch&quot;&gt;&lt;/a&gt;等待多线程完成的CountDownLat
+      
+    
+    </summary>
+    
+    
+      <category term="Java Concurrent" scheme="http://wayne-98.github.io/categories/Java-Concurrent/"/>
+    
+    
+      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Condition</title>
+    <link href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Condition/"/>
+    <id>http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Condition/</id>
+    <published>2020-05-10T13:39:10.478Z</published>
+    <updated>2020-05-10T14:10:39.014Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;Condition接口与示例&quot;&gt;&lt;a href=&quot;#Condition接口与示例&quot; class=&quot;headerlink&quot; title=&quot;Condition接口与示例&quot;&gt;&lt;/a&gt;Condition接口与示例&lt;/h1&gt;&lt;figure class=&quot;highlight 
+      
+    
+    </summary>
+    
+    
+      <category term="Java Concurrent" scheme="http://wayne-98.github.io/categories/Java-Concurrent/"/>
+    
+    
+      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>AQS</title>
+    <link href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/AQS/"/>
+    <id>http://wayne-98.github.io/2020/05/10/Java%20Concurrent/AQS/</id>
+    <published>2020-05-10T13:39:10.467Z</published>
+    <updated>2020-05-10T14:10:23.902Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;&lt;a href=&quot;https://segmentfault.com/a/1190000017372067&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;AQS&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;AbstractQueuedSynchronizer&lt;/p&gt;
+&lt;p&gt;Syn
       
     
     </summary>
