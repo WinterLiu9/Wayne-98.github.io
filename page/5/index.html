@@ -164,7 +164,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Algorithms/May/5%E6%9C%88%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Algorithms/May/%E5%9B%BE%E8%AE%BA%E7%AE%97%E6%B3%95%E5%A4%8D%E4%B9%A0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/808.jpg">
@@ -178,7 +178,124 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/05/10/Algorithms/May/5%E6%9C%88%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-title-link" itemprop="url">5月刷题记录</a>
+            <a href="/2020/05/10/Algorithms/May/%E5%9B%BE%E8%AE%BA%E7%AE%97%E6%B3%95%E5%A4%8D%E4%B9%A0/" class="post-title-link" itemprop="url">图论算法复习</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：21:56:07" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Algorithms/" itemprop="url" rel="index"><span itemprop="name">Algorithms</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="图的基本概念"><a href="#图的基本概念" class="headerlink" title="图的基本概念"></a>图的基本概念</h1><p>图的定义：图 G 由顶点集 V 和边集 E 组成，记为 G = (V, E), 其中 V(G) 表示图 G 中顶点的有限非空集；E(G) 表示图中顶点之间的关系(边)集合。</p>
+<p>连通：在无向图中，若从顶点 v 到顶点 w 之间有路径存在，则称 v 和 w 是连通的。</p>
+<p>连通分量：无向图中的极大连通子图称为连通分量。</p>
+<p>生成树：连通图的生成树是包含图中所有顶点的一个极小连通子图。若图中订点数为 n，则它的生成树含有 n - 1 条边。对于生成树而言，去掉它的一条边，则会变成非连通图，若加上一条边，则会形成一条回路。</p>
+<p>顶点的度：图中每个顶点的度被定义为以该顶点为端点的边的数目。</p>
+<h1 id="图的存储及基本操作"><a href="#图的存储及基本操作" class="headerlink" title="图的存储及基本操作"></a>图的存储及基本操作</h1><ul>
+<li><p>邻接矩阵法</p>
+</li>
+<li><p>邻接表法</p>
+</li>
+</ul>
+<h1 id="图的遍历"><a href="#图的遍历" class="headerlink" title="图的遍历"></a>图的遍历</h1><ul>
+<li>BFS</li>
+</ul>
+<p>BFS 的时间复杂度：</p>
+<ol>
+<li>如果图是邻接表存储的。每个顶点需要访问一次，每个顶点的邻接点也需要搜索一次。O(V) + O(E)</li>
+<li>如果图是邻接矩阵存储的。搜索一个顶点的邻接点需要O(V). 所以时间复杂度是O(V²)</li>
+</ol>
+<p><img src="" alt=""></p>
+<ul>
+<li>DFS</li>
+</ul>
+<h1 id="图的应用"><a href="#图的应用" class="headerlink" title="图的应用"></a>图的应用</h1><ul>
+<li>最小生成树</li>
+</ul>
+<ol>
+<li><p>Prim</p>
+<ul>
+<li>初始化：向空树 T = (Vt, Et) 中添加图 G = {V, E} 的任一顶点 u0，使 Vt = {u0}, Et = ∅</li>
+<li>循环（重复操作直至 Vt  =  V）: 从图 G 中选出满足 {(u, v) | u ∈ Vt, v ∈ V - Vt} 且具有最小权值的边 (u, v) , 并置 Vt = Vt ∪ {v}, Et = Et ∪ {u, v}。</li>
+</ul>
+<p><img src="" alt=""></p>
+</li>
+</ol>
+<p>Prim 算法的时间复杂度是O(V²)，不依赖于 E ，适合求解边稠密的图的最小生成树。</p>
+<ol start="2">
+<li><p>Kruskal</p>
+<ul>
+<li>初始化：Vt = V, Et = ∅。即每一个顶点构成一棵独立的树，T 此时是一个仅含 V 个顶点的森林。</li>
+<li>循环（重复操作直至 T 是一棵树）：按 G 的边的权值递增顺序依次从 E - Et 中选择一条边，若这条边加入 T 后不构成回路，则将其加入 Et，否则舍弃，直到 Et 中含有 n - 1 条边。</li>
+</ul>
+<p><img src="" alt=""></p>
+</li>
+</ol>
+<p>Kruskal 算法的时间复杂度是 O(E log E)</p>
+<ul>
+<li>最短路径</li>
+</ul>
+<p>两点之间的最短路径也包含了路径上其他顶点间的最短路径。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Algorithms/May/5%E6%9C%881%E5%8F%B7~5%E6%9C%8818%E5%8F%B7%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Algorithms/May/5%E6%9C%881%E5%8F%B7~5%E6%9C%8818%E5%8F%B7%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-title-link" itemprop="url">5月1号~5月18号刷题记录</a>
         </h2>
 
         <div class="post-meta">
@@ -195,7 +312,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-18 23:25:11" itemprop="dateModified" datetime="2020-05-18T23:25:11+08:00">2020-05-18</time>
+                <time title="修改时间：2020-05-19 15:42:42" itemprop="dateModified" datetime="2020-05-19T15:42:42+08:00">2020-05-19</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -966,9 +1083,6 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">checkInclusion</span><span class="params">(String s1, String s2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(s2.length() &lt; s1.length()) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">int</span>[] countOfs1 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">26</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">char</span> c : s1.toCharArray()) countOfs1[c - <span class="string">'a'</span>]++;</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>, right = s1.length() - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span>(right &lt; s2.length()) &#123;</span><br><span class="line">            <span class="keyword">if</span>(count(countOfs1, s2, left, right)) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            right++; left++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">count</span><span class="params">(<span class="keyword">int</span>[] countOfs1, String s2, <span class="keyword">int</span> left, <span class="keyword">int</span> right)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] countOfs2 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">26</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = left; i &lt;= right; i++) countOfs2[s2.charAt(i) - <span class="string">'a'</span>]++;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">26</span>; i++)</span><br><span class="line">            <span class="keyword">if</span>(countOfs1[i] != countOfs2[i])</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 每次都要重新计算一次 count2</span></span><br></pre></td></tr></table></figure>
 
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">checkInclusion</span><span class="params">(String s1, String s2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> len1 = s1.length(), len2 = s2.length();</span><br><span class="line">        <span class="keyword">if</span>(len2 &lt; len1) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">int</span>[] count1 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">26</span>];</span><br><span class="line">        <span class="keyword">int</span>[] count2 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">26</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len1; i++) &#123;</span><br><span class="line">            count1[s1.charAt(i) - <span class="string">'a'</span>]++;</span><br><span class="line">            count2[s2.charAt(i) - <span class="string">'a'</span>]++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = len1; i &lt; len2; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(sameCount(count1, count2)) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            count2[s2.charAt(i - len1) - <span class="string">'a'</span>]--;</span><br><span class="line">            count2[s2.charAt(i) - <span class="string">'a'</span>]++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sameCount(count1, count2);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">sameCount</span><span class="params">(<span class="keyword">int</span>[] count1, <span class="keyword">int</span>[] count2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">26</span>; i++) <span class="keyword">if</span>(count2[i] != count1[i]) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 处理方法很巧妙，利用之前算过的，每次更新两遍的值就可以了</span></span><br></pre></td></tr></table></figure>
-
-<p>​    </p>
-<p>4. </p>
 </li>
 </ul>
 
@@ -1871,7 +1985,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-count">47</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

@@ -3697,8 +3697,179 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
       </tags>
   </entry>
   <entry>
-    <title>5月刷题记录</title>
-    <url>/2020/05/10/Algorithms/May/5%E6%9C%88%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/</url>
+    <title>自顶向下方法：链路层和局域网</title>
+    <url>/2020/05/15/Internet/%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%EF%BC%9A%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/</url>
+    <content><![CDATA[<h2 id="链路层概述"><a href="#链路层概述" class="headerlink" title="链路层概述"></a>链路层概述</h2><h3 id="链路层提供的服务"><a href="#链路层提供的服务" class="headerlink" title="链路层提供的服务"></a>链路层提供的服务</h3><ol>
+<li>成帧</li>
+<li>链路接入。媒体访问控制（Medium Access Control, MAC）协议规定了帧在链路上传输的规则。对于链路的一端仅有一个发送方、链路的另一端仅有一个接收方的点对点链路，MAC 协议比较简单，即无论何时链路空闲都可以发送帧。如果多个节点共享单个广播链路的时候，存在多路访问问题，MAC 协议用于协调多个节点的帧传输。</li>
+<li>可靠交付。例如无线链路，其目的是本地纠正一个差错，而不是通过运输层或应用层协议迫使进行端到端的数据重传。</li>
+<li>差错检测和纠正。</li>
+</ol>
+<h3 id="链路层在何处实现"><a href="#链路层在何处实现" class="headerlink" title="链路层在何处实现"></a>链路层在何处实现</h3><p>链路层的主体部分是在<strong>网络适配器中</strong>（network adapter）实现的，网络适配器有时也称为<strong>网络接口卡</strong>（Network Interface Card, NIC），位于网络适配器核心的是链路层控制器，控制器通常实现了许多链路层服务（成帧，链路接入，差错检测）。</p>
+]]></content>
+      <categories>
+        <category>计算机网络</category>
+      </categories>
+      <tags>
+        <tag>计算机网络</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>amanda减脂餐</title>
+    <url>/2020/05/13/life/amanda%E5%87%8F%E8%84%82%E9%A4%90/</url>
+    <content><![CDATA[<h1 id="amanda-减脂便当"><a href="#amanda-减脂便当" class="headerlink" title="amanda 减脂便当"></a><a href="https://www.bilibili.com/video/BV1EV411C7hu" target="_blank" rel="noopener">amanda 减脂便当</a></h1><p>火腿口蘑毛豆糙米饭（两餐量）：糙米、口蘑、火腿、姜末煮饭，结束十分钟前加毛豆仁。</p>
+<p>虾仁奶汁炖菜（两餐量）：1、虾仁汆水捞出；2、黄油、橄榄油，下面粉炒到发黄，加脱脂牛奶，煮成奶酱。3、橄榄油、蒜蓉、大葱、胡萝卜、口蘑。加水炖煮，加魔芋结、山药，下奶酱，下虾仁、毛豆仁、加盐、黑胡椒。（4、加车打芝士。） </p>
+<p>剁椒蒸银鳕鱼（一餐量）：1、银鳕鱼加盐、米酒腌制。2、放在大葱上，抹上姜末铺剁椒。香油，蒸熟。</p>
+<p>茭白毛豆炒鸡丁（两餐量）：1、鸡胸肉切丁、加盐、白胡椒、米酒、蒜末、姜末、玉米淀粉；2、水沸后关火，下鸡胸肉丁。变色后捞出。3、炒蒜蓉、茭白、毛豆仁、魔芋块。生抽、耗油、糖，鸡胸肉回锅。</p>
+<p>盐水鸭腿（两餐量）：1、鸭腿、盐、八角、香叶、花椒、小茴香腌制；2、鸭腿下锅煮熟，加葱段、姜片。凉了以后去皮切块。</p>
+<p>茄汁牛肉酱（两餐量）：1、牛肉末炒黄捞出；2、大葱末、蒜蓉、口蘑、胡萝卜、西芹炒香、加番茄、番茄酱、魔芋块。牛肉末回锅加水炖。3、加盐、黑胡椒、脱脂牛奶。</p>
+<p>豆腐肉丸（一餐量）：1、猪肉馅、耗油、生抽、老抽、米酒、香油、白胡椒、姜末、盐、水淀粉腌制；2、猪肉末加老豆腐，做成肉丸子，蒸熟或烤熟。</p>
+<p>紫苏辣椒酱汁：生抽、清水、木鱼花、柠檬汁、紫苏叶、糖、煮熟后放入过滤放小米椒。</p>
+<p>南瓜、山药、土豆、芋头带皮蒸熟后去皮。</p>
+<p>魔芋块切小块，大葱、口蘑、胡萝卜、部分切片部分切细丁，番茄切碎、西芹切丁、茭白切小块。</p>
+<p>周一：火腿口蘑毛豆糙米饭、虾仁奶汁炖菜、剁椒蒸银鳕鱼。水煮菠菜加芝麻酱<br>周二：蒸南瓜、蒸芋头。茭白毛豆炒鸡丁、盐水鸭腿。水煮西蓝花加辣椒酱汁<br>周三：火腿口蘑毛豆糙米饭、茄汁牛肉酱、豆腐肉丸。水煮芥蓝加紫苏辣椒酱汁。<br>周四：芋头土豆泥、虾仁奶汁炖菜、盐水鸭腿。水煮菠菜、豆芽，加芝麻酱<br>周五：山药土豆泥、茄汁牛肉酱、茭白炒鸡丁，水煮秋葵加辣椒酱汁。  </p>
+]]></content>
+      <categories>
+        <category>life</category>
+      </categories>
+      <tags>
+        <tag>life</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>减脂心得</title>
+    <url>/2020/05/13/life/%E5%87%8F%E8%84%82%E5%BF%83%E5%BE%97/</url>
+    <content><![CDATA[<h2 id="减脂最重要的点"><a href="#减脂最重要的点" class="headerlink" title="减脂最重要的点"></a>减脂最重要的点</h2><p><strong>如果只是单纯的减脂，做好饮食就可以成功。</strong></p>
+<p>饮食要遵循几条原则：</p>
+<ol>
+<li><p>补充营养学的知识</p>
+<ul>
+<li><p>比如说：你要知道大豆类以及豆制品有很多优质植物蛋白质，热量低，可以增加摄入。</p>
+</li>
+<li><p>鱼肉、鸡肉、牛肉、瘦猪肉，也都是很好的蛋白质来源，最好每天都要吃一些。</p>
+</li>
+<li><p>如果是生的或者水煮的蔬菜的热量几乎可以忽略不计，一顿吃200多g蔬菜，提供维生素和膳食纤维，而且很容易吃到，没有经济压力。</p>
+</li>
+<li><p>主食不仅仅有大米和馒头，很多杂粮蛋白质，膳食纤维以及各种维生素含量都远超大米，以及薯类也是不错的主食。杂粮和薯类 GI 值低，饱腹感强，通俗点说就是你吃杂粮一顿饭很难能吃下150g以上，米饭的话…</p>
+</li>
+<li><p>这里推荐关注<a href="https://weibo.com/foodnutrition?topnav=1&wvr=6&topsug=1&is_all=1" target="_blank" rel="noopener">范志红老师的微博</a>，可以用一点时间好好看看范志红老师的文章，终身受益。</p>
+</li>
+</ul>
+</li>
+<li><p>要会看食物营养价值标签，相信我，看懂了之后，垃圾食品的诱惑力会直线下降。这里推荐看<a href="https://www.zhihu.com/question/355691966/answer/932565416" target="_blank" rel="noopener">你买食品时会或有意或无意地看成分表吗？ - 芝麻酱的回答 - 知乎</a></p>
+</li>
+<li><p>好吃，难吃的要死吃两次就不想吃了，不能坚持。</p>
+<ul>
+<li><p>水煮菜难吃可以调个酱汁，或者煮的时候加点香油。</p>
+</li>
+<li><p>沙拉可以加点沙拉酱，热量也远远比烧菜低得多。</p>
+</li>
+<li><p>鸡胸可以腌制一下。</p>
+</li>
+<li><p>等等等等等，可以关注一下美食博主，有很多菜谱。</p>
+</li>
+</ul>
+</li>
+<li><p>蛋白质 碳水 脂肪的配比要均衡，都要吃够。</p>
+</li>
+<li><p>热量差不能过大，也就是说不能节食，如果没有运动，那就保持每天的热量差不超过400 kcal，有运动那就多吃点，一个月瘦 3 斤是不错的减脂速度，非大基数或者专业人士，一个月超过 5 斤，可能会导致流失很多肌肉，即使瘦下来，线条也很不好看。</p>
+</li>
+</ol>
+<p>无论是体脂高的想要减脂，还是怕日常饮食长肉的。第一步都需要，明确自己每天大概需要多少热量，一餐大概摄入多少热量，保证每天的热量缺口在500 kcal，是十分合理健康的速度。</p>
+<h2 id="我的饮食"><a href="#我的饮食" class="headerlink" title="我的饮食"></a>我的饮食</h2><p>就我目前来说：身高175cm，体重145 斤，基本时间都坐在电脑前。一天大概需要1800~2000 kcal 的热量。</p>
+<hr>
+<ul>
+<li>早餐：</li>
+</ul>
+<p>​    30g 苹果 + 30g 火龙果 + 50g 无糖即食燕麦 + 250ml 全脂牛奶发酵酸奶 + 15g ON 蛋白粉（423 kcal）</p>
+<p>​    以上做成一碗酸奶水果燕麦，吃的时候可以加点坚果或者黑芝麻，味道十分棒。</p>
+<ul>
+<li>午餐：</li>
+</ul>
+<p>​    主食：50g 燕麦 + 50ml 酸奶 + 15g ON蛋白粉 + 半个鸡蛋（321 kcal）做成饼</p>
+<p>​    菜：在家妈妈做什么菜就吃什么，基本都是两个中式炒菜，热量感觉挺高的。</p>
+<ul>
+<li>下午：</li>
+</ul>
+<p>​    MP 蛋白粉冲 40 g</p>
+<ul>
+<li><p>晚餐：同早餐</p>
+</li>
+<li><p>一天总热量：</p>
+<p>1329 kcal（不包括中午吃妈妈做的菜）</p>
+</li>
+</ul>
+<hr>
+<p>所以一天下来摄入大概在1800~2000 kcal 左右，如果傍晚出门变速跑5 km, 每天是有热量缺口的。不做有氧，做一些无氧，热量缺口很少。</p>
+<p>饮食的蛋白质摄入量还不错，碳水稍低，燕麦的膳食纤维含量很高。脂肪有牛奶和坚果还有吃的炒菜，也是够的。</p>
+<h2 id="最近三个月的减脂成果"><a href="#最近三个月的减脂成果" class="headerlink" title="最近三个月的减脂成果"></a>最近三个月的减脂成果</h2><p>2月底开始减脂，那时候大概152斤左右，因为基本是靠节食瘦的，身体状态很差，肌肉流失很多。每天吃的碳水太少，脸色很难看，身体根本没有一点线条。</p>
+<p>到今天不到三个月的时间，瘦了 8 斤，速度还是很棒的。最重要的是身体状态变好很多。最近这段时间摄入的蛋白质和总体热量提升了是因为现在不能简单的减脂了，而是需要保证饮食的均衡，配合无氧训练，才能有好身材。</p>
+]]></content>
+      <categories>
+        <category>life</category>
+      </categories>
+      <tags>
+        <tag>life</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>5月19号~5月31号刷题记录</title>
+    <url>/2020/05/19/Algorithms/May/5%E6%9C%8819%E5%8F%B7~5%E6%9C%8831%E5%8F%B7%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<h2 id="5月19号"><a href="#5月19号" class="headerlink" title="5月19号"></a>5月19号</h2><ol>
+<li><a href="https://leetcode-cn.com/problems/merge-two-binary-trees/" target="_blank" rel="noopener">合并二叉树</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> TreeNode <span class="title">mergeTrees</span><span class="params">(TreeNode t1, TreeNode t2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(t1 == <span class="keyword">null</span> &amp;&amp; t2 == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span>(t1 == <span class="keyword">null</span> || t2 == <span class="keyword">null</span>) <span class="keyword">return</span> t1 == <span class="keyword">null</span> ? t2: t1;</span><br><span class="line">        t1.left = mergeTrees(t1.left, t2.left); 	<span class="comment">// 这里要注意，用t1.left 接住返回值</span></span><br><span class="line">        t1.right = mergeTrees(t1.right, t2.right);</span><br><span class="line">        t1.val = t1.val + t2.val;</span><br><span class="line">        <span class="keyword">return</span> t1;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><a href="https://leetcode-cn.com/problems/daily-temperatures/" target="_blank" rel="noopener">每日温度</a></li>
+</ol>
+<ul>
+<li>每遍历到一个位置，都需要考虑之后的数字有没有比当前值大的，所以采用从后往前遍历的方式。</li>
+<li>从后往前遍历需要记录第一个比他大的值的下标，并且比当前值小的不需要考虑，所以采用一个从栈底到栈顶单调递减的栈。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] dailyTemperatures(<span class="keyword">int</span>[] T) &#123;</span><br><span class="line">        <span class="keyword">if</span>(T.length == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">0</span>];</span><br><span class="line">        Deque&lt;Integer&gt; stack = <span class="keyword">new</span> ArrayDeque&lt;&gt;();</span><br><span class="line">        <span class="keyword">int</span>[] res = <span class="keyword">new</span> <span class="keyword">int</span>[T.length];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = T.length - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            <span class="keyword">while</span>(stack.size() &gt; <span class="number">0</span> &amp;&amp; T[i] &gt;= T[stack.peek()]) stack.pop();</span><br><span class="line">            res[i] = stack.isEmpty() ? <span class="number">0</span> : stack.peek() - i;</span><br><span class="line">            stack.push(i);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong><a href="https://leetcode-cn.com/problems/task-scheduler/" target="_blank" rel="noopener">任务调度器</a></strong></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">leastInterval</span><span class="params">(<span class="keyword">char</span>[] tasks, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] count = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">26</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">char</span> task : tasks) count[task - <span class="string">'A'</span>]++;</span><br><span class="line">        Arrays.sort(count);</span><br><span class="line">        <span class="keyword">int</span> time = <span class="number">0</span>; <span class="comment">// 最后的结果</span></span><br><span class="line">        <span class="keyword">while</span>(count[<span class="number">25</span>] &gt; <span class="number">0</span>) &#123;  <span class="comment">// 如果最多的任务还不为0 (还有任务没有执行完)</span></span><br><span class="line">            <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">while</span>(i &lt;= n) &#123; <span class="comment">// 每一轮执行 n + 1 项任务</span></span><br><span class="line">                <span class="keyword">if</span>(count[<span class="number">25</span>] == <span class="number">0</span>) <span class="keyword">break</span>; <span class="comment">// 该次执行任务，已经把所有任务执行完</span></span><br><span class="line">                <span class="keyword">if</span>(i &lt; <span class="number">26</span> &amp;&amp; count[<span class="number">25</span> - i] &gt; <span class="number">0</span>)<span class="comment">// if 为真代表执行一个任务, 为假则待命状态</span></span><br><span class="line">                    count[<span class="number">25</span> - i]--;</span><br><span class="line">                i++;</span><br><span class="line">                time++;</span><br><span class="line">            &#125;</span><br><span class="line">            Arrays.sort(count);<span class="comment">// 执行完一轮任务后, 重新整理数组</span></span><br><span class="line">        &#125; </span><br><span class="line">        <span class="keyword">return</span> time;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><a href="https://leetcode-cn.com/problems/diameter-of-binary-tree/" target="_blank" rel="noopener">二叉树的直径</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> res;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">diameterOfBinaryTree</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// return Math.max(high(root.left) + high(root.right), Math.max(diameterOfBinaryTree(root.left), diameterOfBinaryTree(root.right)));</span></span><br><span class="line">        high(root);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">high</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> left = high(root.left);</span><br><span class="line">        <span class="keyword">int</span> right = high(root.right);</span><br><span class="line">        res = Math.max(res, left + right);</span><br><span class="line">        <span class="keyword">return</span> Math.max(left, right) + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li><a href="https://leetcode-cn.com/problems/convert-bst-to-greater-tree/" target="_blank" rel="noopener">把二叉搜索树转换为累加树</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> preSum = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> TreeNode <span class="title">convertBST</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 二叉搜索树中序遍历是递增的，反中序遍历是递减的</span></span><br><span class="line">        reverseInOrder(root);</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reverseInOrder</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="keyword">null</span>) <span class="keyword">return</span>;</span><br><span class="line">        reverseInOrder(root.right);</span><br><span class="line">        root.val += preSum;</span><br><span class="line">        preSum = root.val;</span><br><span class="line">        reverseInOrder(root.left);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li><a href="https://leetcode-cn.com/problems/hamming-distance/" target="_blank" rel="noopener">汉明距离</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hammingDistance</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> t = x ^ y;</span><br><span class="line">        <span class="keyword">while</span>(t != <span class="number">0</span>) &#123;</span><br><span class="line">            res++;</span><br><span class="line">            t = t &amp; (t - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li><a href="https://leetcode-cn.com/problems/find-all-numbers-disappeared-in-an-array/" target="_blank" rel="noopener">找到所有数组中消失的数字</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">findDisappearedNumbers</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        List&lt;Integer&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">if</span>(nums.length == <span class="number">0</span>) <span class="keyword">return</span> res;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> cur = nums[Math.abs(nums[i]) - <span class="number">1</span>];</span><br><span class="line">            nums[Math.abs(nums[i]) - <span class="number">1</span>] = cur &gt; <span class="number">0</span> ? -cur : cur;  <span class="comment">// 找到了就标记为negative</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) <span class="keyword">if</span>(nums[i] &gt; <span class="number">0</span>) res.add(i + <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="8">
+<li><a href="https://leetcode-cn.com/problems/target-sum/" target="_blank" rel="noopener">目标和</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">findTargetSumWays</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> S)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 定义状态: 可以将dp[i][j]定义为从数组 nums 中 0 ~ i 的元素进行加减可以得到 j 的方法数量。</span></span><br><span class="line">        <span class="comment">// 状态转移方程: dp[i][j] = dp[i - 1][j - nums[i]] + dp[i - 1][j + nums[i]];</span></span><br><span class="line">        <span class="comment">// i = len; j = 2 * t + 1;</span></span><br><span class="line">        <span class="keyword">int</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) sum += nums[i];</span><br><span class="line">        <span class="keyword">if</span>(Math.abs(S) &gt; Math.abs(sum)) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span>[][] dp = <span class="keyword">new</span> <span class="keyword">int</span>[nums.length][<span class="number">2</span> * sum + <span class="number">1</span>];</span><br><span class="line">        <span class="keyword">if</span>(nums[<span class="number">0</span>] == <span class="number">0</span>) &#123;</span><br><span class="line">            dp[<span class="number">0</span>][sum] = <span class="number">2</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            dp[<span class="number">0</span>][sum - nums[<span class="number">0</span>]] = <span class="number">1</span>;</span><br><span class="line">            dp[<span class="number">0</span>][sum + nums[<span class="number">0</span>]] = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= <span class="number">2</span> * sum; j++) &#123;</span><br><span class="line">                <span class="keyword">int</span> L = (j - nums[i]) &lt; <span class="number">0</span> ? <span class="number">0</span> : j - nums[i];</span><br><span class="line">                <span class="keyword">int</span> R = (j + nums[i] &gt; (<span class="number">2</span> * sum)) ? <span class="number">0</span> : j + nums[i];</span><br><span class="line">                dp[i][j] = dp[i - <span class="number">1</span>][L] + dp[i - <span class="number">1</span>][R];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[nums.length - <span class="number">1</span>][sum + S];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>Algorithms</category>
+      </categories>
+      <tags>
+        <tag>Algorithms</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>5月1号~5月18号刷题记录</title>
+    <url>/2020/05/10/Algorithms/May/5%E6%9C%881%E5%8F%B7~5%E6%9C%8818%E5%8F%B7%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/</url>
     <content><![CDATA[<h2 id="5月2号"><a href="#5月2号" class="headerlink" title="5月2号"></a>5月2号</h2><ol>
 <li><a href="https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/" target="_blank" rel="noopener">从前序与中序遍历序列构造二叉树</a></li>
 </ol>
@@ -4447,9 +4618,6 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">checkInclusion</span><span class="params">(String s1, String s2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(s2.length() &lt; s1.length()) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">int</span>[] countOfs1 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">26</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">char</span> c : s1.toCharArray()) countOfs1[c - <span class="string">'a'</span>]++;</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>, right = s1.length() - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span>(right &lt; s2.length()) &#123;</span><br><span class="line">            <span class="keyword">if</span>(count(countOfs1, s2, left, right)) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            right++; left++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">count</span><span class="params">(<span class="keyword">int</span>[] countOfs1, String s2, <span class="keyword">int</span> left, <span class="keyword">int</span> right)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] countOfs2 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">26</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = left; i &lt;= right; i++) countOfs2[s2.charAt(i) - <span class="string">'a'</span>]++;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">26</span>; i++)</span><br><span class="line">            <span class="keyword">if</span>(countOfs1[i] != countOfs2[i])</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 每次都要重新计算一次 count2</span></span><br></pre></td></tr></table></figure>
 
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">checkInclusion</span><span class="params">(String s1, String s2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> len1 = s1.length(), len2 = s2.length();</span><br><span class="line">        <span class="keyword">if</span>(len2 &lt; len1) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">int</span>[] count1 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">26</span>];</span><br><span class="line">        <span class="keyword">int</span>[] count2 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">26</span>];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len1; i++) &#123;</span><br><span class="line">            count1[s1.charAt(i) - <span class="string">'a'</span>]++;</span><br><span class="line">            count2[s2.charAt(i) - <span class="string">'a'</span>]++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = len1; i &lt; len2; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(sameCount(count1, count2)) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            count2[s2.charAt(i - len1) - <span class="string">'a'</span>]--;</span><br><span class="line">            count2[s2.charAt(i) - <span class="string">'a'</span>]++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sameCount(count1, count2);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">sameCount</span><span class="params">(<span class="keyword">int</span>[] count1, <span class="keyword">int</span>[] count2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">26</span>; i++) <span class="keyword">if</span>(count2[i] != count1[i]) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 处理方法很巧妙，利用之前算过的，每次更新两遍的值就可以了</span></span><br></pre></td></tr></table></figure>
-
-<p>​    </p>
-<p>4. </p>
 </li>
 </ul>
 ]]></content>
@@ -4458,122 +4626,6 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
       </categories>
       <tags>
         <tag>Algorithms</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>自顶向下方法：链路层和局域网</title>
-    <url>/2020/05/15/Internet/%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%EF%BC%9A%E9%93%BE%E8%B7%AF%E5%B1%82%E5%92%8C%E5%B1%80%E5%9F%9F%E7%BD%91/</url>
-    <content><![CDATA[<h2 id="链路层概述"><a href="#链路层概述" class="headerlink" title="链路层概述"></a>链路层概述</h2><h3 id="链路层提供的服务"><a href="#链路层提供的服务" class="headerlink" title="链路层提供的服务"></a>链路层提供的服务</h3><ol>
-<li>成帧</li>
-<li>链路接入。媒体访问控制（Medium Access Control, MAC）协议规定了帧在链路上传输的规则。对于链路的一端仅有一个发送方、链路的另一端仅有一个接收方的点对点链路，MAC 协议比较简单，即无论何时链路空闲都可以发送帧。如果多个节点共享单个广播链路的时候，存在多路访问问题，MAC 协议用于协调多个节点的帧传输。</li>
-<li>可靠交付。例如无线链路，其目的是本地纠正一个差错，而不是通过运输层或应用层协议迫使进行端到端的数据重传。</li>
-<li>差错检测和纠正。</li>
-</ol>
-<h3 id="链路层在何处实现"><a href="#链路层在何处实现" class="headerlink" title="链路层在何处实现"></a>链路层在何处实现</h3><p>链路层的主体部分是在<strong>网络适配器中</strong>（network adapter）实现的，网络适配器有时也称为<strong>网络接口卡</strong>（Network Interface Card, NIC），位于网络适配器核心的是链路层控制器，控制器通常实现了许多链路层服务（成帧，链路接入，差错检测）。</p>
-]]></content>
-      <categories>
-        <category>计算机网络</category>
-      </categories>
-      <tags>
-        <tag>计算机网络</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>amanda减脂餐</title>
-    <url>/2020/05/13/life/amanda%E5%87%8F%E8%84%82%E9%A4%90/</url>
-    <content><![CDATA[<h1 id="amanda-减脂便当"><a href="#amanda-减脂便当" class="headerlink" title="amanda 减脂便当"></a><a href="https://www.bilibili.com/video/BV1EV411C7hu" target="_blank" rel="noopener">amanda 减脂便当</a></h1><p>火腿口蘑毛豆糙米饭（两餐量）：糙米、口蘑、火腿、姜末煮饭，结束十分钟前加毛豆仁。</p>
-<p>虾仁奶汁炖菜（两餐量）：1、虾仁汆水捞出；2、黄油、橄榄油，下面粉炒到发黄，加脱脂牛奶，煮成奶酱。3、橄榄油、蒜蓉、大葱、胡萝卜、口蘑。加水炖煮，加魔芋结、山药，下奶酱，下虾仁、毛豆仁、加盐、黑胡椒。（4、加车打芝士。） </p>
-<p>剁椒蒸银鳕鱼（一餐量）：1、银鳕鱼加盐、米酒腌制。2、放在大葱上，抹上姜末铺剁椒。香油，蒸熟。</p>
-<p>茭白毛豆炒鸡丁（两餐量）：1、鸡胸肉切丁、加盐、白胡椒、米酒、蒜末、姜末、玉米淀粉；2、水沸后关火，下鸡胸肉丁。变色后捞出。3、炒蒜蓉、茭白、毛豆仁、魔芋块。生抽、耗油、糖，鸡胸肉回锅。</p>
-<p>盐水鸭腿（两餐量）：1、鸭腿、盐、八角、香叶、花椒、小茴香腌制；2、鸭腿下锅煮熟，加葱段、姜片。凉了以后去皮切块。</p>
-<p>茄汁牛肉酱（两餐量）：1、牛肉末炒黄捞出；2、大葱末、蒜蓉、口蘑、胡萝卜、西芹炒香、加番茄、番茄酱、魔芋块。牛肉末回锅加水炖。3、加盐、黑胡椒、脱脂牛奶。</p>
-<p>豆腐肉丸（一餐量）：1、猪肉馅、耗油、生抽、老抽、米酒、香油、白胡椒、姜末、盐、水淀粉腌制；2、猪肉末加老豆腐，做成肉丸子，蒸熟或烤熟。</p>
-<p>紫苏辣椒酱汁：生抽、清水、木鱼花、柠檬汁、紫苏叶、糖、煮熟后放入过滤放小米椒。</p>
-<p>南瓜、山药、土豆、芋头带皮蒸熟后去皮。</p>
-<p>魔芋块切小块，大葱、口蘑、胡萝卜、部分切片部分切细丁，番茄切碎、西芹切丁、茭白切小块。</p>
-<p>周一：火腿口蘑毛豆糙米饭、虾仁奶汁炖菜、剁椒蒸银鳕鱼。水煮菠菜加芝麻酱<br>周二：蒸南瓜、蒸芋头。茭白毛豆炒鸡丁、盐水鸭腿。水煮西蓝花加辣椒酱汁<br>周三：火腿口蘑毛豆糙米饭、茄汁牛肉酱、豆腐肉丸。水煮芥蓝加紫苏辣椒酱汁。<br>周四：芋头土豆泥、虾仁奶汁炖菜、盐水鸭腿。水煮菠菜、豆芽，加芝麻酱<br>周五：山药土豆泥、茄汁牛肉酱、茭白炒鸡丁，水煮秋葵加辣椒酱汁。  </p>
-]]></content>
-      <categories>
-        <category>life</category>
-      </categories>
-      <tags>
-        <tag>life</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>减脂心得</title>
-    <url>/2020/05/13/life/%E5%87%8F%E8%84%82%E5%BF%83%E5%BE%97/</url>
-    <content><![CDATA[<h2 id="减脂最重要的点"><a href="#减脂最重要的点" class="headerlink" title="减脂最重要的点"></a>减脂最重要的点</h2><p><strong>如果只是单纯的减脂，做好饮食就可以成功。</strong></p>
-<p>饮食要遵循几条原则：</p>
-<ol>
-<li><p>补充营养学的知识</p>
-<ul>
-<li><p>比如说：你要知道大豆类以及豆制品有很多优质植物蛋白质，热量低，可以增加摄入。</p>
-</li>
-<li><p>鱼肉、鸡肉、牛肉、瘦猪肉，也都是很好的蛋白质来源，最好每天都要吃一些。</p>
-</li>
-<li><p>如果是生的或者水煮的蔬菜的热量几乎可以忽略不计，一顿吃200多g蔬菜，提供维生素和膳食纤维，而且很容易吃到，没有经济压力。</p>
-</li>
-<li><p>主食不仅仅有大米和馒头，很多杂粮蛋白质，膳食纤维以及各种维生素含量都远超大米，以及薯类也是不错的主食。杂粮和薯类 GI 值低，饱腹感强，通俗点说就是你吃杂粮一顿饭很难能吃下150g以上，米饭的话…</p>
-</li>
-<li><p>这里推荐关注<a href="https://weibo.com/foodnutrition?topnav=1&wvr=6&topsug=1&is_all=1" target="_blank" rel="noopener">范志红老师的微博</a>，可以用一点时间好好看看范志红老师的文章，终身受益。</p>
-</li>
-</ul>
-</li>
-<li><p>要会看食物营养价值标签，相信我，看懂了之后，垃圾食品的诱惑力会直线下降。这里推荐看<a href="https://www.zhihu.com/question/355691966/answer/932565416" target="_blank" rel="noopener">你买食品时会或有意或无意地看成分表吗？ - 芝麻酱的回答 - 知乎</a></p>
-</li>
-<li><p>好吃，难吃的要死吃两次就不想吃了，不能坚持。</p>
-<ul>
-<li><p>水煮菜难吃可以调个酱汁，或者煮的时候加点香油。</p>
-</li>
-<li><p>沙拉可以加点沙拉酱，热量也远远比烧菜低得多。</p>
-</li>
-<li><p>鸡胸可以腌制一下。</p>
-</li>
-<li><p>等等等等等，可以关注一下美食博主，有很多菜谱。</p>
-</li>
-</ul>
-</li>
-<li><p>蛋白质 碳水 脂肪的配比要均衡，都要吃够。</p>
-</li>
-<li><p>热量差不能过大，也就是说不能节食，如果没有运动，那就保持每天的热量差不超过400 kcal，有运动那就多吃点，一个月瘦 3 斤是不错的减脂速度，非大基数或者专业人士，一个月超过 5 斤，可能会导致流失很多肌肉，即使瘦下来，线条也很不好看。</p>
-</li>
-</ol>
-<p>无论是体脂高的想要减脂，还是怕日常饮食长肉的。第一步都需要，明确自己每天大概需要多少热量，一餐大概摄入多少热量，保证每天的热量缺口在500 kcal，是十分合理健康的速度。</p>
-<h2 id="我的饮食"><a href="#我的饮食" class="headerlink" title="我的饮食"></a>我的饮食</h2><p>就我目前来说：身高175cm，体重145 斤，基本时间都坐在电脑前。一天大概需要1800~2000 kcal 的热量。</p>
-<hr>
-<ul>
-<li>早餐：</li>
-</ul>
-<p>​    30g 苹果 + 30g 火龙果 + 50g 无糖即食燕麦 + 250ml 全脂牛奶发酵酸奶 + 15g ON 蛋白粉（423 kcal）</p>
-<p>​    以上做成一碗酸奶水果燕麦，吃的时候可以加点坚果或者黑芝麻，味道十分棒。</p>
-<ul>
-<li>午餐：</li>
-</ul>
-<p>​    主食：50g 燕麦 + 50ml 酸奶 + 15g ON蛋白粉 + 半个鸡蛋（321 kcal）做成饼</p>
-<p>​    菜：在家妈妈做什么菜就吃什么，基本都是两个中式炒菜，热量感觉挺高的。</p>
-<ul>
-<li>下午：</li>
-</ul>
-<p>​    MP 蛋白粉冲 40 g</p>
-<ul>
-<li><p>晚餐：同早餐</p>
-</li>
-<li><p>一天总热量：</p>
-<p>1329 kcal（不包括中午吃妈妈做的菜）</p>
-</li>
-</ul>
-<hr>
-<p>所以一天下来摄入大概在1800~2000 kcal 左右，如果傍晚出门变速跑5 km, 每天是有热量缺口的。不做有氧，做一些无氧，热量缺口很少。</p>
-<p>饮食的蛋白质摄入量还不错，碳水稍低，燕麦的膳食纤维含量很高。脂肪有牛奶和坚果还有吃的炒菜，也是够的。</p>
-<h2 id="最近三个月的减脂成果"><a href="#最近三个月的减脂成果" class="headerlink" title="最近三个月的减脂成果"></a>最近三个月的减脂成果</h2><p>2月底开始减脂，那时候大概152斤左右，因为基本是靠节食瘦的，身体状态很差，肌肉流失很多。每天吃的碳水太少，脸色很难看，身体根本没有一点线条。</p>
-<p>到今天不到三个月的时间，瘦了 8 斤，速度还是很棒的。最重要的是身体状态变好很多。最近这段时间摄入的蛋白质和总体热量提升了是因为现在不能简单的减脂了，而是需要保证饮食的均衡，配合无氧训练，才能有好身材。</p>
-]]></content>
-      <categories>
-        <category>life</category>
-      </categories>
-      <tags>
-        <tag>life</tag>
       </tags>
   </entry>
 </search>
