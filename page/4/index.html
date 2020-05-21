@@ -164,6 +164,456 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Git/Git%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Git/Git%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">Git 学习笔记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:08:50" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">开发工具</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Git是目前世界上最先进的分布式版本控制系统</p>
+<h1 id="时光机穿梭"><a href="#时光机穿梭" class="headerlink" title="时光机穿梭"></a>时光机穿梭</h1><p><strong>$ git config –global user.name “Your Name”<br>$ git config –global user.email “<a href="mailto:email@example.com">email@example.com</a>“</strong></p>
+<hr>
+<ul>
+<li>初始化一个Git仓库，使用<strong>git init</strong>命令。</li>
+<li>添加文件到Git仓库，分两步：<ol>
+<li>使用命令<strong>git add <file></strong>，注意，可反复多次使用，添加多个文件；</li>
+<li>使用命令<strong>git commit -m <message></strong>，完成。</li>
+</ol>
+</li>
+</ul>
+<hr>
+<ul>
+<li>要随时掌握工作区的状态，使用<strong>git status</strong>命令。</li>
+<li>如果git status告诉你有文件被修改过，用<strong>git diff</strong>可以查看修改内容。</li>
+</ul>
+<hr>
+<h2 id="版本回退"><a href="#版本回退" class="headerlink" title="版本回退"></a>版本回退</h2><ul>
+<li>HEAD指向的版本就是当前版本，因此，Git允许我们在版本的历史之间穿梭，<br>使用命令<strong>git reset –hard commit_id</strong>。</li>
+<li>穿梭前，用<strong>git log</strong>可以查看提交历史，以便确定要回退到哪个版本。</li>
+<li>要重返未来，用<strong>git reflog</strong>查看命令历史，以便确定要回到未来的哪个版本。</li>
+</ul>
+<hr>
+<h2 id="工作区和暂存区"><a href="#工作区和暂存区" class="headerlink" title="工作区和暂存区"></a>工作区和暂存区</h2><p><strong>暂存区</strong>是Git非常重要的概念<br>[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-hcAUgRih-1587607662307)(en-resource://database/1321:1)]</p>
+<hr>
+<h2 id="撤销修改"><a href="#撤销修改" class="headerlink" title="撤销修改"></a>撤销修改</h2><ol>
+<li>当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令<strong>git checkout – file</strong>。</li>
+<li>当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，<br>分两步，第一步用命令<strong>git reset HEAD <file></strong>，就回到了场景1，第二步按场景1操作。</li>
+<li>已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退一节，不过前提是没有推送到远程库。</li>
+</ol>
+<h1 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h1><h2 id="添加远程库"><a href="#添加远程库" class="headerlink" title="添加远程库"></a>添加远程库</h2><ul>
+<li><p>要关联一个远程库，使用命令</p>
+</li>
+<li><p><em>git remote add origin git@server-name:path/repo-name.git；*</em></p>
+</li>
+<li><p>关联后，使用命令<strong>git push -u origin master</strong>第一次推送master分支的所有内容；</p>
+</li>
+<li><p>此后，每次本地提交后，只要有必要，就可以使用命令<strong>git push origin master</strong>推送最新修改；</p>
+</li>
+</ul>
+<hr>
+<h2 id="从远程库克隆"><a href="#从远程库克隆" class="headerlink" title="从远程库克隆"></a>从远程库克隆</h2><ul>
+<li>git clone <a href="mailto:git@github.com">git@github.com</a>:Winter-XJTU/gitskills.git</li>
+</ul>
+<h1 id="分支管理"><a href="#分支管理" class="headerlink" title="分支管理"></a>分支管理</h1><h2 id="创建与合并分支"><a href="#创建与合并分支" class="headerlink" title="创建与合并分支"></a>创建与合并分支</h2><p>Git鼓励大量使用分支：</p>
+<ul>
+<li>查看分支：git branch</li>
+<li>创建分支：git branch <name></li>
+<li>切换分支：git checkout <name></li>
+<li>创建+切换分支：git checkout -b <name></li>
+<li>合并某分支到当前分支：git merge <name></li>
+<li>删除分支：git branch -d <name></li>
+</ul>
+<hr>
+<h2 id="解决冲突"><a href="#解决冲突" class="headerlink" title="解决冲突"></a>解决冲突</h2><p>当Git无法自动合并分支时，就必须首先解决冲突。<br>解决冲突后，再提交，合并完成。<br>解决冲突就是把Git合并失败的文件手动编辑为我们希望的内容，再提交。<br>用<strong>git log –graph</strong>命令可以看到分支合并图。</p>
+<ul>
+<li>分支策略<br>分支策略在实际开发中，我们应该按照几个基本原则进行分支管理：<br>首先，master分支应该是非常稳定的，也就是仅用来发布新版本，平时不能在上面干活；那在哪干活呢？干活都在dev分支上，也就是说，dev分支是不稳定的，到某个时候，比如1.0版本发布时，再把dev分支合并到master上，在master分支发布1.0版本；你和你的小伙伴们每个人都在dev分支上干活，每个人都有自己的分支，时不时地往dev分支上合并就可以了。</li>
+</ul>
+<p><strong>git merge –no-ff -m “merge with no ff” dev</strong><br>Git分支十分强大，在团队开发中应该充分应用。合并分支时，加上–no-ff参数就可以用普通模式合并，合并后的历史有分支，能看出来曾经做过合并，而fast forward合并就看不出来曾经做过合并。</p>
+<ul>
+<li>bug分支</li>
+</ul>
+<p>修复bug时，我们会通过创建新的bug分支进行修复，然后合并，最后删除；当手头工作没有完成时，先把工作现场git stash一下，然后去修复bug，修复后，再git stash pop，回到工作现场；在master分支上修复的bug，想要合并到当前dev分支，可以用git cherry-pick <commit>命令，把bug提交的修改“复制”到当前分支，避免重复劳动。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">168  vim hello.py</span><br><span class="line">170  git add hello.py</span><br><span class="line">171  git commit -m <span class="string">"hello.py"</span></span><br><span class="line">172  git stash</span><br><span class="line">//保留工作现场</span><br><span class="line"></span><br><span class="line">176  git checkout master</span><br><span class="line">177  git checkout -b issue</span><br><span class="line">179  vim readme.txt</span><br><span class="line">180  git add readme.txt</span><br><span class="line">181  git commit -m <span class="string">"fix bug"</span></span><br><span class="line">182  git checkout master</span><br><span class="line">183  git merge --no-ff -m <span class="string">"merge bug fix issue with no ff"</span> issue</span><br><span class="line">//修复bug并且合并到master</span><br><span class="line"></span><br><span class="line">186  git checkout dev</span><br><span class="line">190  git stash list</span><br><span class="line">191  git stash pop</span><br><span class="line">//恢复工作现场</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">201  git cherry-pick 891c0cf</span><br><span class="line">//在master分支上修复的bug，想要合并到当前dev分支</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="多人协作"><a href="#多人协作" class="headerlink" title="多人协作"></a>多人协作</h2><p>因此，多人协作的工作模式通常是这样：<br>首先，可以试图用git push origin <branch-name>推送自己的修改；<br>如果推送失败，则因为远程分支比你的本地更新，需要先用git pull试图合并；<br>如果合并有冲突，则解决冲突，并在本地提交；没有冲突或者解决掉冲突后，再用git push origin <branch-name>推送就能成功！如果git pull提示no tracking information，则说明本地分支和远程分支的链接关系没有创建，用命令git branch –set-upstream-to <branch-name> origin/<branch-name>。这就是多人协作的工作模式，一旦熟悉了，就非常简单。</p>
+<p>小结</p>
+<p>查看远程库信息，使用git remote -v；<br>本地新建的分支如果不推送到远程，对其他人就是不可见的；<br>从本地推送分支，使用git push origin branch-name，如果推送失败，先用git pull抓取远程的新提交；<br>在本地创建和远程分支对应的分支，使用git checkout -b branch-name origin/branch-name，本地和远程分支的名称最好一致；<br>建立本地分支和远程分支的关联，使用git branch –set-upstream branch-name origin/branch-name；<br>从远程抓取分支，使用git pull，如果有冲突，要先处理冲突。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Distributed%20System/%E4%BB%8EPaxos%E5%88%B0Zookeeper%20%E7%AC%AC%E5%9B%9B%E7%AB%A0%EF%BC%9AZookeeper%20%E4%B8%8E%20Paxos/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Distributed%20System/%E4%BB%8EPaxos%E5%88%B0Zookeeper%20%E7%AC%AC%E5%9B%9B%E7%AB%A0%EF%BC%9AZookeeper%20%E4%B8%8E%20Paxos/" class="post-title-link" itemprop="url">从Paxos到Zookeeper 第四章：Zookeeper 与 Paxos</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-21 10:28:31" itemprop="dateModified" datetime="2020-05-21T10:28:31+08:00">2020-05-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BB%8EPaxos%E5%88%B0Zookeeper%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">从Paxos到Zookeeper读书笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Zookeeper基本概念"><a href="#Zookeeper基本概念" class="headerlink" title="Zookeeper基本概念"></a>Zookeeper基本概念</h2><p>Zookeeper 是一个典型的分布式数据一致性的解决方案，分布式应用程序可以基于它实现诸如数据发布/订阅，负载均衡，命名服务，分布式协调/通知，集群管理，Master 选举，分布式锁和分布式队列等功能。</p>
+<ul>
+<li>集群角色<ul>
+<li>Leader：为客户端提供读和写服务。</li>
+<li>Follower：提供读服务</li>
+<li>Observer：提供读服务，但是不参与 Leader 的选举过程，也不参与写操作的“过半写成功”策略，可以在不影响写性能的情况下提升集群的读性能。</li>
+</ul>
+</li>
+<li>会话<ul>
+<li>客户端与 Zookeeper 的连接是一个 TCP 的长连接。ZK 对外提供服务的端口号为 2181。</li>
+</ul>
+</li>
+<li>ZNode<ul>
+<li>ZNode 指的是数据模型中的数据单元，称之为数据节点。ZK 的所有数据存储在内存当中，数据模型是一棵树。</li>
+<li>ZNode 可以分为持久性或临时性节点</li>
+</ul>
+</li>
+<li>版本<ul>
+<li>每个ZNode，Zookeeper都会维护一个 Stat 的数据结构，Stat 记录了该 ZNode 的三个数据版本。version(当前ZNode 的版本)，cversion(当前ZNode子节点的版本)和aversion(当前ZNode的ACL版本)。</li>
+</ul>
+</li>
+<li>Watcher<ul>
+<li>ZK 允许用户在指定节点上注册一些 Watcher，并且在一些特定事件触发的时候，ZK 服务端会将事件通知到感兴趣的客户端上去</li>
+</ul>
+</li>
+<li>ACL<ul>
+<li>Access Control List 来进行权限控制<ol>
+<li>CREATE：创建子节点的权限</li>
+<li>READ：获取节点数据和子节点列表的权限</li>
+<li>WRITE：更新节点数据的权限</li>
+<li>DELETE：删除子节点的权限</li>
+<li>ADMIN：设置节点 ACL 的权限</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="ZAB-协议"><a href="#ZAB-协议" class="headerlink" title="ZAB 协议"></a>ZAB 协议</h1><p>Zookeeper Atomic  Broadcast（ZK原子消息广播协议）</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Distributed%20System/%E4%BB%8EPaxos%E5%88%B0Zookeeper%20%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9A%E4%B8%80%E8%87%B4%E6%80%A7%E5%8D%8F%E8%AE%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Distributed%20System/%E4%BB%8EPaxos%E5%88%B0Zookeeper%20%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9A%E4%B8%80%E8%87%B4%E6%80%A7%E5%8D%8F%E8%AE%AE/" class="post-title-link" itemprop="url">从Paxos到Zookeeper 第二章：一致性协议</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-21 10:28:29" itemprop="dateModified" datetime="2020-05-21T10:28:29+08:00">2020-05-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BB%8EPaxos%E5%88%B0Zookeeper%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">从Paxos到Zookeeper读书笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>在分布式系统中，每一个机器节点能够明确知道自己在进行事务操作中的结果的成败，但是无法直接获取到其他分布式节点的操作结果。因此，但一个事务操作需要跨越多个分布式节点的时候，为了保持事务处理的 ACID 的特性，就需要引入一个称为“协调者”（Coordinator）的组件来统一调度所有分布式节点的执行逻辑，这些被调度的节点被称为“参与者”（Participant）。协调者负责调度参与者的行为，并最终决定参与者是否要把事务真正进行提交。基于这个思想，衍生了二阶段提交和三阶段提交两种协议。</p>
+<h2 id="2PC-Two-Phase-Commit"><a href="#2PC-Two-Phase-Commit" class="headerlink" title="2PC(Two-Phase Commit)"></a>2PC(Two-Phase Commit)</h2><p><strong>阶段一：提交事务请求</strong> （投票阶段：即各参与者投票表明是否要继续执行接下来的事务提交操作）</p>
+<ol>
+<li><p>事务询问</p>
+<p>协调者向所有参与者发送事务内容，询问是否可以执行事务提交操作，并开始等待各参与者的响应。</p>
+</li>
+<li><p>执行事务</p>
+<p>各参与者节点执行事务操作，并将 Undo 和 Redo 信息记录到事务日志中。</p>
+</li>
+<li><p>各参与者向协调者反馈事务询问的响应</p>
+<p>如果参与者成功执行了事务操作，那么就反馈给协调者 Yes 响应，表示事务可以执行</p>
+</li>
+</ol>
+<p><strong>阶段二：执行事务提交</strong></p>
+<ol>
+<li><p>执行事务提交：所有的参与者反馈的都是 Yes 响应</p>
+<ul>
+<li>发送提交请求： 协调者向所有参与者发送 Commit 请求。</li>
+<li>事务提交：参与者收到 Commit 请求后，会正式的执行事务提交操作，并在完成提交之后释放在整个事务期间占用的事务资源。</li>
+<li>反馈事务提交结果：参与者在事务提交之后，向协调者发送 ACK 消息。</li>
+<li>完成事务：协调者收到所有参与者反馈的 ACK 消息后，完成事务。</li>
+</ul>
+</li>
+<li><p>中断事务：如果任何一个参与者向协调者发送了 No 响应，或者在等待超时之后，协调者尚无法收到所有参与者的反馈响应，那么就会中断事务。</p>
+<ul>
+<li>发送回滚请求：协调者向所有参与者发送 Rollback 请求。</li>
+<li>事务回滚：参与者在收到 Rollback 请求后，会利用其在阶段一中记录的 Undo 信息来执行事务回滚操作，并在完成回滚后释放在整个事务期间占用的事务资源。</li>
+<li>反馈事务回滚结果：参与者在完成事务回滚之后，向协调者发送 ACK 消息。</li>
+<li>中断事务：协调者收到所有参与者反馈的 ACK 消息后，完成事务中断</li>
+</ul>
+</li>
+</ol>
+<hr>
+<ul>
+<li><strong>优点</strong>：原理简单，实现方便</li>
+<li><strong>缺点</strong>：同步阻塞，单点问题，脑裂，太过保守<ul>
+<li>同步阻塞：2PC 的执行过程中，所有参与该事务操作的逻辑都处于阻塞状态。也就是说，各个参与者在等待其他参与者响应的过程中，将无法进行其他任何操作。</li>
+<li>单点问题：如果协调者崩了，那么其他参与者将会一直处于锁定事务资源的状态中，而无法继续完成事务操作。</li>
+<li>数据不一致：2PC 的阶段二，即执行事务提交的时候，当协调者向所有的参与者发送 Commit 请求后，由于种种原因（局部网络异常，协调者尚未发送完所有 Commit 自身发生崩溃）导致最终只有部分参与者收到了 Commit 请求。那么收到 Commit 请求的参与者就会进行事务的提交，而其他没有收到 Commit 的参与者则无法进行事务提交。于是整个分布式系统出现了数据不一致的现象。</li>
+<li>太过保守：如果在协调者指示参与者进行事务提交询问的过程中，参与者出现故障而导致协调者始终无法获取到所有参与者的相应信息的话，这时协调者只能依靠自身的超时机制来判断是否需要中断事务，这样的策略太过保守。 也就是 2PC 协议没有设计较为完善的容错机制，任意一个节点的失败都会导致整个事务的失败。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3PC-Three-Phase-Commit"><a href="#3PC-Three-Phase-Commit" class="headerlink" title="3PC(Three-Phase Commit)"></a>3PC(Three-Phase Commit)</h2><p>是 2PC 的改进版，将二阶段提交协议的“提交事务请求”过程一分为二，形成了由 CanCommit、PreCommit 和 do Commit 三个阶段组成的事务处理协议。</p>
+<p><strong>阶段一：CanCommit</strong></p>
+<ol>
+<li><p>事务询问：协调者向所有参与者发送一个包含事务内容的 CanCommit 请求，询问是否可以执行事务提交操作，并开始等待各参与者的响应。</p>
+</li>
+<li><p>各参与者向协调者反馈事务询问的响应：参与者在接收到来自协调者的 CanCommit请求后，正常情况下，如果其自身认为可以顺利执行事务，那么就会反馈 Yes 响应，并进入预备状态，否则反馈 No 响应。</p>
+</li>
+</ol>
+<p><strong>阶段二：PreCommit</strong></p>
+<p>在阶段二中，协调者会根据参与者的反馈情况来决定是否可以进行事务的 PreCommit 操作，正常情况下，包含两种情况</p>
+<ul>
+<li><p>执行事务预提交</p>
+<p>假如协调者从所有的参与者获得的反馈都是 Yes ，那么就会执行事务的预提交</p>
+<ol>
+<li>发送预提交请求：协调者向所有参与者节点发出 PreCommit 的请求，并进入 Prepared 阶段。</li>
+<li>事务预提交：参与者收到  PreCommit 请求后，会执行事务操作，并将 Undo 和 Redo 信息记录到事务日志中。</li>
+<li>各参与者向协调者反馈事务执行的响应：如果参与者成功执行了事务操作，那么就反馈给协调者 Ack 响应，同时等待最终的指令：提交(commit) 或者 终止(abort).</li>
+</ol>
+</li>
+<li><p>中断事务</p>
+<p>假如任意一个参与者向协调者反馈了 No 响应，或者在等待超时之后，协调者尚无法接收到所有参与者的反馈响应，那么就会中断事务。</p>
+<ol>
+<li>发送中断请求：协调者向所有参与者节点发送 abort 请求。</li>
+<li>中断事务：无论是收到来自协调者的 abort 请求，或者是在等待协调者请求的过程中出现超时，参与者都会中断事务。</li>
+</ol>
+</li>
+</ul>
+<p><strong>阶段三： doCommit</strong></p>
+<p>该阶段会执行真正的事务提交，会存在以下两种情况</p>
+<ul>
+<li><p>执行提交</p>
+<ol>
+<li>发送提交请求：假设协调者处于正常工作状态，并且收到了来自所有参与者的 Ack 响应，那么它将从“预提交”状态转换到“提交”状态，并向所有的参与者发出 doCommit 请求。</li>
+<li>事务提交：参与者收到 doCommit 请求后，会正式的执行事务提交操作，并在完成提交之后释放在整个事务期间占用的事务资源。</li>
+<li>反馈事务提交结果：参与者在事务提交之后，向协调者发送 ACK 消息。</li>
+<li>完成事务：协调者收到所有参与者反馈的 ACK 消息后，完成事务。</li>
+</ol>
+</li>
+<li><p>中断事务</p>
+<p>进入这一阶段，假设协调者处于正常工作状态，并且有任意一个参与者向协调者反馈了 No 响应，或者在等待超时之后，协调者尚无法收到所有参与者的反馈响应，那么就会中断事务。</p>
+<ol>
+<li>发送中断请求：协调者向所有参与者节点发送 abort 请求。</li>
+<li>事务回滚：参与者在收到 abort 请求后，会利用其在阶段二中记录的 Undo 信息来执行事务回滚操作，并在完成回滚后释放在整个事务期间占用的事务资源。</li>
+<li>反馈事务回滚结果：参与者在完成事务回滚之后，向协调者发送 ACK 消息。</li>
+<li>中断事务：协调者收到所有参与者反馈的 ACK 消息后，完成事务中断。</li>
+</ol>
+</li>
+</ul>
+<hr>
+<p>一旦进入阶段三，可能会出现以下两种故障：</p>
+<ul>
+<li>协调者出现问题</li>
+<li>协调者和参与者之间的网络出现故障</li>
+</ul>
+<p>无论出现哪种情况，最终都会导致参与者无法收到来自协调者的 doCommit 或是 abort 请求，针对这样的异常情况，参与者都会在等待超时之后，继续进行事务提交。</p>
+<hr>
+<ul>
+<li><strong>优点：</strong>相对于 2PC ，3PC 最大的优点是减低了参与者的阻塞范围，并且能够在出现单点故障后继续达成一致。</li>
+<li><strong>缺点：</strong>参与者在收到 PreCommit 消息后，如果出现了网络分区，此时协调者所在的节点无法与参与者进行网络通信，这种情况下，参与者依然会进行事务的提交，这样会出现数据的不一致。</li>
+</ul>
+<hr>
+<h2 id="Paxos"><a href="#Paxos" class="headerlink" title="Paxos"></a>Paxos</h2><p><a href="https://mp.weixin.qq.com/s/aJoXSQo9-zmukN2RsiZ3_g" target="_blank" rel="noopener">微信PaxosStore：深入浅出Paxos算法协议</a></p>
+<p><a href="https://mp.weixin.qq.com/s/6VWUA5EDV2UIq4NqmQYWUA" target="_blank" rel="noopener">微信自研生产级paxos类库PhxPaxos实现原理介绍</a></p>
+<p> <strong>Proposer 生成提案</strong></p>
+<ol>
+<li><p>Proposer 选择一个新的提案编号 Mn，然后向某个  Acceptor 集合的成员发送请求，要求该集合中 Acceptor 作出如下回应：</p>
+<ul>
+<li>向 Proposer 承诺，保证不再批准任何编号小于 Mn 的提案</li>
+<li>如果 Acceptor 已经批准过任何提案，那么其就向 Proposer 反馈当前该 Acceptor 已经批准的编号小于 Mn 但为最大编号的那个提案的值。</li>
+</ul>
+</li>
+</ol>
+<p>   我们将请求编号为 Mn 的提案的 Prepare 请求。</p>
+<ol start="2">
+<li>如果 Proposer 收到了来自半数以上的 Acceptor 的响应结果，那么它就可以产生编号为 Mn，value 的值为 Vn 的提案，这里的 Vn 是所有响应中编号最大的提案的 Value 值。（半数以上的 Acceptor 都没有批准过任何提案，即响应中不包含任何的提案，那么 Vn 的值可以由 Proposer 任意选择）。</li>
+</ol>
+<p>在确定提案以后，Proposer 就会将该提案再次发给某个 Acceptor 集合，并期望获得他们的批准，称为 Accept 请求。</p>
+<p><strong>Acceptor 批准提案</strong></p>
+<ul>
+<li>Prepare 请求：Acceptor 可以在任何时候响应一个 Prepare 请求。</li>
+<li>Accept 请求：在不违背 Acceptor 现有承诺的前提下，可以任意响应 Accept 请求。</li>
+</ul>
+<p>一个 Acceptor 只要尚未响应过任何编号大于 Mn 的 Prepare 请求，那么它就可以接受这个编号为 Mn 的提案。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Distributed%20System/%E4%BB%8EPaxos%E5%88%B0Zookeeper%20%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9A%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -187,17 +637,23 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:07:22" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-21 10:28:33" itemprop="dateModified" datetime="2020-05-21T10:28:33+08:00">2020-05-21</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E4%BB%8EPaxos%E5%88%B0Zookeeper/" itemprop="url" rel="index"><span itemprop="name">从Paxos到Zookeeper</span></a>
+                  <a href="/categories/%E4%BB%8EPaxos%E5%88%B0Zookeeper%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">从Paxos到Zookeeper读书笔记</span></a>
                 </span>
             </span>
 
@@ -683,7 +1139,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-18 13:15:07" itemprop="dateModified" datetime="2020-05-18T13:15:07+08:00">2020-05-18</time>
+                <time title="修改时间：2020-05-21 10:28:04" itemprop="dateModified" datetime="2020-05-21T10:28:04+08:00">2020-05-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -691,7 +1147,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%AB%98%E6%80%A7%E8%83%BDMySQL/" itemprop="url" rel="index"><span itemprop="name">高性能MySQL</span></a>
+                  <a href="/categories/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">高性能MySQL读书笔记</span></a>
                 </span>
             </span>
 
@@ -778,7 +1234,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-18 13:15:09" itemprop="dateModified" datetime="2020-05-18T13:15:09+08:00">2020-05-18</time>
+                <time title="修改时间：2020-05-21 10:28:03" itemprop="dateModified" datetime="2020-05-21T10:28:03+08:00">2020-05-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -786,7 +1242,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%AB%98%E6%80%A7%E8%83%BDMySQL/" itemprop="url" rel="index"><span itemprop="name">高性能MySQL</span></a>
+                  <a href="/categories/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">高性能MySQL读书笔记</span></a>
                 </span>
             </span>
 
@@ -806,583 +1262,6 @@
 <li>按功能拆分</li>
 <li>数据分片：通用且成功</li>
 </ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E5%85%AD%E7%AB%A0%EF%BC%9A%E6%9F%A5%E8%AF%A2%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E5%85%AD%E7%AB%A0%EF%BC%9A%E6%9F%A5%E8%AF%A2%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" class="post-title-link" itemprop="url">高性能MySQL读书笔记第六章：查询性能优化</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-18 13:15:12" itemprop="dateModified" datetime="2020-05-18T13:15:12+08:00">2020-05-18</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%AB%98%E6%80%A7%E8%83%BDMySQL/" itemprop="url" rel="index"><span itemprop="name">高性能MySQL</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="为什么查询速度会慢？"><a href="#为什么查询速度会慢？" class="headerlink" title="为什么查询速度会慢？"></a>为什么查询速度会慢？</h2><ul>
-<li><p>查询的生命周期</p>
-<p>查询的生命周期，从客户端，到服务器，然后在服务器上进行解析，生成执行计划，执行，并返回结果给客户端。执行是查询生命周期最重要的阶段，这其中包括了大量为了检索数据到存储引擎的调用以及调用后的数据处理，包括排序、分组等等。</p>
-</li>
-</ul>
-<h2 id="慢查询基础：优化数据访问"><a href="#慢查询基础：优化数据访问" class="headerlink" title="慢查询基础：优化数据访问"></a>慢查询基础：优化数据访问</h2><ul>
-<li>分析步骤</li>
-</ul>
-<ol>
-<li><p>确认应用程序是否在检索大量超过需要的数据。这通常意味着访问了太多的行，但有时候也是可能访问了太多的列</p>
-</li>
-<li><p>确认MySQL服务器层是否在分析大量超过需要的数据行</p>
-</li>
-</ol>
-<h3 id="是否向数据库请求了不需要的数据"><a href="#是否向数据库请求了不需要的数据" class="headerlink" title="是否向数据库请求了不需要的数据"></a>是否向数据库请求了不需要的数据</h3><ol>
-<li>查询不需要的记录（加上limit）</li>
-<li>多表关联时返回全部列（查询涉及三张表的时候，使用select *）</li>
-<li>总是取出全部列（无法使用索引覆盖扫描，慎用select*）</li>
-<li>重复查询相同的数据（缓存）</li>
-</ol>
-<h3 id="MySQL是否在扫描额外的记录"><a href="#MySQL是否在扫描额外的记录" class="headerlink" title="MySQL是否在扫描额外的记录"></a>MySQL是否在扫描额外的记录</h3><ul>
-<li><strong>衡量查询开销的三个指标：</strong></li>
-</ul>
-<ol>
-<li><p>响应时间：</p>
-<ul>
-<li>服务时间是指数据库处理这个查询花了多少时间</li>
-<li>排队时间是指服务器因为等待某些资源而没有真正执行查询的时间。可能是等I/O操作完成，等行锁</li>
-</ul>
-</li>
-<li><p>扫描的行数：</p>
-</li>
-<li><p>返回的行数：</p>
-</li>
-</ol>
-<p>这三个指标都会存放在MySQL的慢日志中，所以检查慢日志记录是找出扫描行数过多的查询的好办法。</p>
-<ul>
-<li><strong>访问类型：</strong></li>
-</ul>
-<p>全表扫描，索引扫描，范围扫描，唯一索引查询，常数引用</p>
-<ul>
-<li><strong>MySQL 应用 where ：</strong></li>
-</ul>
-<ol>
-<li>在索引中使用 where 条件来过滤不匹配的记录。在存储引擎层完成的。</li>
-<li>使用索引扫描(在 Extra 列中出现了 Using Index )来返回记录，直接从索引中过滤不需要的记录并返回命中结果。这是在 MySQL 服务器层完成的，但无须回表查询记录</li>
-<li>在数据表中返回数据，然后过滤不满足条件的记录(在 Extra 列中出现 Using Where)。这是在 MySQL 服务器层完成，MySQL 需要先从数据表读出记录然后过滤</li>
-</ol>
-<h2 id="重构查询的方式"><a href="#重构查询的方式" class="headerlink" title="重构查询的方式"></a>重构查询的方式</h2><ul>
-<li><p><strong>一个复杂的查询还是多个简单的查询</strong></p>
-</li>
-<li><p><strong>切分查询：</strong>大查询切分成小查询，每个查询功能完全一样，每次只完成一小部分</p>
-</li>
-<li><p><strong>分解关联查询：</strong></p>
-</li>
-</ul>
-<ol>
-<li><p>对每一个表进行一次单表查询，然后将结果在应用程序中进行关联</p>
-</li>
-<li><p>让缓存的效率更高  </p>
-</li>
-<li><p>将查询分解后，执行单个查询可以减少锁的竞争</p>
-</li>
-<li><p>在应用层做关联，可以更容易对数据库进行拆分，更容易做到高性能和可扩展</p>
-</li>
-</ol>
-<h2 id="查询执行的基础"><a href="#查询执行的基础" class="headerlink" title="查询执行的基础"></a>查询执行的基础</h2><ol>
-<li><p>客服端发送一条查询给服务器</p>
-</li>
-<li><p>服务器先检查查询缓存，如果命中缓存，则立即返回</p>
-</li>
-<li><p>服务器端进行SQL解析，预处理，再由优化器生成对应的执行计划</p>
-</li>
-<li><p>MySQL根据优化器生成的执行计划，调用存储引擎的API来执行查询</p>
-</li>
-<li><p>返回结果给客户端</p>
-</li>
-</ol>
-<h3 id="MySQL客户端-服务端通信协议：半双工"><a href="#MySQL客户端-服务端通信协议：半双工" class="headerlink" title="MySQL客户端/服务端通信协议：半双工"></a>MySQL客户端/服务端通信协议：半双工</h3><h3 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h3><h3 id="查询优化处理"><a href="#查询优化处理" class="headerlink" title="查询优化处理"></a>查询优化处理</h3><ol>
-<li><p>语法解析器和预处理：生成“解析树”并验证解析树是否合法，验证权限</p>
-</li>
-<li><p>查询优化器：基于成本的优化器</p>
-</li>
-<li><p>数据和索引统计信息：统计信息在存储引擎层，服务器层在执行查询优化的时候需要调用api</p>
-</li>
-<li><p>MySQL如何执行关联查询：嵌套循环关联操作</p>
-<ul>
-<li>MySQL先在一个表中循环取出单条数据，然后再嵌套循环到下一个表中寻找匹配的行，依次下去，直到找到所有表中匹配的行为止。然后根据各个表匹配的行，返回查询中需要的列。<ul>
-<li>如果是左外连接，取出单条数据遍历下一个表的时候，如果没有匹配，则输出当前行+NULL</li>
-<li>右连接改正等价的左外连接</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>执行计划：生成一颗查询的指令树</p>
-</li>
-<li><p>关联查询优化器：</p>
-</li>
-<li><p>排序优化：</p>
-<ul>
-<li><p>如果需要排序的数据量小于“排序缓冲区”，MySQL使用内存进行“快排”。如果内存不够，MySQL先将数据分块，每个独立的块使用快排然后刷到磁盘上，最后将各个排好序的块合并。</p>
-</li>
-<li><p>排序算法：</p>
-<ul>
-<li><p>两次传输排序：读取行指针和需要排序的字段，对其进行排序，然后根据排序结果读取所需要的数据行。优点是排序的时候存储尽可能少的数据，缺点是第二次数据传输的时候又大量的随机I/O</p>
-</li>
-<li><p>单次传输排序：先读取查询所需要的所有的列，然后再根据给定列进行排序，最后直接返回结果</p>
-</li>
-</ul>
-</li>
-<li><p>关联查询的时候如果需要排序：</p>
-<ul>
-<li>orderBy 子句中的所有列全部来自关联的第一个表，那么 MySQL 在关联处理第一个表时就进行文件排序。Extra：Using filesort</li>
-<li>除此之外，MySQL 都会将关联的结果存放在一个临时表中，在所有的关联都结束的时候，再进行文件排序。Extra：Using temporary；Using filesort</li>
-<li>有limit，也会对全量数据排序，然后返回较少的数据（5.6版本之后，对这个有优化，不再是全量数据排序）</li>
-</ul>
-</li>
-</ul>
-</li>
-</ol>
-<h3 id="查询执行引擎"><a href="#查询执行引擎" class="headerlink" title="查询执行引擎"></a>查询执行引擎</h3><ul>
-<li>解析和优化阶段，MySQL生成对应的执行计划(数据结构)</li>
-<li>查询中的每个表有一个handler的实例表示，存储引擎的接口称为handler API</li>
-</ul>
-<h3 id="返回结果给客户端：TCP"><a href="#返回结果给客户端：TCP" class="headerlink" title="返回结果给客户端：TCP"></a>返回结果给客户端：TCP</h3>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E4%BA%94%E7%AB%A0%EF%BC%9A%E5%88%9B%E5%BB%BA%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E7%B4%A2%E5%BC%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E4%BA%94%E7%AB%A0%EF%BC%9A%E5%88%9B%E5%BB%BA%E9%AB%98%E6%80%A7%E8%83%BD%E7%9A%84%E7%B4%A2%E5%BC%95/" class="post-title-link" itemprop="url">高性能MySQL读书笔记第五章：创建高性能的索引</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-18 13:15:04" itemprop="dateModified" datetime="2020-05-18T13:15:04+08:00">2020-05-18</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%AB%98%E6%80%A7%E8%83%BDMySQL/" itemprop="url" rel="index"><span itemprop="name">高性能MySQL</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="索引基础"><a href="#索引基础" class="headerlink" title="索引基础"></a>索引基础</h1><p>MySQL的索引是在存储引擎层实现的</p>
-<h2 id="磁盘IO与预读"><a href="#磁盘IO与预读" class="headerlink" title="磁盘IO与预读"></a>磁盘IO与预读</h2><p>磁盘读取数据靠的是机械运动，每次读取数据花费的时间可以分为<strong>寻道时间</strong>、<strong>旋转延迟</strong>、<strong>传输时间</strong>三个部分，寻道时间指的是磁臂移动到指定磁道所需要的时间，主流磁盘一般在<strong>5ms</strong>以下；旋转延迟就是我们经常听说的磁盘转速，比如一个磁盘7200转，表示每分钟能转7200次，也就是说1秒钟能转120次，旋转延迟就是1/120/2 = <strong>4.17ms</strong>；传输时间指的是从磁盘读出或将数据写入磁盘的时间，一般在零点几毫秒，相对于前两个时间可以忽略不计。</p>
-<p>考虑到磁盘IO是非常高昂的操作，计算机操作系统做了一些优化，<strong>当一次IO时，不光把当前磁盘地址的数据，而是把相邻的数据也都读取到内存缓冲区内</strong>，因为局部预读性原理告诉我们，当计算机访问一个地址的数据的时候，与其相邻的数据也会很快被访问到。每一次IO读取的数据我们称之为一页(page)。具体一页有多大数据跟操作系统有关，一般为<strong>4k</strong>或8k，也就是我们读取一页内的数据时候，实际上才发生了一次IO，这个理论对于索引的数据结构设计非常有帮助。</p>
-<p>3层的b+树可以表示上百万的数据，如果上百万的数据查找只需要三次IO，性能提高将是巨大的，如果没有索引，每个数据项都要发生一次IO，那么总共需要百万次的IO，显然成本非常非常高。</p>
-<h2 id="索引的类型"><a href="#索引的类型" class="headerlink" title="索引的类型"></a>索引的类型</h2><ol>
-<li>B+Tree索引</li>
-</ol>
-<ul>
-<li><p>B+Tree索引有不同的<strong>实现方式</strong>，各有优劣。</p>
-<ul>
-<li>MyISAM使用前缀压缩技术使得索引更小，但InnoDB则按照原数据格式进行存储</li>
-<li>MyISAM索引通过数据的物理位置引用被索引的行，而InnoDB则根据主键引用被索引的行</li>
-</ul>
-</li>
-<li><p>可以使用B+Tree索引的类型</p>
-<ul>
-<li>B+Tree索引适合于全键值、键值范围或键前缀查找(根据最左前缀的查找)<br>  <strong>B+Tree索引的有效查询类型</strong>：<ul>
-<li>全值匹配</li>
-<li><strong>匹配最左前缀</strong></li>
-<li>匹配列前缀</li>
-<li>匹配范围值</li>
-<li>精确匹配某一列并范围匹配另一列</li>
-<li>只访问索引的查询</li>
-<li>如果orderby子句满足前面列出的几种查询类型，则这个索引也可以满足对应的排序需求</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>B+Tree索引的一些<strong>限制</strong></p>
-<ul>
-<li>如果不是从索引的最左列开始查找，则无法使用索引</li>
-<li>不能跳过索引中的列（比如说我查询第一列和第三列，则索引只能使用第一列）</li>
-<li>如果查询中有某个列的范围查询，则其右边所有列都无法使用索引优化查找</li>
-</ul>
-</li>
-</ul>
-<h1 id="索引的优点"><a href="#索引的优点" class="headerlink" title="索引的优点"></a>索引的优点</h1><ul>
-<li>索引大大减少了服务器需要扫描的数据量</li>
-<li>索引帮助服务器避免排序和临时表</li>
-<li>索引可以将随机I/O变为顺序I/O</li>
-</ul>
-<h1 id="高性能索引策略"><a href="#高性能索引策略" class="headerlink" title="高性能索引策略"></a>高性能索引策略</h1><h2 id="独立的列"><a href="#独立的列" class="headerlink" title="独立的列"></a>独立的列</h2><p>指索引列不能是表达式的一部分，也不能是函数的参数</p>
-<h2 id="前缀索引和索引选择性"><a href="#前缀索引和索引选择性" class="headerlink" title="前缀索引和索引选择性"></a>前缀索引和索引选择性</h2><ul>
-<li>索引很长的字符串，需要使用前缀索引，这样可以大大减少索引空间，从而提升索引效率。但是会降低索引的选择性。（BLOB，TEXT必须使用前缀索引）</li>
-<li>索引的选择性是指，不重复的索引值和数据表记录总数的比值。</li>
-<li>MySQL无法使用前缀索引做 order by和 group by，也无法使用前缀索引做覆盖扫描。</li>
-</ul>
-<h2 id="多列索引"><a href="#多列索引" class="headerlink" title="多列索引"></a>多列索引</h2><p>为每一个列创建单独的索引，或者按照错误的顺序创建多列索引，是错误的。</p>
-<h2 id="选择合适的索引列顺序"><a href="#选择合适的索引列顺序" class="headerlink" title="选择合适的索引列顺序"></a>选择合适的索引列顺序</h2><ul>
-<li>当不需要考虑排序和分组的时候，将选择性最高的列放到前面通常是很好的。这时索引的作用是优化where条件的查找</li>
-<li>将选择性最高的列放在索引的最前列，在某些场景可能有帮助，但通常不如避免随机I/O和排序那么重要，考虑问题需要全面。</li>
-</ul>
-<h2 id="聚簇索引"><a href="#聚簇索引" class="headerlink" title="聚簇索引"></a>聚簇索引</h2><p>聚簇索引并不是一种单独的索引类型，而是一种数据存储方式。<br>数据行实际存放在索引的叶子页中，“聚簇”表示数据行和相邻的键值紧凑的存储在一起。</p>
-<h3 id="聚簇索引的优点"><a href="#聚簇索引的优点" class="headerlink" title="聚簇索引的优点"></a>聚簇索引的优点</h3><ul>
-<li>可以把相关的数据保存在一起</li>
-<li>因为聚簇索引把索引和数据保存在同一个B+Tree中，所以数据访问更快</li>
-<li>使用覆盖索引扫描的查询可以直接使用页节点中的主键值</li>
-<li>使用主键值当作指针会让二级索引占用更多的空间，换来的好处是，InnoDB在移动行的时候无须更新二级索引中这个“指针”</li>
-</ul>
-<h3 id="聚簇索引的缺点"><a href="#聚簇索引的缺点" class="headerlink" title="聚簇索引的缺点"></a>聚簇索引的缺点</h3><ul>
-<li>聚簇索引最大限度的提高了 I/O 密集型应用的提升，如果数据全部在内存中，则访问的顺序就没有那么重要了，聚簇索引的优势也就没了。</li>
-<li>插入速度严重依赖于插入顺序。按照主键的顺序插入是加载数据到 InnoDB 表中速度最快的方式。如果不是，插入完成后最好使用 OPTIMIZE TABLE 命令重新组织一下表。</li>
-<li>更新聚簇索引的代价很高，因为会强制 InnoDB 将每个被更新的行移动到新的位置</li>
-<li>基于聚簇索引的表在插入新行或者主键被更新导致需要移动行的时候，可能面临“页分裂”的问题。<ul>
-<li>当行的主键值要求必须将这一行插入到某个已满的页中，存储引擎会将该页分裂成两个页面来容纳该行，这就是一项页分裂的操作。页分裂会导致占用更多的磁盘空间</li>
-</ul>
-</li>
-<li>聚簇索引可能会导致全表扫描变慢，尤其是行比较稀疏，或者由于页分裂导致数据存储不连续的时候</li>
-<li>二级索引(非聚簇索引)可能比想象的要更大，因为在二级索引的叶子节点包含了引用行的主键列。</li>
-<li>二级索引访问需要两次索引查找，而不是一次<ul>
-<li>二级索引叶子结点保存的不是指向行物理位置的指针，而是行的主键值</li>
-<li>存储引擎需要找到二级索引的叶子结点获得对应的主键值，然后根据这个值去聚簇索引中查找到对应的行  </li>
-</ul>
-</li>
-</ul>
-<h3 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h3><p>如果一个索引包含所有需要查询的值，我们就称之为覆盖索引。</p>
-<ul>
-<li>覆盖索引的优点：<ol>
-<li>索引条目通常远小于数据行的大小，如果只需要读取索引，MySQL就会极大地减少数据访问量。</li>
-<li>因为索引是按照列值顺序存储的，所以对于 I/O 密集型的范围查询会比随机磁盘读取每一行的数据的 I/O 要少得多。</li>
-<li>因为 InnoDB 的聚簇索引，覆盖索引可以避免回表查询。</li>
-</ol>
-</li>
-</ul>
-<p>当发起一个被索引覆盖的查询时，在 explain 的 Extra 列可以看到 “Using index” 的信息。</p>
-<h3 id="使用索引扫描来排序"><a href="#使用索引扫描来排序" class="headerlink" title="使用索引扫描来排序"></a>使用索引扫描来排序</h3><p>EXPLAIN 出来的列的 type 列的值为 “index” ，则说明 MySQL 使用了索引扫描来做排序。</p>
-<p>MySQL使用索引来对结果做排序的一些限制：</p>
-<ol>
-<li><p>只有当索引列的顺序和 ORDER BY 子句的顺序完全一致，并且所有列的排序方向都一样时</p>
-<ol start="2">
-<li>如果需要关联多张表，则只有当 ORDER BY 子句引用的字段全部为第一个表时</li>
-<li>其他查找型的限制(最左前缀优先等等)</li>
-</ol>
-</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9AMySQL%E6%9E%B6%E6%9E%84/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9AMySQL%E6%9E%B6%E6%9E%84/" class="post-title-link" itemprop="url">高性能MySQL读书笔记第一章：MySQL架构</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-18 13:15:00" itemprop="dateModified" datetime="2020-05-18T13:15:00+08:00">2020-05-18</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%AB%98%E6%80%A7%E8%83%BDMySQL/" itemprop="url" rel="index"><span itemprop="name">高性能MySQL</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="MySQL逻辑架构"><a href="#MySQL逻辑架构" class="headerlink" title="MySQL逻辑架构"></a>MySQL逻辑架构</h2><ul>
-<li><strong>连接管理、授权认证与安全</strong><br>  每个客户端连接都会在服务器进程中拥有一个线程<br>  认证基于用户名、原始主机信息和密码</li>
-<li><strong>优化与执行</strong><br>MySQL 会解析查询，并创建内部数据结构，然后对其进行各种优化，包括重写查询、决定表的读取顺序以及选择合适的索引等。</li>
-</ul>
-<hr>
-<h2 id="并发控制"><a href="#并发控制" class="headerlink" title="并发控制"></a>并发控制</h2><ul>
-<li><strong>并发控制的两个层面：</strong><br>  服务器层和存储引擎层</li>
-<li><strong>读写锁</strong><br>  读锁是共享的，相互不堵塞的<br>  写锁是排他的，一个写锁会堵塞其他读锁和写锁</li>
-<li><strong>锁粒度</strong><br>  表锁：最基本的锁策略，开销最小的策略，（一般是在服务器层实现）<br>  行锁：支持最大程度的并发处理，同时也带来了最大的锁开销，行级锁只在存储引擎实现</li>
-</ul>
-<hr>
-<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>事务就是一个原子性的 SQL 查询或者说一个独立的工作单元。事务内的语句，要么全部执行成功，要么全部执行失败。</p>
-<ul>
-<li><p><strong>ACID</strong></p>
-<ol>
-<li>Atomicity 原子性：一个事务必须被视为一个不可分割的最小工作单元，整个事务中的所有操作要么全部提交成功，要么全部失败回滚，对一个事务来说，不可能只执行其中的一部分操作。</li>
-<li>Consistency 一致性：数据库总是从一个一致性状态转换到另外一个一致性状态。</li>
-<li>Isolation 隔离性：一个事务所做的修改在最终提交以前，对其他事务是不可见的。</li>
-<li>Durability 持续性：一旦事务提交，其所做的修改就会永久保存到数据库中。</li>
-</ol>
-</li>
-<li><p><strong>隔离级别</strong></p>
-<ol>
-<li>READ UNCOMMITTED (未提交读)<ul>
-<li>在未提交读级别，事务中的修改，即使没有提交，对其他事务也是可见的</li>
-<li>事务可以读取未提交的数据，被称为脏读</li>
-</ul>
-</li>
-<li>READ COMMITTED (提交读)<ul>
-<li>提交读满足隔离性的定义。一个事务开始时，只能“看见”已经提交的事务所做的修改</li>
-<li>也称作不可重复读，一个事务内执行两次同样的查询，可能会得到不一样的结果</li>
-</ul>
-</li>
-<li>REPEATABLE READ (可重复读)（是 MySQL 默认事务隔离级别）<ul>
-<li>解决了脏读的问题，该级别保证了在同一个事务中多次读取同样记录的结果是一致的</li>
-<li>幻读：当某个事物在读取某个范围内的记录时，另外一个事务又在该范围内插入了新的记录，当之前的事务再次读取该范围的时候就会产生幻行。多版本并发控制 MVCC 解决了幻读的问题</li>
-</ul>
-</li>
-<li>SERIALIZABLE (可串行化)<ul>
-<li>强制事务串行执行</li>
-</ul>
-</li>
-</ol>
-</li>
-<li><p><strong>死锁</strong><br>  死锁是指两个或多个事务在同一资源上相互占用，并请求锁定对方占用的资源，从而导致恶性循环的现象。<br>  InnoDB目前处理死锁的方法是将持有最少行级排他锁的事务进行回滚</p>
-</li>
-<li><p><strong>事务日志</strong></p>
-<ol>
-<li>可以帮助提高事务的效率</li>
-<li>使用事务日志，存储引擎在修改表数据的时只需要修改其内存拷贝，再把该修改行为记录到持久在硬盘上的事务日志中，而不用每次都将修改的数据本身持久到磁盘。</li>
-<li>事务日志采取的是追加的方式，因此写日志的操作是磁盘上一小块区域的顺序 I/O ,而不是像随机 I/O 需要在磁盘的多个地方移动磁头</li>
-<li>事务日志持久以后，内存中被修改的数据在后台可以慢慢地刷回到磁盘</li>
-</ol>
-</li>
-<li><p><strong>MySQL中的事务</strong></p>
-<ol>
-<li>自动提交：如果不显式的开始一个事务，则每个查询都会被当成一个事务执行操作</li>
-<li>在事务中混合使用存储引擎：MySQL 服务器层不管理事务，事务是由下层的存储引擎实现的。所以在同一个事务中，使用多种存储引擎是不可靠的。</li>
-<li>隐式和显式锁定：InnoDB 采用的是两阶段锁定协议。在事务执行过程中，随时都可以执行锁定，锁只有在执行 commit 或者 rollback 的时候才会释放，并且所有的锁是在同一时刻被释放。</li>
-</ol>
-</li>
-</ul>
-<hr>
-<h2 id="多版本并发控制"><a href="#多版本并发控制" class="headerlink" title="多版本并发控制"></a>多版本并发控制</h2><ul>
-<li><p>可以认为 MVCC 是行级锁的一个变种，但是它在很多情况下避免的加锁操作，因此开销更低。虽然实现的机制有所不同，但大都实现了非阻塞的读操作，写操作也只锁定必要的行。</p>
-</li>
-<li><p>MVCC 的实现，是通过保存数据在某个时间点上的快照实现的。</p>
-<ul>
-<li>事务快照是用来存储数据库的事务运行情况，用来做可见性判断</li>
-<li>一个事务快照的创建过程可以概括为：<ol>
-<li>查看当前所有的未提交并活跃的事务，存储在数组中</li>
-<li>选取未提交并活跃的事务中最小的XID，记录在快照的xmin中</li>
-<li>选取所有已提交事务中最大的XID，加1后记录在xmax中</li>
-</ol>
-</li>
-<li>快照生成时机的不同, 造成了RC,RR两种隔离级别的不同可见性<ol>
-<li>repeatable read 级别, 事务在 begin/start transaction 之后的第一条 select 读操作后, 会创建一个快照(read view), 将当前系统中活跃的其他事务记录记录起来;</li>
-<li>read committed 级别, 事务中每条 select 语句都会创建一个快照(read view);</li>
-</ol>
-</li>
-</ul>
-</li>
-<li><p>InnoDB 的 MVCC，InnoDB存储引擎在数据库每行数据的后面添加了三个字段来实现的。一个字段保存了行的创建时间，一个保存了行的过期(删除)时间。存储并不是实际时间值，而是系统版本号。每开始一个事务，系统版本号都会自动递增。还有一个是回滚指针(DB_ROLL_PTR)字段: 指写入回滚段(rollback segment)的 undo log record (撤销日志记录)。</p>
-<ol>
-<li>SELECT：<ul>
-<li>InnoDB只查找版本早于当前事务版本的数据行。这样可以确保事务读取的行要么是在事务开始前就已经存在的，要么是事务自身插入或修改过的</li>
-<li>行的删除版本号要么未定义，要么大于当前事务版本号。这可以确保事务读到的行，在事务开始之前未被删除</li>
-</ul>
-</li>
-<li>INSERT<br> InnoDB为新插入的每一行保存当前系统版本号作为行版本号</li>
-<li>DELETE<br> InnoDB为删除的每一行保存当前系统版本号作为行删除标识</li>
-<li>UPDATE<br> InnoDB为插入一行新数据，保存当前系统版本号作为行版本号，同时保存当前系统版本号到原来的行作为行删除标识</li>
-</ol>
-</li>
-<li><p>MVCC只在可重复读和提交读两个隔离级别下工作</p>
-<ol>
-<li>未提交读总是读取最新的数据行，而不是符合当前事务版本的数据行。</li>
-<li>SERIALIZABLE 则会对所有读取的行都加锁。</li>
-</ol>
-</li>
-<li><p>Undo-log</p>
-<ol>
-<li>Undo log 是 InnoDB MVCC 事务特性的重要组成部分。当我们对记录做了变更操作时就会产生 undo记录，Undo 记录默认被记录到系统表空间(ibdata)中，但从5.6开始，也可以使用独立的Undo 表空间。</li>
-<li>Undo记录中存储的是老版本数据，当一个旧的事务需要读取数据时，为了能读取到老版本的数据，需要顺着undo链找到满足其可见性的记录。当版本链很长时，通常可以认为这是个比较耗时的操作（例如bug#69812）。</li>
-<li>大多数对数据的变更操作包括INSERT/DELETE/UPDATE，其中INSERT操作在事务提交前只对当前事务可见，因此产生的Undo日志可以在事务提交后直接删除（谁会对刚插入的数据有可见性需求呢！！），而对于UPDATE/DELETE则需要维护多版本信息，在InnoDB里，UPDATE和DELETE操作产生的Undo日志被归成一类，即update_undo</li>
-<li>另外, 在回滚段中的undo logs分为: insert undo log 和 update undo log<ul>
-<li>insert undo log : 事务对insert新记录时产生的undolog, 只在事务回滚时需要, 并且在事务提交后就可以立即丢弃。</li>
-<li>update undo log : 事务对记录进行delete和update操作时产生的undo log, 不仅在事务回滚时需要, 一致性读也需要，所以不能随便删除，只有当数据库所使用的快照中不涉及该日志记录，对应的回滚日志才会被purge线程删除。</li>
-</ul>
-</li>
-</ol>
-</li>
-</ul>
-<hr>
-<h2 id="MySQL存储引擎"><a href="#MySQL存储引擎" class="headerlink" title="MySQL存储引擎"></a>MySQL存储引擎</h2><ul>
-<li>InnoDB<ol>
-<li>InnoDB的数据存储在表空间中，表空间是由InnoDB管理的黑盒子，由一系列的数据文件组成。InnoDB可以将每个表的数据和索引放在单独的文件中。</li>
-<li>InnoDB采用MVCC来支持高并发，默认的隔离级别是可重复读，并且通过间隙锁(next-key locking)策略防止幻读的出现。间隙锁是的InnoDB不仅仅锁定查询涉及的行，还会对索引中的间隙进行锁定，以防止幻影行的插入<ul>
-<li>InnoDB支持行锁（锁定字段含有索引的情况下，否则走表锁），但锁定方式并非简单的锁定指定行上的索引，而是分为3种锁定算法：<br>1）记录锁（Record Locks）：锁定指定行的索引项<br>2）Gap Locks：锁定某一个范围内的索引，但不包括记录本身<br>3）间隙锁定（Next-Key Locks）：锁定一个范围内的索引，并且锁定记录本身   Next-Key Locks = Record Locks + Gap Locks<br>A next-key lock is a combination of a record lock on the index record and a gap lock on the gap before the index record</li>
-</ul>
-</li>
-<li>InnoDB表是基于聚簇索引来实现的，聚簇索引对主键查询有很高的性能，不过它的二级索引中必须包含主键列。因此若表上的索引较多的话，主键应当尽可能的小。</li>
-</ol>
-</li>
-<li>MyISAM<ol>
-<li>MySQL5.1及之前的版本，是默认存储引擎。MyISAM提供了大量的特性，包括全文索引，压缩，空间函数等</li>
-<li>MyISAM不支持事务和行级锁，并且崩溃后无法安全恢复</li>
-<li>存储：MyISAM将表存储在两个文件中：数据文件和索引文件。表可以包括动态或静态行</li>
-<li>特性<ul>
-<li>加锁和并发：对整张表加锁；在表有读取查询的同时，也可以往表中插入新的记录，称为并发插入</li>
-<li>修复：check table mytable; repair table mytable</li>
-<li>索引：即使是BLOB和TEXT等长字段，基于前500个字符创建索引；支持全文索引，是一种基于分词创建的索引</li>
-<li>延迟更新索引键：在每次修改执行完成时，不会立即将修改的索引数据写入磁盘，而是会写到内存中的键缓冲区，只有在清理键缓冲区或者关闭表的时候才会将对应的索引块写入到磁盘</li>
-</ul>
-</li>
-<li>压缩表：压缩表是不能修改的，可以极大的减少磁盘空间占用，因此也可以减少磁盘I/O，从而提升查询性能。支持索引，索引也是只读的</li>
-</ol>
-</li>
-</ul>
 
       
     </div>
@@ -1469,20 +1348,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">50</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

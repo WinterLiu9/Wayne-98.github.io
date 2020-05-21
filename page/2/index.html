@@ -164,6 +164,309 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/12/Internet/%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%EF%BC%9A%E7%BD%91%E7%BB%9C%E5%B1%82-%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/12/Internet/%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%EF%BC%9A%E7%BD%91%E7%BB%9C%E5%B1%82-%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/" class="post-title-link" itemprop="url">自顶向下方法：网络层-数据平面</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-12 08:56:53" itemprop="dateCreated datePublished" datetime="2020-05-12T08:56:53+08:00">2020-05-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-21 10:27:19" itemprop="dateModified" datetime="2020-05-21T10:27:19+08:00">2020-05-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">计算机网络:自顶向下方法读书笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="路由器工作原理"><a href="#路由器工作原理" class="headerlink" title="路由器工作原理"></a>路由器工作原理</h2><ul>
+<li><p>输入端口</p>
+<ul>
+<li>最长前缀匹配规则：在路由表中寻找最长的匹配项，并向与最长前缀匹配相关联的链路转发分组</li>
+<li>三态内容可寻址存储器：线性时间内找到匹配项</li>
+</ul>
+</li>
+<li><p>交换结构</p>
+<ul>
+<li>经内存交换</li>
+<li>经总线交换</li>
+<li>经互联网络交换：纵横式交换</li>
+</ul>
+</li>
+<li><p>输出端口</p>
+</li>
+<li><p>路由选择处理器或者是 SND</p>
+</li>
+<li><p>分组调度</p>
+<ul>
+<li>先进先出</li>
+<li>优先权排队</li>
+<li>循环和加权公平排队</li>
+</ul>
+</li>
+</ul>
+<h2 id="网际协议：IPv4、寻址、IPv6-及其他"><a href="#网际协议：IPv4、寻址、IPv6-及其他" class="headerlink" title="网际协议：IPv4、寻址、IPv6 及其他"></a>网际协议：IPv4、寻址、IPv6 及其他</h2><ul>
+<li>IPv4 数据报格式</li>
+</ul>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Internet/IPv4%E6%95%B0%E6%8D%AE%E6%8A%A5%E6%A0%BC%E5%BC%8F.jpg?raw=true" alt=""></p>
+<ul>
+<li>IPv4 数据分片</li>
+</ul>
+<p>生成一个数据报时，发送主机为该数据报设置源和目的地址的同时加上标识号。路由器需要分片的时候，形成的每一个数据报都具有相同的源和目的地址以及标识号。</p>
+<p>标志位为 0 代表着这是较大数据报分片后的最后一片。</p>
+<p>为了让目的主机确定是否丢失了一个片，使用偏移字段指定该片应放在初始 IP 数据报的哪个位置。</p>
+<ul>
+<li><p>IPv4 编址</p>
+<ul>
+<li>点分十进制</li>
+<li>子网掩码：/ 左侧定义了子网地址</li>
+<li>无类别域间路由(Classless Interdomain Routing, CIDR)：a . b . c . d / x</li>
+<li>分类编址：IP 地址的网络部分被限制为长度为 8A, 16B, 或 24C 比特<ul>
+<li>/ 24 C : 仅仅能容纳 254台主机</li>
+<li>/ 16 B : 65534</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>获取地址：</p>
+<ul>
+<li>获取一块地址：ISP, 因特网名字和编号分配机构(Internet Corporation for Assigned Names and Numbers, ICANN)</li>
+<li>获取主机地址：动态主机配置协议(Dynamic Host Configuration, DHCP)</li>
+</ul>
+</li>
+<li><p>DHCP：</p>
+<ul>
+<li><p>一个客户-服务器协议。通常每个子网都有一台 DHCP 服务器，如果子网中没有服务器，则需要一个 DHCP 中继代理(路由器)。</p>
+</li>
+<li><p>DHCP 运行步骤</p>
+<ol>
+<li>DHCP 服务器发现：DHCP 发现报文，客户在 UDP 分组中向端口 67 发送该发现报文。目的IP 地址使用广播地址 255.255.255.255，源 IP 地址为 0.0.0.0.</li>
+<li>DHCP 服务器提供：DHCP 服务器收到一个 DHCP 发现报文时，用 DHCP 提供报文向客户响应。目的 IP 地址仍然是广播地址。提供报文中还包含有收到发现报文的事务 ID, 向客户推荐的 IP 地址、网络掩码以及 IP 地址租用期。</li>
+<li>DHCP 请求：客户从收到的一个或多个服务器提供中选择一个，向选中的服务器提供用 DHCP 请求报文进行响应，回显配置的参数</li>
+<li>DHCP ACK：服务器用 DHCP ACK 报文对 DHCP 请求报文进行响应，证实所要求的参数。</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p>网络地址转换 NAT：</p>
+<p>路由器上的一张 NAT 转换表，表项中包含了端口号及其 IP 地址。</p>
+</li>
+</ul>
+<ul>
+<li>IPv6 数据报格式</li>
+</ul>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Internet/IPv6.png?raw=true" alt=""></p>
+<ul>
+<li>IPv6 的向后兼容：隧道技术</li>
+<li>通用转发和 SND(待学习)</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/5.5%20~%205.12%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/5.5%20~%205.12%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" class="post-title-link" itemprop="url">5.5 ~ 5.12 学习计划</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 22:18:16 / 修改时间：22:18:51" itemprop="dateCreated datePublished" datetime="2020-05-10T22:18:16+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">学习记录</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="5-5-5-12-学习计划"><a href="#5-5-5-12-学习计划" class="headerlink" title="5.5 ~ 5.12 学习计划"></a>5.5 ~ 5.12 学习计划</h2><ul>
+<li>每天写 LeetCode，复习 200 英语单词</li>
+<li>JVM 复习一遍笔记</li>
+<li>Java 并发 复习一遍笔记</li>
+<li>高性能MySQL 再看一遍 5 6 章节</li>
+<li>美团文章 JVM 调优</li>
+<li>计算机网络 IP 数据链路 多播 数据控制层</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/%E9%9D%A2%E8%AF%95/%E9%9C%80%E8%A6%81%E6%8F%90%E5%8D%87%E7%9A%84%E7%82%B9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/%E9%9D%A2%E8%AF%95/%E9%9C%80%E8%A6%81%E6%8F%90%E5%8D%87%E7%9A%84%E7%82%B9/" class="post-title-link" itemprop="url">需要提升的点</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:15:52" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Collections.sort() 原理：归并</p>
+<p>图的一些算法，需要复习一下</p>
+<p>JVM 调优 参数</p>
+<p>设计模式： 单例模式（懒汉饿汉） 工厂方法模式  观察者模式   责任链模式</p>
+<p>红黑树</p>
+<p>ThreadLocal</p>
+<p><strong>B 树和 B+树的区别</strong>：</p>
+<ul>
+<li>B 树，每个节点都存储 key 和 data，所有节点组成这棵树，并且叶子节点指针为 nul，叶子结点不包含任何关键字信息。</li>
+<li>B+树，所有的叶子结点中包含了全部关键字的信息，及指向含有这些关键字记录的指针，且叶子结点本身依关键字的大小自小而大的顺序链接，所有的非终端结点可以看成是索引部分，结点中仅含有其子树根结点中最大（或最小）关键字。(而 B 树的非终节点也包含需要查找的有效信息)</li>
+</ul>
+<p><strong>为什么说 B+比 B 树更适合实际应用中操作系统的文件索引和数据库索引？</strong></p>
+<ul>
+<li>B+的磁盘读写代价更低。B+的内部结点并没有指向关键字具体信息的指针。因此其内部结点相对 B树更小。如果把所有同一内部结点的关键字存放在同一盘块中，那么盘块所能容纳的关键字数量也越多。一次性读入内存中的需要查找的关键字也就越多。相对来说 IO 读写次数也就降低了。</li>
+<li>B+-tree 的查询效率更加稳定<br>由于非终结点并不是最终指向文件内容的结点，而只是叶子结点中关键字的索引。所以任何关键字的查找必须走一条从根结点到叶子结点的路。所有关键字查询的路径长度相同，导致每一个数据的查询效率相当。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Scoket/socket%20IO/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -512,7 +815,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E5%9B%9B%E9%83%A8%E5%88%86%EF%BC%9A%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/" class="post-title-link" itemprop="url">深入理解Java虚拟机第四部分：程序编译与代码优化</a>
+            <a href="/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E5%9B%9B%E9%83%A8%E5%88%86%EF%BC%9A%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/" class="post-title-link" itemprop="url">深入理解Java虚拟机读书笔记第四部分：程序编译与代码优化</a>
         </h2>
 
         <div class="post-meta">
@@ -529,7 +832,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-16 12:33:04" itemprop="dateModified" datetime="2020-05-16T12:33:04+08:00">2020-05-16</time>
+                <time title="修改时间：2020-05-21 10:26:32" itemprop="dateModified" datetime="2020-05-21T10:26:32+08:00">2020-05-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -537,7 +840,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+                  <a href="/categories/JVM%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">JVM读书笔记</span></a>
                 </span>
             </span>
 
@@ -642,7 +945,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%EF%BC%9A%E8%B5%B0%E8%BF%9B%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="post-title-link" itemprop="url">深入理解Java虚拟机第二部分：走进内存管理</a>
+            <a href="/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%EF%BC%9A%E8%B5%B0%E8%BF%9B%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="post-title-link" itemprop="url">深入理解Java虚拟机读书笔记第二部分：走进内存管理</a>
         </h2>
 
         <div class="post-meta">
@@ -659,7 +962,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-16 09:31:10" itemprop="dateModified" datetime="2020-05-16T09:31:10+08:00">2020-05-16</time>
+                <time title="修改时间：2020-05-21 10:25:58" itemprop="dateModified" datetime="2020-05-21T10:25:58+08:00">2020-05-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -667,7 +970,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+                  <a href="/categories/JVM%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">JVM读书笔记</span></a>
                 </span>
             </span>
 
@@ -1022,7 +1325,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%B8%89%E9%83%A8%E5%88%86%EF%BC%9A%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%A7%E8%A1%8C%E5%AD%90%E7%B3%BB%E7%BB%9F/" class="post-title-link" itemprop="url">深入理解Java虚拟机第三部分：虚拟机执行子系统</a>
+            <a href="/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%B8%89%E9%83%A8%E5%88%86%EF%BC%9A%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%A7%E8%A1%8C%E5%AD%90%E7%B3%BB%E7%BB%9F/" class="post-title-link" itemprop="url">深入理解Java虚拟机读书笔记第三部分：虚拟机执行子系统</a>
         </h2>
 
         <div class="post-meta">
@@ -1039,7 +1342,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-16 10:58:04" itemprop="dateModified" datetime="2020-05-16T10:58:04+08:00">2020-05-16</time>
+                <time title="修改时间：2020-05-21 10:26:10" itemprop="dateModified" datetime="2020-05-21T10:26:10+08:00">2020-05-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1047,7 +1350,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+                  <a href="/categories/JVM%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">JVM读书笔记</span></a>
                 </span>
             </span>
 
@@ -1497,618 +1800,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%20%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9AJava%E5%B9%B6%E5%8F%91%E6%9C%BA%E5%88%B6%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Java%20Concurrent/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%20%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9AJava%E5%B9%B6%E5%8F%91%E6%9C%BA%E5%88%B6%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/" class="post-title-link" itemprop="url">Java并发编程的艺术 第二章：Java并发机制的底层实现原理</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:12:01" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java-Concurrent/" itemprop="url" rel="index"><span itemprop="name">Java Concurrent</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Java并发编程的艺术-第二章"><a href="#Java并发编程的艺术-第二章" class="headerlink" title="Java并发编程的艺术 第二章"></a>Java并发编程的艺术 第二章</h1><p>Java代码在编译后会变成Java字节码，字节码被类加载器加载到JVM里，JVM执行字节码，最终需要转化为汇编指令在CPU上执行，Java中所使用的并发机制依赖于<strong>JVM的实现</strong>和<strong>CPU的指令</strong>。</p>
-<h2 id="volatile的应用"><a href="#volatile的应用" class="headerlink" title="volatile的应用"></a>volatile的应用</h2><h3 id="volatile的定义以及实现原理"><a href="#volatile的定义以及实现原理" class="headerlink" title="volatile的定义以及实现原理"></a>volatile的定义以及实现原理</h3><ul>
-<li><strong>有什么作用？</strong><br>Java线程内存模型确保所有线程看到这个变量的值是一致的。</li>
-<li><strong>volatile是如何来保证可见性的呢？</strong><ol>
-<li>将当前处理器缓存行的数据写回到系统内存。<br>（Lock前缀指令会引起处理器缓存回写到内存。）</li>
-<li>这个写回内存的操作会使在其他CPU里缓存了该内存地址的数据无效。<br>（一个处理器的缓存回写到内存会导致其他处理器的缓存无效。）</li>
-</ol>
-</li>
-<li><strong>缓存一致性协议</strong><br>每个处理器通过嗅探在总线上传播的数据来检查自己的缓存是不是过期了，这个写回内存的操作会使在其他CPU里缓存了该地址的数据无效。</li>
-</ul>
-<hr>
-<h2 id="synchronized的实现原理与应用"><a href="#synchronized的实现原理与应用" class="headerlink" title="synchronized的实现原理与应用"></a>synchronized的实现原理与应用</h2><ul>
-<li><p><strong>实现的基础</strong><br>Java中的每一个对象都可以作为锁。</p>
-<ol>
-<li>对于普通同步方法，锁是当前实例对象。</li>
-<li>对于静态同步方法，锁是当前类的Class对象。</li>
-<li>对于同步方法块，锁是Synchronized括号里配置的对象。</li>
-</ol>
-</li>
-</ul>
-<p>当一个线程访问同步代码块时，必须得到锁，退出或抛出异常时必须释放锁。</p>
-<h3 id="Java对象头"><a href="#Java对象头" class="headerlink" title="Java对象头"></a>Java对象头</h3><ul>
-<li><p><strong>synchronized用的锁是存在Java对象头里的</strong></p>
-<ol>
-<li>Mark Word<br>存储对象的 HashCode、分代年龄和锁标记位</li>
-<li>Class Metadata Address<br>存储到对象类型的指针</li>
-<li>Array Length<br>如果是数组对象，则需要记录数组的长度</li>
-</ol>
-<hr>
-</li>
-<li><p><strong>Mark Word的存储格式</strong><br>在32位系统上mark word长度为32bit，64位系统上长度为64bit。<br>为了能在有限的空间里存储下更多的数据，其存储格式是不固定的，在32位系统上各状态的格式如下：<br><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/MarkWord.png?raw=true" alt=""><br><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/MarkWord1.png?raw=true" alt=""></p>
-</li>
-</ul>
-<ol>
-<li>当对象状态为偏向锁（biasable）时，mark word 存储的是偏向的线程 ID；</li>
-<li>当状态为轻量级锁（lightweight locked）时，mark word存储的是指向线程栈中Lock Record的指针；</li>
-<li>当状态为重量级锁（inflated）时，为指向堆中的monitor对象的指针。</li>
-</ol>
-<hr>
-<ul>
-<li><strong>Synchonized在JVM里的实现原理</strong><br><code>javap -v 查看class文件对应的JVM字节码信息.</code><br>对于synchronized关键字而言，javac在编译时，会生成对应的monitorenter和monitorexit指令分别对应synchronized同步块的进入和退出<ul>
-<li><strong>synchronized 修饰一个同步块的时候</strong><br>一个monitorenter指令和两个monitorexit指令。<ul>
-<li>原因是：为了保证抛异常的情况下也能释放锁，所以javac为同步代码块添加了一个隐式的try-finally，在finally中会调用monitorexit命令释放锁。<ul>
-<li><strong>synchronized 修饰一个方法的时候</strong><br>javac为其生成了一个ACC_SYNCHRONIZED关键字，在JVM进行方法调用时，发现调用的方法被ACC_SYNCHRONIZED修饰，则会先尝试获得锁。</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="锁的升级与对比"><a href="#锁的升级与对比" class="headerlink" title="锁的升级与对比"></a>锁的升级与对比</h3><ul>
-<li><p><strong>锁的状态</strong></p>
-<p>  无锁状态–&gt;偏向锁状态–&gt;轻量级锁状态–&gt;重量级锁状态<br>  锁可以升级但是不可以降级（为了提高锁获得和锁释放的效率）</p>
-</li>
-</ul>
-<hr>
-<ul>
-<li><p><strong>重量级锁</strong><br>重量级锁是我们常说的传统意义上的锁，其利用操作系统底层的同步机制去实现Java中的线程同步。<br>重量级锁的状态下，对象的mark word为指向一个堆中monitor对象的指针。<br><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/Monitor.png?raw=true" alt=""></p>
-</li>
-<li><p>Contention List：竞争队列，所有请求锁的线程首先被放在这个竞争队列中；</p>
-</li>
-<li><p>Entry List：Contention List中那些有资格成为候选资源的线程被移动到Entry List中；</p>
-</li>
-<li><p>Wait Set：哪些调用wait方法被阻塞的线程被放置在这里；</p>
-</li>
-<li><p>OnDeck：任意时刻，最多只有一个线程正在竞争锁资源，该线程被称为OnDeck；</p>
-</li>
-<li><p>Owner：当前已经获取到所资源的线程被称为Owner；</p>
-</li>
-<li><p>!Owner：当前释放锁的线程。</p>
-</li>
-</ul>
-<hr>
-<ul>
-<li><p>线程获取重量级锁的过程</p>
-<ul>
-<li>当一个线程尝试获得锁时，如果该锁已经被占用，则会将该线程封装成一个ObjectWaiter对象插入到Contention List的队列尾部，然后暂停当前线程；</li>
-<li>当持有锁的线程释放锁前，会将Contention List中的所有元素移动到Entry List中去，并唤醒Entry List的队首线程。</li>
-<li>如果一个线程在同步块中调用了Object#wait方法，会将该线程对应的ObjectWaiter从EntryList移除并加入到WaitSet中，然后释放锁；</li>
-<li>当wait的线程被notify之后，会将对应的ObjectWaiter从WaitSet移动到EntryList中。</li>
-</ul>
-<hr>
-</li>
-<li><p><strong>轻量级锁</strong></p>
-<ul>
-<li><strong>为什么引入轻量级锁？</strong><br>  在 Java 程序运行时，同步块中的代码都是不存在竞争的，不同的线程交替的执行同步块中的代码。这种情况下，用重量级锁是没必要的。因此 JVM 引入了轻量级锁的概念。</li>
-</ul>
-</li>
-</ul>
-<p>线程在执行同步块之前，JVM 会先在当前的线程的栈帧中创建一个 Lock Record，其包括一个用于存储对象头中的  mark word（官方称之为 Displaced Mark Word）以及一个指向对象的指针。下图右边的部分就是一个 Lock Record 。<br><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/LockRecord.png?raw=true" alt=""></p>
-<ul>
-<li><strong>加锁过程</strong><br><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/Locking.png?raw=true" alt=""><br><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/Locking1.png?raw=true" alt=""></li>
-</ul>
-<ol>
-<li>在线程栈中创建一个Lock Record，将其obj（即上图的Object reference）字段指向锁对象。</li>
-<li>直接通过CAS指令将Lock Record的地址存储在对象头的mark word中，如果对象处于无锁状态则修改成功，代表该线程获得了轻量级锁。如果失败，进入到步骤3。</li>
-<li>如果是当前线程已经持有该锁了，代表这是一次锁重入。设置Lock Record第一部分（Displaced Mark Word）为null，起到了一个重入计数器的作用。然后结束。</li>
-<li>走到这一步说明发生了竞争，需要膨胀为重量级锁。</li>
-</ol>
-<ul>
-<li><strong>解锁过程</strong> </li>
-</ul>
-<ol>
-<li>遍历线程栈,找到所有obj字段等于当前锁对象的Lock Record。</li>
-<li>如果Lock Record的Displaced Mark Word为null，代表这是一次重入，将obj设置为null后continue。</li>
-<li>如果Lock Record的Displaced Mark Word不为null，则利用CAS指令将对象头的mark word恢复成为Displaced Mark Word。如果成功，则continue，否则膨胀为重量级锁。</li>
-</ol>
-<hr>
-<ul>
-<li><strong>偏向锁</strong><ul>
-<li><strong>为什么引入偏向锁？</strong><br>偏向锁是在针对轻量级锁在没有竞争的情况下作出的优化,降低无竞争情况下获取锁的开销。</li>
-<li><strong>对象创建</strong><br>  当JVM启用了偏向锁模式（1.6以上默认开启），当新创建一个对象的时候，如果该对象所属的class没有关闭偏向锁模式，那新创建对象的mark word将是可偏向状态，此时mark word中的thread id为0，表示未偏向任何线程，也叫做匿名偏向(anonymously biased)。</li>
-<li><strong>加锁过程</strong><ol>
-<li>当该对象第一次被线程获得锁的时候，发现是匿名偏向状态，则会用CAS指令，将mark word中的thread id由0改成当前线程Id。如果成功，则代表获得了偏向锁，继续执行同步块中的代码。否则，将偏向锁撤销，升级为轻量级锁。</li>
-<li>当被偏向的线程再次进入同步块时，发现锁对象偏向的就是当前线程，在通过一些额外的检查后，会往当前线程的栈中添加一条Displaced Mark Word为空的Lock Record中，然后继续执行同步块的代码，因为操纵的是线程私有的栈，因此不需要用到CAS指令；由此可见偏向锁模式下，当被偏向的线程再次尝试获得锁时，仅仅进行几个简单的操作就可以了，在这种情况下，synchronized关键字带来的性能开销基本可以忽略。</li>
-<li>当其他线程进入同步块时，发现已经有偏向的线程了，则会进入到撤销偏向锁的逻辑里，一般来说，会在safepoint中去查看偏向的线程是否还存活，如果存活且还在同步块中则将锁升级为轻量级锁，原偏向的线程继续拥有锁，当前线程则走入到锁升级的逻辑里；如果偏向的线程已经不存活或者不在同步块中，则将对象头的mark word改为无锁状态（unlocked），之后再升级为轻量级锁。</li>
-</ol>
-</li>
-</ul>
-</li>
-</ul>
-<p>由此可见，偏向锁升级的时机为：当锁已经发生偏向后，只要有另一个线程尝试获得偏向锁，则该偏向锁就会升级成轻量级锁。当然这个说法不绝对，因为还有批量重偏向这一机制。</p>
-<hr>
-<ul>
-<li><strong>偏向锁的撤销</strong></li>
-</ul>
-<p>当有其他线程尝试获得锁时，是根据遍历偏向线程的lock record来确定该线程是否还在执行同步块中的代码。因此偏向锁的解锁很简单，仅仅将栈中的最近一条lock record的obj字段设置为null。需要注意的是，偏向锁的解锁步骤中并不会修改对象头中的thread id。   </p>
-<p>偏向锁默认不是立即就启动的，在程序启动后，通常有几秒的延迟，可以通过命令<br>-XX:BiasedLockingStartupDelay=0来关闭延迟</p>
-<hr>
-<ul>
-<li><strong>批量重偏向与撤销</strong><ul>
-<li><strong>为什么要引入批量重偏向与撤销？</strong><br>从上文偏向锁的加锁解锁过程中可以看出，当只有一个线程反复进入同步块时，偏向锁带来的性能开销基本可以忽略，但是当有其他线程尝试获得锁时，就需要等到safepoint时将偏向锁撤销为无锁状态或升级为轻量级/重量级锁。总之，偏向锁的撤销是有一定成本的，如果说运行时的场景本身存在多线程竞争的，那偏向锁的存在不仅不能提高性能，而且会导致性能下降。因此，JVM中增加了一种批量重偏向/撤销的机制。</li>
-<li><strong>存在两种情况会导致偏向锁降低性能</strong></li>
-</ul>
-<ol>
-<li>一个线程创建了大量对象并执行了初始的同步操作，之后在另一个线程中将这些对象作为锁进行之后的操作。这种case下，会导致大量的偏向锁撤销操作。</li>
-<li>存在明显多线程竞争的场景下使用偏向锁是不合适的，例如生产者/消费者队列。</li>
-</ol>
-</li>
-</ul>
-<p>批量重偏向（bulk rebias）机制是为了解决第一种场景。批量撤销（bulk revoke）则是为了解决第二种场景。</p>
-<ul>
-<li><strong>做法</strong><ol>
-<li>以class为单位，为每个class维护一个偏向锁撤销计数器，每一次该class的对象发生偏向撤销操作时，该计数器+1，当这个值达到重偏向阈值（默认20）时，JVM就认为该class的偏向锁有问题，因此会进行批量重偏向。 </li>
-<li>每个class对象会有一个对应的epoch字段，每个处于偏向锁状态对象的mark word中也有该字段，其初始值为创建该对象时class中的epoch的值。每次发生批量重偏向时，就将该值+1，同时遍历JVM中所有线程的栈，找到该class所有正处于加锁状态的偏向锁，将其epoch字段改为新值。下次获得锁时，发现当前对象的epoch值和class的epoch不相等，那就算当前已经偏向了其他线程，也不会执行撤销操作，而是直接通过CAS操作将其mark word的Thread Id 改成当前线程Id。 </li>
-<li>当达到重偏向阈值后，假设该class计数器继续增长，当其达到批量撤销的阈值后（默认40），JVM就认为该class的使用场景存在多线程竞争，会标记该class为不可偏向，之后，对于该class的锁，直接走轻量级锁的逻辑。</li>
-</ol>
-</li>
-</ul>
-<hr>
-<ul>
-<li><strong>End</strong><br>Java中的synchronized有偏向锁、轻量级锁、重量级锁三种形式，分别对应了锁只被一个线程持有、不同线程交替持有锁、多线程竞争锁三种情况。当条件不满足时，锁会按偏向锁-&gt;轻量级锁-&gt;重量级锁 的顺序升级。JVM种的锁也是能降级的，只不过条件很苛刻，暂不讨论。</li>
-</ul>
-<hr>
-<h2 id="原子操作的实现原理"><a href="#原子操作的实现原理" class="headerlink" title="原子操作的实现原理"></a>原子操作的实现原理</h2><ul>
-<li><strong>处理器实现原子操作</strong></li>
-</ul>
-<ol>
-<li>通过总线锁保证原子性。总线锁就是使用处理器提供的一个LOCK＃信号，当一个处理器在总线上输出此信号时，其他处理器的请求将被阻塞住，那么该处理器可以独占共享内存。</li>
-<li>通过缓存锁定来保证原子性。缓存一致性协议</li>
-</ol>
-<ul>
-<li><strong>Java实现原子操作</strong></li>
-</ul>
-<ol>
-<li>循环CAS实现原子操作<br>CAS有3个操作数，内存值V，旧的预期值A，要修改的新值B。当且仅当预期值A和内存值V相同时，将内存值V修改为B，否则什么都不做。<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> value;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> value;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">incrementAndGet</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        <span class="keyword">int</span> current = get();</span><br><span class="line">        <span class="keyword">int</span> next = current + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (compareAndSet(current, next))</span><br><span class="line">            <span class="keyword">return</span> next;   </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">compareAndSet</span><span class="params">(<span class="keyword">int</span> expect, <span class="keyword">int</span> update)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> unsafe.compareAndSwapInt(<span class="keyword">this</span>, valueOffset, expect, update);    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<hr>
-<ol start="2">
-<li>CAS实现原子操作的三大问题</li>
-</ol>
-<ul>
-<li><strong>ABA问题</strong><br>如果一个值原来是A，变成了B，又变成了A，那么使用CAS进行检查时会发现它的值没有发生变化，但是实际上却变化了。ABA问题的解决思路就是使用版本号。在变量前面追加上版本号，每次变量更新的时候把版本号加1，那么A→B→A就会变成1A→2B→3A</li>
-<li><strong>循环时间长开销大</strong><br>自旋CAS如果长时间不成功，会给CPU带来非常大的执行开销。如果JVM能支持处理器提供的pause指令，那么效率会有一定的提升。<ul>
-<li>pause指令有两个作用：<ol>
-<li>它可以延迟流水线执行指令（de-pipeline），使CPU不会消耗过多的执行资源，延迟的时间取决于具体实现的版本，在一些处理器上延迟时间是零。</li>
-<li>它可以避免在退出循环的时候因内存顺序冲突（Memory Order Violation）而引起CPU流水线被清空（CPU Pipeline Flush），从而提高CPU的执行效率。</li>
-</ol>
-</li>
-</ul>
-</li>
-<li><strong>只能保证一个共享变量的原子操作</strong><ol>
-<li>用锁机制。</li>
-<li>把多个共享变量合并成一个共享变量来操作。</li>
-</ol>
-</li>
-</ul>
-<hr>
-<ol start="3">
-<li>使用锁机制实现原子操作<br>除了偏向锁，JVM实现锁的方式都用了循环CAS，即当一个线程想进入同步块的时候使用循环CAS的方式来获取锁，当它退出同步块的时候使用循环CAS释放锁。</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%20%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Java%20Concurrent/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%20%E7%AC%AC%E4%B8%89%E7%AB%A0%EF%BC%9AJava%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" class="post-title-link" itemprop="url">Java并发编程的艺术 第三章：Java内存模型</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:11:19" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java-Concurrent/" itemprop="url" rel="index"><span itemprop="name">Java Concurrent</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="3-Java内存模型"><a href="#3-Java内存模型" class="headerlink" title="3. Java内存模型"></a>3. Java内存模型</h1><p>Java线程之间的通信对程序员完全透明，内存可见性问题很容易困扰Java程序员。</p>
-<ul>
-<li>Java内存模型的基础：主要介绍内存模型相关的基本概念；</li>
-<li>Java内存模型中的顺序一致性：主要介绍重排序与顺序一致性内存模型；</li>
-<li>同步原语：主要介绍3个同步原语（synchronized、volatile和final）的内存语义及重排序规则在处理器<br>中的实现；</li>
-<li>Java内存模型的设计：主要介绍Java内存模型的设计原理，及其与处理器内存模型和顺序一致性内存模型的关系。</li>
-</ul>
-<h2 id="3-1-Java内存模型的基础"><a href="#3-1-Java内存模型的基础" class="headerlink" title="3.1 Java内存模型的基础"></a>3.1 Java内存模型的基础</h2><h3 id="3-1-1-并发编程模型的两个关键问题"><a href="#3-1-1-并发编程模型的两个关键问题" class="headerlink" title="3.1.1 并发编程模型的两个关键问题"></a>3.1.1 并发编程模型的两个关键问题</h3><ol>
-<li><strong>线程之间的通信</strong>  <ul>
-<li>共享内存</li>
-<li>消息传递</li>
-</ul>
-</li>
-<li><strong>线程之间的同步</strong><ul>
-<li>在共享内存并发模型中，同步是显示进行的</li>
-<li>在消息传递并发模型中，由于消息的发送必须在消息的接收之前，同步是隐式进行</li>
-</ul>
-</li>
-</ol>
-<hr>
-<h3 id="3-1-2-Java内存模型的抽象结构"><a href="#3-1-2-Java内存模型的抽象结构" class="headerlink" title="3.1.2 Java内存模型的抽象结构"></a>3.1.2 Java内存模型的抽象结构</h3><p>实例域，静态域和数组存储在堆内存中，多线程共享（共享变量）。<br>局部变量，方法定义参数和异常处理器参数不在线程之间共享，所以不会有内存可见性问题，也不受内存模型的影响。</p>
-<p><strong>Java线程之间的通信由Java内存模型JMM控制, JMM决定一个线程对共享变量的写入何时对另一个线程可见</strong></p>
-<ul>
-<li><p>JMM定义了线程和主内存之间的抽象关系<br>  线程之间的共享变量存储在主内存中，每个线程都有一个私有的本地内存，本地内存中存储了该线程以读/写共享变量的副本。</p>
-<ul>
-<li>本地内存是JMM的一个抽象概念，并不真实存在。它涵盖了缓存、写缓冲区、寄存器以及其他的硬件和编译器优化</li>
-</ul>
-</li>
-<li><p>JMM通过控制主内存与每个线程的本地内存之间的交互，来为Java程序员提供内存可见性保证。</p>
-</li>
-</ul>
-<hr>
-<h3 id="3-1-3-从源代码到指令序列的重排序"><a href="#3-1-3-从源代码到指令序列的重排序" class="headerlink" title="3.1.3 从源代码到指令序列的重排序"></a>3.1.3 从源代码到指令序列的重排序</h3><ol>
-<li><strong>编译器优化的重排序</strong><br>编译器在不改变单线程程序语义的前提下，可以重新安排语句的执行顺序。</li>
-<li><strong>指令级并行的重排序</strong><br>现代处理器采用了指令级并行技术（Instruction-Level Parallelism，ILP）来将多条指令重叠执行。如果不存在数据依赖性，处理器可以改变语句对应机器指令的执行顺序。</li>
-<li><strong>内存系统的重排序</strong><br>由于处理器使用缓存和读/写缓冲区，这使得加载和存储操作看上去可能是在乱序执行。</li>
-</ol>
-<p>对于编译器，JMM的编译器重排序规则会禁止特定类型的编译器重排序（不是所有的编译器重排序都要禁止）。对于处理器重排序，JMM的处理器重排序规则会要求Java编译器在生成指令序列时，插入特定类型的内存屏障（Memory Barriers，Intel称之为Memory Fence）指令，通过<strong>内存屏障指令</strong>来禁止特定类型的处理器重排序。</p>
-<h3 id="3-1-4-并发编程模型的分类"><a href="#3-1-4-并发编程模型的分类" class="headerlink" title="3.1.4 并发编程模型的分类"></a>3.1.4 并发编程模型的分类</h3><p>现代处理器使用写缓冲区临时保存向内存写入的数据。</p>
-<p>优点：</p>
-<ul>
-<li><p>保证指令流水线式持续运行，避免由于处理器停顿等待向内存写入数据而产生的延迟。</p>
-</li>
-<li><p>通过批处理的方式刷新写缓冲区，以及合并写缓冲区对同一内存地址的多次写，可以减少对内存总线的占用</p>
-</li>
-</ul>
-<p>缺点：</p>
-<ul>
-<li>每个处理器上的写缓冲区仅仅对其自己可见，处理器对内存的读写操作的执行顺序，并不一定与内存实际发生的读写顺序一致。</li>
-</ul>
-<p>为了保证内存可见性，Java 编译器在生成指令序列的适当位置会插入内存屏障指令来禁止特定类型的处理器重排序。</p>
-<table>
-<thead>
-<tr>
-<th align="left">屏障类型</th>
-<th>指令示例</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">LoadLoad Barriers</td>
-<td>Load 1; LoadLoad; Load 2</td>
-<td>确保Load 1 数据的装载先于 <br/>Load 2 及后续所有装载指令的装载</td>
-</tr>
-<tr>
-<td align="left">StoreStore Barriers</td>
-<td>Store 1; StoreStore; Store 2</td>
-<td>确保 Store1 的数据对其他处理器可见<br/>(刷新到内存)先于 Store2 及后续存储指令的存储</td>
-</tr>
-<tr>
-<td align="left">LoadStore Barriers</td>
-<td>Load 1; LoadStore; Store 2</td>
-<td>确保Load 1 数据的装载先于 <br/>Store 2 及后续的存储指令刷新到内存</td>
-</tr>
-<tr>
-<td align="left">StoreLoad Barriers</td>
-<td>Store 1; StoreLoad; Load 2</td>
-<td>确保 Store1 的数据对其他处理器可见<br/>(刷新到内存)先于 Load 2 及后续装载指令的装载。</td>
-</tr>
-</tbody></table>
-<p>StoreLoad Barriers 是一个“全能型” 的屏障，执行该屏障开销大，因为当前处理器会把写缓冲区中的数据全部刷新到内存中。</p>
-<hr>
-<h3 id="3-1-5-happens-before简介"><a href="#3-1-5-happens-before简介" class="headerlink" title="3.1.5 happens-before简介"></a>3.1.5 happens-before简介</h3><p>在JMM中，如果一个操作执行的结果需要对另一个操作可见，那么这两个操作之间必须要存在happens-before关<br>系。这里提到的两个操作既可以是在一个线程之内，也可以是在不同线程之间。</p>
-<ul>
-<li>the first is visible to and ordered before the second</li>
-<li>一个happens-before规则对应于一个或多个编译器和处理器重排序规则</li>
-</ul>
-<ol>
-<li><strong>程序顺序规则</strong><br>一个线程中的每个操作，happens-before于线程中的任意后续操作</li>
-<li><strong>监视器锁规则</strong><br>对一个锁的解锁，happens-before于随后对这个锁的加锁</li>
-<li><strong>volatile变量规则</strong><br>对一个volatile域的写，happens-before于任意后续对这个volatile域的读</li>
-<li><strong>传递性</strong></li>
-</ol>
-<hr>
-<h2 id="3-2-重排序"><a href="#3-2-重排序" class="headerlink" title="3.2 重排序"></a>3.2 重排序</h2><p>重排序是指编译器和处理器为了优化程序性能而对<strong>指令序列进行重新排序</strong>的一种手段。</p>
-<h3 id="3-2-1-数据依赖性"><a href="#3-2-1-数据依赖性" class="headerlink" title="3.2.1 数据依赖性"></a>3.2.1 数据依赖性</h3><p>如果两个操作访问同一个变量，且这两个操作中有一个为写操作，此时这两个操作之间就存在数据依赖性</p>
-<p>编译器和处理器在重排序时，会遵守数据依赖性，编译器和处理器不会改变存在数据依赖关系的两个操作的执行顺序。</p>
-<h3 id="3-2-2-as-if-serial-语义"><a href="#3-2-2-as-if-serial-语义" class="headerlink" title="3.2.2 as-if-serial 语义"></a>3.2.2 as-if-serial 语义</h3><p>as-if-serial 语义的意思是：不管怎么重排序（编译器和处理器为了提高并行度），（单线程）程序的执行结果不能被改变。编译器、runtime 和处理器都必须遵守 as-if-serial 语义。</p>
-<p>as-if-serial 语义使单线程程序员无需担心重排序会干扰他们，也无需担心内存可见性问题。</p>
-<h3 id="3-2-3-程序顺序规则"><a href="#3-2-3-程序顺序规则" class="headerlink" title="3.2.3 程序顺序规则"></a>3.2.3 程序顺序规则</h3><p>在不改变程序执行结果的前提下，尽可能提高并行度。</p>
-<h3 id="3-2-4-重排序对多线程的影响"><a href="#3-2-4-重排序对多线程的影响" class="headerlink" title="3.2.4 重排序对多线程的影响"></a>3.2.4 重排序对多线程的影响</h3><p>代码中存在控制依赖性时，会影响指令序列执行的并行度。为此，编译器和处理器会采用猜测（Speculation）执行来克服控制相关性对并行度的影响。以处理器的猜测执行为例，执行线程B的处理器可以提前读取并计算a*a，然后把计算结果临时保存到一个名为重排序缓冲（Reorder Buffer，ROB）的硬件缓存中。当操作3的条<br>件判断为真时，就把该计算结果写入变量i中。</p>
-<h2 id="3-3-顺序一致性"><a href="#3-3-顺序一致性" class="headerlink" title="3.3 顺序一致性"></a>3.3 顺序一致性</h2><p>顺序一致性内存模型是一个理论参考模型。</p>
-<h3 id="3-3-1-数据竞争和顺序一致性"><a href="#3-3-1-数据竞争和顺序一致性" class="headerlink" title="3.3.1 数据竞争和顺序一致性"></a>3.3.1 数据竞争和顺序一致性</h3>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Java%20Concurrent/Java%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0/" class="post-title-link" itemprop="url">Java中的线程池</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-12 20:52:39" itemprop="dateModified" datetime="2020-05-12T20:52:39+08:00">2020-05-12</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java-Concurrent/" itemprop="url" rel="index"><span itemprop="name">Java Concurrent</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><strong>线程池的优点：</strong></p>
-<ul>
-<li><strong>降低资源消耗</strong>。通过重复利用已创建的线程降低线程创建和销毁造成的消耗</li>
-<li><strong>提高响应速度</strong>。当任务到达时，任务可以不需要等到线程创建就能立即执行。</li>
-<li><strong>提高线程的可管理性</strong>。线程是稀缺资源，如果无限制地创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一分配、调优和监控。</li>
-</ul>
-<hr>
-<h2 id="线程池的实现原理"><a href="#线程池的实现原理" class="headerlink" title="线程池的实现原理"></a>线程池的实现原理</h2><p>提交一个新任务到线程池时，<strong>线程池的处理流程</strong>：</p>
-<ol>
-<li>线程池判断核心线程池里的线程是否都在执行任务。如果不是，则创建一个新的工作线程来执行任务。如果核心线程池里的线程都在执行任务，则进入下个流程。</li>
-<li>线程池判断工作队列是否已经满。如果工作队列没有满，则将新提交的任务存储在这个工作队列里。如果工作队列满了，则进入下个流程</li>
-<li>线程池判断线程池的线程是否都处于工作状态。如果没有，则创建一个新的工作线程来执行任务。如果已经满了，则交给饱和策略来处理这个任务。</li>
-</ol>
-<hr>
-<p><strong>ThreadPoolExecutor执行execute方法的4种情况：</strong></p>
-<ol>
-<li>如果当前运行的线程少于corePoolSize，则创建新线程来执行任务（注意，执行这一步骤需要获取全局锁）</li>
-<li>如果运行的线程等于或多于corePoolSize，则将任务加入BlockingQueue。</li>
-<li>如果无法将任务加入BlockingQueue（队列已满），则创建新的线程来处理任务（注意，执行这一步骤需要获取全局锁）。</li>
-<li>如果创建新线程将使当前运行的线程超出maximumPoolSize，任务将被拒绝，并调用RejectedExecutionHandler.rejectedExecution()方法。</li>
-</ol>
-<p><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/ThreadPollExecutor.png?raw=true" alt=""><br><strong>总体设计思路</strong></p>
-<ul>
-<li>是为了在执行execute()方法时，尽可能地避免获取全局锁（那将会是一个严重的可伸缩瓶颈）</li>
-<li>在ThreadPoolExecutor完成预热之后（当前运行的线程数大于等于corePoolSize），几乎所有的execute()方法调用都是执行步骤2，而步骤2不需要获取全局锁。</li>
-</ul>
-<p><strong>工作线程</strong></p>
-<ul>
-<li>工作线程：线程池创建线程时，会将线程封装成工作线程Worker，Worker在执行完任务后，还会循环获取工作队列里的任务来执行<ul>
-<li>线程池线程执行任务分两种情况：<ol>
-<li>在execute()方法中创建一个线程时，会让这个线程执行当前任务。</li>
-<li>这个线程执行完上述任务时，会反复从BlockingQueue获取任务来执行</li>
-</ol>
-</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h2 id="线程池的创建"><a href="#线程池的创建" class="headerlink" title="线程池的创建"></a>线程池的创建</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime,milliseconds,runnableTaskQueue, handler);</span><br></pre></td></tr></table></figure>
-<ol>
-<li><p>corePoolSize（线程池的基本大小）<br> 如果调用了线程池的prestartAllCoreThreads()方法，线程池会提前创建并启动所有基本线程。</p>
-</li>
-<li><p>runnableTaskQueue（任务队列）</p>
-<ul>
-<li>ArrayBlockingQueue：是一个基于数组结构的有界阻塞队列，此队列按FIFO（先进先出）原则对元素进行排序。</li>
-<li><strong>LinkedBlockingQueue</strong>：一个基于链表结构的阻塞队列，此队列按 FIFO 排序元素，吞吐量通常要高于ArrayBlockingQueue。静态工厂方法Executors.newFixedThreadPool()使用了这个队列。</li>
-<li><strong>SynchronousQueue</strong>：一个不存储元素的阻塞队列。每个插入操作必须等到另一个线程调用移除操作，否则插入操作一直处于阻塞状态，吞吐量通常要高于 LinkedBlockingQueue，静态工厂方法 Executors.newCachedThreadPool 使用了这个队列。</li>
-<li>PriorityBlockingQueue：一个具有优先级的无限阻塞队列。</li>
-</ul>
-</li>
-<li><p>maximumPoolSize（线程池最大数量）：线程池允许创建的最大线程数。如果队列满了，并且已创建的线程数小于最大线程数，则线程池会再创建新的线程执行任务。值得注意的是，如果使用了无界的任务队列这个参数就没什么效果。</p>
-</li>
-<li><p>ThreadFactory：用于设置创建线程的工厂，可以通过线程工厂给每个创建出来的线程设置更有意义的名字。</p>
-</li>
-<li><p>RejectedExecutionHandler（饱和策略）：</p>
-<ul>
-<li><p>AbortPolicy：直接抛出异常。（默认饱和处理策略）</p>
-</li>
-<li><p>CallerRunsPolicy：用“线程池正在运行的线程”来运行任务。(创建线程池的线程，一般是主线程)</p>
-</li>
-<li><p>DiscardOldestPolicy：当有任务添加到线程池被拒绝时，线程池会丢弃阻塞队列中末尾的任务，然后将被拒绝的任务添加到末尾</p>
-</li>
-<li><p>DiscardPolicy：不处理，丢弃掉。</p>
-</li>
-<li><p>自定义饱和处理策略：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">MyRejectedExecutionHandler</span> <span class="keyword">implements</span> <span class="title">RejectedExecutionHandler</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">rejectedExecution</span><span class="params">(Runnable r, ThreadPoolExecutor executor)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">new</span> Thread(r,<span class="string">"新线程"</span>+<span class="keyword">new</span> Random().nextInt(<span class="number">10</span>)).start();</span><br><span class="line">    &#125;<span class="comment">//让被拒绝的任务在一个新的线程中执行</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>keepAliveTime（线程活动保持时间）：线程池的工作线程空闲后，保持存活的时间。</p>
-<ul>
-<li>如果任务很多，并且每个任务执行的时间比较短，可以调大时间，提高线程的利用率。</li>
-</ul>
-</li>
-<li><p>TimeUnit（线程活动保持时间的单位）：可选的单位有天（DAYS）、小时（HOURS）、分钟（MINUTES）、毫秒（MILLISECONDS）、微秒（MICROSECONDS，千分之一毫秒）和纳秒（NANOSECONDS，千分之一微秒）。</p>
-</li>
-</ol>
-<hr>
-<h2 id="向线程池提交任务"><a href="#向线程池提交任务" class="headerlink" title="向线程池提交任务"></a>向线程池提交任务</h2><ul>
-<li><strong>execute()</strong> 方法用于提交不需要返回值的任务，所以无法判断任务是否被线程池执行成功</li>
-<li><strong>submit()</strong> 方法用于提交需要返回值的任务。线程池会返回一个future类型的对象，通过这个future对象可以判断任务是否执行成功，并且可以通过future的get()方法来获取返回值，get()方法会阻塞当前线程直到任务完成，而使用get（long timeout，TimeUnit unit）方法则会阻塞当前线程一段时间后立即返回，这时候有可能任务没有执行完。</li>
-</ul>
-<hr>
-<h2 id="关闭线程池"><a href="#关闭线程池" class="headerlink" title="关闭线程池"></a>关闭线程池</h2><ul>
-<li><strong>shutdown或shutdownNow方法的执行原理：</strong><br>遍历线程池中的工作线程，然后逐个调用线程的interrupt方法来中断线程，所以无法响应中断的任务可能永远无法终止。</li>
-<li><strong>shutdown或shutdownNow方法的区别：</strong></li>
-</ul>
-<ol>
-<li>shutdownNow首先将线程池的状态设置成STOP，然后尝试停止所有的正在执行或暂停任务的线程，并返回等待执行任务的列表。</li>
-<li>shutdown只是将线程池的状态设置成SHUTDOWN状态，然后中断所有没有正在执行任务的线程。</li>
-</ol>
-<hr>
-<h2 id="线程池的状态"><a href="#线程池的状态" class="headerlink" title="线程池的状态"></a>线程池的状态</h2><ol>
-<li>当线程池创建后，初始为 running 状态</li>
-<li>调用 shutdown 方法后，处 shutdown 状态，此时不再接受新的任务，等待已有的任务执行完毕</li>
-<li>调用 shutdownnow 方法后，进入 stop 状态，不再接受新的任务，并且会尝试终止正在执行的任务。</li>
-<li>当处于 shotdown 或 stop 状态，并且所有工作线程已经销毁，任务缓存队列已清空，线程池被设为 terminated 状态。<h2 id="合理使用线程池"><a href="#合理使用线程池" class="headerlink" title="合理使用线程池"></a>合理使用线程池</h2></li>
-</ol>
-<ul>
-<li><strong>高并发、任务执行时间短的业务怎样使用线程池？</strong><br>  高并发、任务执行时间短的业务，线程池线程数可以设置为CPU核数+1，减少线程上下文的切换</li>
-<li><strong>并发不高、任务执行时间长的业务怎样使用线程池？</strong><ol>
-<li>假如是业务时间长集中在IO操作上，也就是IO密集型的任务，因为IO操作并不占用CPU，所以不要让所有的CPU闲下来，可以适当加大线程池中的线程数目，让CPU处理更多的业务</li>
-<li>假如是业务时间长集中在计算操作上，也就是计算密集型任务，这个就没办法了，和（1）一样吧，线程池中的线程数设置得少一些，减少线程上下文的切换</li>
-</ol>
-</li>
-<li><strong>并发高、业务执行时间长的业务怎样使用线程池？</strong><br>并发高、业务执行时间长，解决这种类型任务的关键不在于线程池而在于整体架构的设计。<ol>
-<li>看看这些业务里面某些数据是否能做缓存是第一步，增加服务器是第二步，至于线程池的设置，设置参考</li>
-<li>最后，业务执行时间长的问题，也可能需要分析一下，看看能不能使用中间件对任务进行拆分和解耦</li>
-</ol>
-</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -2180,20 +1871,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">50</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
