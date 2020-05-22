@@ -195,7 +195,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-21 10:28:52" itemprop="dateModified" datetime="2020-05-21T10:28:52+08:00">2020-05-21</time>
+                <time title="修改时间：2020-05-22 13:45:21" itemprop="dateModified" datetime="2020-05-22T13:45:21+08:00">2020-05-22</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -258,14 +258,14 @@
 </ol>
 <hr>
 <ul>
-<li><strong>Synchonized在JVM里的实现原理</strong><br><code>javap -v 查看class文件对应的JVM字节码信息.</code><br>对于synchronized关键字而言，javac在编译时，会生成对应的monitorenter和monitorexit指令分别对应synchronized同步块的进入和退出<ul>
-<li><strong>synchronized 修饰一个同步块的时候</strong><br>一个monitorenter指令和两个monitorexit指令。<ul>
-<li>原因是：为了保证抛异常的情况下也能释放锁，所以javac为同步代码块添加了一个隐式的try-finally，在finally中会调用monitorexit命令释放锁。<ul>
+<li><p><strong>Synchonized在JVM里的实现原理</strong><br><code>javap -v 查看class文件对应的JVM字节码信息.</code><br>对于synchronized关键字而言，javac在编译时，会生成对应的monitorenter和monitorexit指令分别对应synchronized同步块的进入和退出</p>
+<ul>
+<li><p><strong>synchronized 修饰一个同步块的时候</strong><br>一个monitorenter指令和两个monitorexit指令。</p>
+<p>原因是：为了保证抛异常的情况下也能释放锁，所以javac为同步代码块添加了一个隐式的try-finally，在finally中会调用monitorexit命令释放锁。</p>
+</li>
+</ul>
+<ul>
 <li><strong>synchronized 修饰一个方法的时候</strong><br>javac为其生成了一个ACC_SYNCHRONIZED关键字，在JVM进行方法调用时，发现调用的方法被ACC_SYNCHRONIZED修饰，则会先尝试获得锁。</li>
-</ul>
-</li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>
@@ -461,7 +461,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-21 10:28:59" itemprop="dateModified" datetime="2020-05-21T10:28:59+08:00">2020-05-21</time>
+                <time title="修改时间：2020-05-22 16:58:43" itemprop="dateModified" datetime="2020-05-22T16:58:43+08:00">2020-05-22</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -484,14 +484,14 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="3-Java内存模型"><a href="#3-Java内存模型" class="headerlink" title="3. Java内存模型"></a>3. Java内存模型</h1><p>Java线程之间的通信对程序员完全透明，内存可见性问题很容易困扰Java程序员。</p>
+          <h1 id="Java内存模型"><a href="#Java内存模型" class="headerlink" title="Java内存模型"></a>Java内存模型</h1><p>Java线程之间的通信对程序员完全透明，内存可见性问题很容易困扰Java程序员。</p>
 <ul>
 <li>Java内存模型的基础：主要介绍内存模型相关的基本概念；</li>
 <li>Java内存模型中的顺序一致性：主要介绍重排序与顺序一致性内存模型；</li>
-<li>同步原语：主要介绍3个同步原语（synchronized、volatile和final）的内存语义及重排序规则在处理器<br>中的实现；</li>
+<li>同步原语：主要介绍3个同步原语（synchronized、volatile和final）的内存语义及重排序规则在处理器中的实现；</li>
 <li>Java内存模型的设计：主要介绍Java内存模型的设计原理，及其与处理器内存模型和顺序一致性内存模型的关系。</li>
 </ul>
-<h2 id="3-1-Java内存模型的基础"><a href="#3-1-Java内存模型的基础" class="headerlink" title="3.1 Java内存模型的基础"></a>3.1 Java内存模型的基础</h2><h3 id="3-1-1-并发编程模型的两个关键问题"><a href="#3-1-1-并发编程模型的两个关键问题" class="headerlink" title="3.1.1 并发编程模型的两个关键问题"></a>3.1.1 并发编程模型的两个关键问题</h3><ol>
+<h2 id="Java内存模型的基础"><a href="#Java内存模型的基础" class="headerlink" title="Java内存模型的基础"></a>Java内存模型的基础</h2><h3 id="并发编程模型的两个关键问题"><a href="#并发编程模型的两个关键问题" class="headerlink" title="并发编程模型的两个关键问题"></a>并发编程模型的两个关键问题</h3><ol>
 <li><strong>线程之间的通信</strong>  <ul>
 <li>共享内存</li>
 <li>消息传递</li>
@@ -504,7 +504,7 @@
 </li>
 </ol>
 <hr>
-<h3 id="3-1-2-Java内存模型的抽象结构"><a href="#3-1-2-Java内存模型的抽象结构" class="headerlink" title="3.1.2 Java内存模型的抽象结构"></a>3.1.2 Java内存模型的抽象结构</h3><p>实例域，静态域和数组存储在堆内存中，多线程共享（共享变量）。<br>局部变量，方法定义参数和异常处理器参数不在线程之间共享，所以不会有内存可见性问题，也不受内存模型的影响。</p>
+<h3 id="Java内存模型的抽象结构"><a href="#Java内存模型的抽象结构" class="headerlink" title="Java内存模型的抽象结构"></a>Java内存模型的抽象结构</h3><p>实例域，静态域和数组存储在堆内存中，多线程共享（共享变量）。<br>局部变量，方法定义参数和异常处理器参数不在线程之间共享，所以不会有内存可见性问题，也不受内存模型的影响。</p>
 <p><strong>Java线程之间的通信由Java内存模型JMM控制, JMM决定一个线程对共享变量的写入何时对另一个线程可见</strong></p>
 <ul>
 <li><p>JMM定义了线程和主内存之间的抽象关系<br>  线程之间的共享变量存储在主内存中，每个线程都有一个私有的本地内存，本地内存中存储了该线程以读/写共享变量的副本。</p>
@@ -516,13 +516,13 @@
 </li>
 </ul>
 <hr>
-<h3 id="3-1-3-从源代码到指令序列的重排序"><a href="#3-1-3-从源代码到指令序列的重排序" class="headerlink" title="3.1.3 从源代码到指令序列的重排序"></a>3.1.3 从源代码到指令序列的重排序</h3><ol>
+<h3 id="从源代码到指令序列的重排序"><a href="#从源代码到指令序列的重排序" class="headerlink" title="从源代码到指令序列的重排序"></a>从源代码到指令序列的重排序</h3><ol>
 <li><strong>编译器优化的重排序</strong><br>编译器在不改变单线程程序语义的前提下，可以重新安排语句的执行顺序。</li>
 <li><strong>指令级并行的重排序</strong><br>现代处理器采用了指令级并行技术（Instruction-Level Parallelism，ILP）来将多条指令重叠执行。如果不存在数据依赖性，处理器可以改变语句对应机器指令的执行顺序。</li>
 <li><strong>内存系统的重排序</strong><br>由于处理器使用缓存和读/写缓冲区，这使得加载和存储操作看上去可能是在乱序执行。</li>
 </ol>
 <p>对于编译器，JMM的编译器重排序规则会禁止特定类型的编译器重排序（不是所有的编译器重排序都要禁止）。对于处理器重排序，JMM的处理器重排序规则会要求Java编译器在生成指令序列时，插入特定类型的内存屏障（Memory Barriers，Intel称之为Memory Fence）指令，通过<strong>内存屏障指令</strong>来禁止特定类型的处理器重排序。</p>
-<h3 id="3-1-4-并发编程模型的分类"><a href="#3-1-4-并发编程模型的分类" class="headerlink" title="3.1.4 并发编程模型的分类"></a>3.1.4 并发编程模型的分类</h3><p>现代处理器使用写缓冲区临时保存向内存写入的数据。</p>
+<h3 id="并发编程模型的分类"><a href="#并发编程模型的分类" class="headerlink" title="并发编程模型的分类"></a>并发编程模型的分类</h3><p>现代处理器使用写缓冲区临时保存向内存写入的数据。</p>
 <p>优点：</p>
 <ul>
 <li><p>保证指令流水线式持续运行，避免由于处理器停顿等待向内存写入数据而产生的延迟。</p>
@@ -566,7 +566,7 @@
 </tbody></table>
 <p>StoreLoad Barriers 是一个“全能型” 的屏障，执行该屏障开销大，因为当前处理器会把写缓冲区中的数据全部刷新到内存中。</p>
 <hr>
-<h3 id="3-1-5-happens-before简介"><a href="#3-1-5-happens-before简介" class="headerlink" title="3.1.5 happens-before简介"></a>3.1.5 happens-before简介</h3><p>在JMM中，如果一个操作执行的结果需要对另一个操作可见，那么这两个操作之间必须要存在happens-before关<br>系。这里提到的两个操作既可以是在一个线程之内，也可以是在不同线程之间。</p>
+<h3 id="happens-before简介"><a href="#happens-before简介" class="headerlink" title="happens-before简介"></a>happens-before简介</h3><p>在JMM中，如果一个操作执行的结果需要对另一个操作可见，那么这两个操作之间必须要存在happens-before关系。这里提到的两个操作既可以是在一个线程之内，也可以是在不同线程之间。</p>
 <ul>
 <li>the first is visible to and ordered before the second</li>
 <li>一个happens-before规则对应于一个或多个编译器和处理器重排序规则</li>
@@ -578,15 +578,15 @@
 <li><strong>传递性</strong></li>
 </ol>
 <hr>
-<h2 id="3-2-重排序"><a href="#3-2-重排序" class="headerlink" title="3.2 重排序"></a>3.2 重排序</h2><p>重排序是指编译器和处理器为了优化程序性能而对<strong>指令序列进行重新排序</strong>的一种手段。</p>
-<h3 id="3-2-1-数据依赖性"><a href="#3-2-1-数据依赖性" class="headerlink" title="3.2.1 数据依赖性"></a>3.2.1 数据依赖性</h3><p>如果两个操作访问同一个变量，且这两个操作中有一个为写操作，此时这两个操作之间就存在数据依赖性</p>
+<h2 id="重排序"><a href="#重排序" class="headerlink" title="重排序"></a>重排序</h2><p>重排序是指编译器和处理器为了优化程序性能而对<strong>指令序列进行重新排序</strong>的一种手段。</p>
+<h3 id="数据依赖性"><a href="#数据依赖性" class="headerlink" title="数据依赖性"></a>数据依赖性</h3><p>如果两个操作访问同一个变量，且这两个操作中有一个为写操作，此时这两个操作之间就存在数据依赖性</p>
 <p>编译器和处理器在重排序时，会遵守数据依赖性，编译器和处理器不会改变存在数据依赖关系的两个操作的执行顺序。</p>
-<h3 id="3-2-2-as-if-serial-语义"><a href="#3-2-2-as-if-serial-语义" class="headerlink" title="3.2.2 as-if-serial 语义"></a>3.2.2 as-if-serial 语义</h3><p>as-if-serial 语义的意思是：不管怎么重排序（编译器和处理器为了提高并行度），（单线程）程序的执行结果不能被改变。编译器、runtime 和处理器都必须遵守 as-if-serial 语义。</p>
+<h3 id="as-if-serial-语义"><a href="#as-if-serial-语义" class="headerlink" title="as-if-serial 语义"></a>as-if-serial 语义</h3><p>as-if-serial 语义的意思是：不管怎么重排序（编译器和处理器为了提高并行度），（单线程）程序的执行结果不能被改变。编译器、runtime 和处理器都必须遵守 as-if-serial 语义。</p>
 <p>as-if-serial 语义使单线程程序员无需担心重排序会干扰他们，也无需担心内存可见性问题。</p>
-<h3 id="3-2-3-程序顺序规则"><a href="#3-2-3-程序顺序规则" class="headerlink" title="3.2.3 程序顺序规则"></a>3.2.3 程序顺序规则</h3><p>在不改变程序执行结果的前提下，尽可能提高并行度。</p>
-<h3 id="3-2-4-重排序对多线程的影响"><a href="#3-2-4-重排序对多线程的影响" class="headerlink" title="3.2.4 重排序对多线程的影响"></a>3.2.4 重排序对多线程的影响</h3><p>代码中存在控制依赖性时，会影响指令序列执行的并行度。为此，编译器和处理器会采用猜测（Speculation）执行来克服控制相关性对并行度的影响。以处理器的猜测执行为例，执行线程B的处理器可以提前读取并计算a*a，然后把计算结果临时保存到一个名为重排序缓冲（Reorder Buffer，ROB）的硬件缓存中。当操作3的条<br>件判断为真时，就把该计算结果写入变量i中。</p>
-<h2 id="3-3-顺序一致性"><a href="#3-3-顺序一致性" class="headerlink" title="3.3 顺序一致性"></a>3.3 顺序一致性</h2><p>顺序一致性内存模型是一个理论参考模型。</p>
-<h3 id="3-3-1-数据竞争和顺序一致性"><a href="#3-3-1-数据竞争和顺序一致性" class="headerlink" title="3.3.1 数据竞争和顺序一致性"></a>3.3.1 数据竞争和顺序一致性</h3>
+<h3 id="程序顺序规则"><a href="#程序顺序规则" class="headerlink" title="程序顺序规则"></a>程序顺序规则</h3><p>在不改变程序执行结果的前提下，尽可能提高并行度。</p>
+<h3 id="重排序对多线程的影响"><a href="#重排序对多线程的影响" class="headerlink" title="重排序对多线程的影响"></a>重排序对多线程的影响</h3><p>代码中存在控制依赖性时，会影响指令序列执行的并行度。为此，编译器和处理器会采用猜测（Speculation）执行来克服控制相关性对并行度的影响。以处理器的猜测执行为例，执行线程B的处理器可以提前读取并计算a*a，然后把计算结果临时保存到一个名为重排序缓冲（Reorder Buffer，ROB）的硬件缓存中。当操作3的条件判断为真时，就把该计算结果写入变量i中。</p>
+<h2 id="顺序一致性"><a href="#顺序一致性" class="headerlink" title="顺序一致性"></a>顺序一致性</h2><p>顺序一致性内存模型是一个理论参考模型。</p>
+<h3 id="数据竞争和顺序一致性"><a href="#数据竞争和顺序一致性" class="headerlink" title="数据竞争和顺序一致性"></a>数据竞争和顺序一致性</h3>
       
     </div>
 
