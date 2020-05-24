@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://wayne-98.github.io/"/>
-  <updated>2020-05-22T05:26:56.854Z</updated>
+  <updated>2020-05-24T05:55:43.477Z</updated>
   <id>http://wayne-98.github.io/</id>
   
   <author>
@@ -15,6 +15,55 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Redis设计与实现读书笔记:第一部分:数据结构与对象:第六章:整数集合</title>
+    <link href="http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E5%85%AD%E7%AB%A0%E6%95%B4%E6%95%B0%E9%9B%86%E5%90%88/"/>
+    <id>http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E5%85%AD%E7%AB%A0%E6%95%B4%E6%95%B0%E9%9B%86%E5%90%88/</id>
+    <published>2020-05-24T04:52:42.592Z</published>
+    <updated>2020-05-24T05:55:43.477Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;整数集合&quot;&gt;&lt;a href=&quot;#整数集合&quot; class=&quot;headerlink&quot; title=&quot;整数集合&quot;&gt;&lt;/a&gt;整数集合&lt;/h1&gt;&lt;p&gt;整数集合( intset )是集合键的底层实现之一，当一个集合中只包含整数值元素，并且这个集合的元素数量不多时，Redis就
+      
+    
+    </summary>
+    
+    
+      <category term="Redis设计与实现读书笔记" scheme="http://wayne-98.github.io/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="Redis" scheme="http://wayne-98.github.io/tags/Redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis设计与实现读书笔记:第一部分:数据结构与对象:第五章:跳跃表</title>
+    <link href="http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%BA%94%E7%AB%A0%E8%B7%B3%E8%B7%83%E8%A1%A8/"/>
+    <id>http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%BA%94%E7%AB%A0%E8%B7%B3%E8%B7%83%E8%A1%A8/</id>
+    <published>2020-05-24T00:54:46.122Z</published>
+    <updated>2020-05-24T04:52:44.119Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;跳跃表&quot;&gt;&lt;a href=&quot;#跳跃表&quot; class=&quot;headerlink&quot; title=&quot;跳跃表&quot;&gt;&lt;/a&gt;跳跃表&lt;/h1&gt;&lt;p&gt;跳跃表是一个种有序数据结构，平均 &lt;em&gt;O(logN)&lt;/em&gt; 复杂度的节点查找，还可以通过顺序性操作来批量处理节点。&lt;/p&gt;
+
+      
+    
+    </summary>
+    
+    
+      <category term="Redis设计与实现读书笔记" scheme="http://wayne-98.github.io/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="Redis" scheme="http://wayne-98.github.io/tags/Redis/"/>
+    
+  </entry>
   
   <entry>
     <title>Redis设计与实现读书笔记:第一部分:数据结构与对象:第四章:字典</title>
@@ -453,55 +502,6 @@
     
     
       <category term="JVM读书笔记" scheme="http://wayne-98.github.io/categories/JVM%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
-    
-    
-      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>HashMap</title>
-    <link href="http://wayne-98.github.io/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/HashMap/"/>
-    <id>http://wayne-98.github.io/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/HashMap/</id>
-    <published>2020-05-10T13:39:10.535Z</published>
-    <updated>2020-05-10T14:13:04.131Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;java.util.Map 的实现类主要有四个常用的：HashMap、Hashtable、LinkedHashMap和TreeMap&lt;/p&gt;
-&lt;p&gt;(1) HashMap：&lt;strong&gt;遍历顺序不确定&lt;/strong&gt;， HashMap最多只&lt;strong&gt;允许一条记录的
-      
-    
-    </summary>
-    
-    
-      <category term="Java 容器" scheme="http://wayne-98.github.io/categories/Java-%E5%AE%B9%E5%99%A8/"/>
-    
-    
-      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>ConcurrentHashMap</title>
-    <link href="http://wayne-98.github.io/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/ConcurrentHashMap/"/>
-    <id>http://wayne-98.github.io/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/ConcurrentHashMap/</id>
-    <published>2020-05-10T13:39:10.527Z</published>
-    <updated>2020-05-10T14:12:53.263Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;JDK1.8版本的ConcurrentHashMap的数据结构已经接近HashMap，相对而言，ConcurrentHashMap只是增加了同步的操作来控制并发，从JDK1.7版本的ReentrantLock+Segment+HashEntry，到JDK1.8版本中sync
-      
-    
-    </summary>
-    
-    
-      <category term="Java 容器" scheme="http://wayne-98.github.io/categories/Java-%E5%AE%B9%E5%99%A8/"/>
     
     
       <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>

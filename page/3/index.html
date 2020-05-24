@@ -164,6 +164,206 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/HashMap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/HashMap/" class="post-title-link" itemprop="url">HashMap</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:13:04" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java-%E5%AE%B9%E5%99%A8/" itemprop="url" rel="index"><span itemprop="name">Java 容器</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>java.util.Map 的实现类主要有四个常用的：HashMap、Hashtable、LinkedHashMap和TreeMap</p>
+<p>(1) HashMap：<strong>遍历顺序不确定</strong>， HashMap最多只<strong>允许一条记录的</strong>键为null。HashMap非线程安全。</p>
+<p>(2) Hashtable：<strong>线程安全的</strong>(sync)，Hashtable不建议在新代码中使用，不需要线程安全的场合可以用HashMap替换，需要线程安全的场合可以用ConcurrentHashMap替换。</p>
+<p>(3) LinkedHashMap：LinkedHashMap是HashMap的一个子类，保存了记录的<strong>插入顺序</strong>，在用Iterator遍历LinkedHashMap时，先得到的记录肯定是先插入的，也可以在构造时带参数，按照访问次序排序。</p>
+<p>(4) TreeMap：TreeMap实现SortedMap接口，能够把它保存的记录根据键排序，默认是<strong>按键值的升序排序</strong>，也可以指定排序的比较器，当用Iterator遍历TreeMap时，得到的记录是排过序的。如果使用排序的映射，建议使用TreeMap。在使用TreeMap时，key必须实现Comparable接口或者在构造TreeMap传入自定义的Comparator，否则会在运行时抛出java.lang.ClassCastException类型的异常。</p>
+<p>对于上述四种Map类型的类，要求映射中的key是不可变对象。不可变对象是该对象在创建后它的哈希值不会被改变。如果对象的哈希值发生变化，Map对象很可能就定位不到映射的位置了。</p>
+<h2 id="存储结构字段"><a href="#存储结构字段" class="headerlink" title="存储结构字段"></a>存储结构字段</h2><ol>
+<li>HashMap类中有一个非常重要的字段，就是 Node[] table，即哈希桶数组，明显它是一个Node的数组。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> hash;    <span class="comment">//用来定位数组索引位置</span></span><br><span class="line">        <span class="keyword">final</span> K key;</span><br><span class="line">        V value;</span><br><span class="line">        Node&lt;K,V&gt; next;   <span class="comment">//链表的下一个node</span></span><br><span class="line"></span><br><span class="line">        Node(<span class="keyword">int</span> hash, K key, V value, Node&lt;K,V&gt; next) &#123; ... &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> K <span class="title">getKey</span><span class="params">()</span></span>&#123; ... &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">getValue</span><span class="params">()</span> </span>&#123; ... &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123; ... &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123; ... &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> V <span class="title">setValue</span><span class="params">(V newValue)</span> </span>&#123; ... &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object o)</span> </span>&#123; ... &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>HashMap就是使用哈希表来存储的。哈希表为解决冲突，可以采用<strong>开放地址法</strong>和<strong>链地址法</strong>等来解决问题，Java中HashMap采用了链地址法。</li>
+</ol>
+<p>如果哈希桶数组很大，即使较差的Hash算法也会比较分散，如果哈希桶数组数组很小，即使好的Hash算法也会出现较多碰撞，所以就需要在<strong>空间成本和时间成本</strong>之间权衡，其实就是在根据实际情况确定哈希桶数组的大小，并在此基础上设计好的hash算法减少Hash碰撞。那么通过什么方式来控制map使得Hash碰撞的概率又小，哈希桶数组（Node[] table）占用空间又少呢？答案就是<strong>好的Hash算法和扩容机制</strong>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> threshold;             <span class="comment">// 所能容纳的key-value对极限 </span></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">float</span> loadFactor;    <span class="comment">// 负载因子</span></span><br><span class="line"><span class="keyword">int</span> modCount;  <span class="comment">//记录HashMap内部结构发生变化的次数</span></span><br><span class="line"><span class="keyword">int</span> size;</span><br></pre></td></tr></table></figure>
+
+<p>Node[] table的初始化长度length(默认值是<strong>16</strong>)，Load factor为负载因子(默认值是<strong>0.75</strong>)，threshold是HashMap所能容纳的最大数据量的Node(键值对)个数。threshold = length * Load factor。也就是说，在数组定义好长度之后，负载因子越大，所能容纳的键值对个数越多。</p>
+<p>结合负载因子的定义公式可知，threshold就是在此Load factor和length(数组长度)对应下允许的最大元素数目，超过这个数目就重新resize(扩容)，扩容后的HashMap容量是之前容量的<strong>两倍</strong>。<strong>默认的负载因子0.75是对空间和时间效率的一个平衡选择</strong>，建议大家不要修改，除非在时间和空间比较特殊的情况下，如果<strong>内存空间很多而又对时间效率要求很高，可以降低负载因子Load factor的值</strong>；相反，如果内存空间紧张而对时间效率要求不高，可以增加负载因子loadFactor的值，这个值可以大于1。</p>
+<p>哈希桶数组table的长度length大小必须为2的n次方(一定是合数)，这是一种非常规的设计，常规的设计是把桶的大小设计为素数。相对来说素数导致冲突的概率要小于合数。<strong>当length总是2的n次方时，h&amp; (length-1)运算等价于对length取模，也就是h%length，但是&amp;比%具有更高的效率。</strong></p>
+<p>负载因子和Hash算法设计的再合理，也免不了会出现拉链过长的情况，一旦出现拉链过长，则会严重影响HashMap的性能。于是，在JDK1.8版本中，对数据结构做了进一步的优化，引入了红黑树。而当链表长度太长（默认超过8）时，链表就转换为红黑树，利用红黑树快速增删改查的特点提高HashMap的性能。</p>
+<h2 id="功能实现-方法"><a href="#功能实现-方法" class="headerlink" title="功能实现-方法"></a>功能实现-方法</h2><h3 id="1-确定哈希桶数组索引位置"><a href="#1-确定哈希桶数组索引位置" class="headerlink" title="1. 确定哈希桶数组索引位置"></a>1. 确定哈希桶数组索引位置</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">方法一：</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object key)</span> </span>&#123;   <span class="comment">//jdk1.8 &amp; jdk1.7</span></span><br><span class="line">     <span class="keyword">int</span> h;</span><br><span class="line">     <span class="comment">// h = key.hashCode() 为第一步 取hashCode值</span></span><br><span class="line">     <span class="comment">// h ^ (h &gt;&gt;&gt; 16)  为第二步 高位参与运算</span></span><br><span class="line">     <span class="keyword">return</span> (key == <span class="keyword">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">&#125;</span><br><span class="line">方法二：</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">indexFor</span><span class="params">(<span class="keyword">int</span> h, <span class="keyword">int</span> length)</span> </span>&#123;  <span class="comment">//jdk1.7的源码，jdk1.8没有这个方法，但是实现原理一样的</span></span><br><span class="line">     <span class="keyword">return</span> h &amp; (length-<span class="number">1</span>);  <span class="comment">//第三步 取模运算</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>这里的Hash算法本质上就是三步：<strong>取key的hashCode值、高位运算、取模运算</strong>。</p>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/hash.png?raw=true" alt=""></p>
+<p>在JDK1.8的实现中，优化了高位运算的算法，通过hashCode()的高16位异或低16位实现的：(h = k.hashCode()) ^ (<strong>h &gt;&gt;&gt; 16</strong>)，主要是从速度、功效、质量来考虑的，这么做可以在数组table的length比较小的时候，也能保证考虑到<strong>高低Bit都参与到Hash的</strong>计算中，同时不会有太大的开销。</p>
+<h2 id="2-分析HashMap的put方法"><a href="#2-分析HashMap的put方法" class="headerlink" title="2. 分析HashMap的put方法"></a>2. 分析HashMap的put方法</h2><p><img src="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/put.png?raw=true" alt=""></p>
+<h2 id="3-扩容机制"><a href="#3-扩容机制" class="headerlink" title="3. 扩容机制"></a>3. 扩容机制</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"> <span class="number">1</span> <span class="function"><span class="keyword">void</span> <span class="title">resize</span><span class="params">(<span class="keyword">int</span> newCapacity)</span> </span>&#123;   <span class="comment">//传入新的容量</span></span><br><span class="line"> <span class="number">2</span>     Entry[] oldTable = table;    <span class="comment">//引用扩容前的Entry数组</span></span><br><span class="line"> <span class="number">3</span>     <span class="keyword">int</span> oldCapacity = oldTable.length;         </span><br><span class="line"> <span class="number">4</span>     <span class="keyword">if</span> (oldCapacity == MAXIMUM_CAPACITY) &#123;  <span class="comment">//扩容前的数组大小如果已经达到最大(2^30)了</span></span><br><span class="line"> <span class="number">5</span>         threshold = Integer.MAX_VALUE; <span class="comment">//修改阈值为int的最大值(2^31-1)，这样以后就不会扩容了</span></span><br><span class="line"> <span class="number">6</span>         <span class="keyword">return</span>;</span><br><span class="line"> <span class="number">7</span>     &#125;</span><br><span class="line"> <span class="number">8</span>  </span><br><span class="line"> <span class="number">9</span>     Entry[] newTable = <span class="keyword">new</span> Entry[newCapacity];  <span class="comment">//初始化一个新的Entry数组</span></span><br><span class="line"><span class="number">10</span>     transfer(newTable);                         <span class="comment">//！！将数据转移到新的Entry数组里</span></span><br><span class="line"><span class="number">11</span>     table = newTable;                           <span class="comment">//HashMap的table属性引用新的Entry数组</span></span><br><span class="line"><span class="number">12</span>     threshold = (<span class="keyword">int</span>)(newCapacity * loadFactor);<span class="comment">//修改阈值</span></span><br><span class="line"><span class="number">13</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"> <span class="number">1</span> <span class="function"><span class="keyword">void</span> <span class="title">transfer</span><span class="params">(Entry[] newTable)</span> </span>&#123;</span><br><span class="line"> <span class="number">2</span>     Entry[] src = table;                   <span class="comment">//src引用了旧的Entry数组</span></span><br><span class="line"> <span class="number">3</span>     <span class="keyword">int</span> newCapacity = newTable.length;</span><br><span class="line"> <span class="number">4</span>     <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; src.length; j++) &#123; <span class="comment">//遍历旧的Entry数组</span></span><br><span class="line"> <span class="number">5</span>         Entry&lt;K,V&gt; e = src[j];             <span class="comment">//取得旧Entry数组的每个元素</span></span><br><span class="line"> <span class="number">6</span>         <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123;</span><br><span class="line"> <span class="number">7</span>             src[j] = <span class="keyword">null</span>;<span class="comment">//释放旧Entry数组的对象引用（for循环后，旧的Entry数组不再引用任何对象）</span></span><br><span class="line"> <span class="number">8</span>             <span class="keyword">do</span> &#123;</span><br><span class="line"> <span class="number">9</span>                 Entry&lt;K,V&gt; next = e.next;</span><br><span class="line"><span class="number">10</span>                 <span class="keyword">int</span> i = indexFor(e.hash, newCapacity); <span class="comment">//！！重新计算每个元素在数组中的位置</span></span><br><span class="line"><span class="number">11</span>                 e.next = newTable[i]; <span class="comment">//标记[1]</span></span><br><span class="line"><span class="number">12</span>                 newTable[i] = e;      <span class="comment">//将元素放在数组上</span></span><br><span class="line"><span class="number">13</span>                 e = next;             <span class="comment">//访问下一个Entry链上的元素</span></span><br><span class="line"><span class="number">14</span>             &#125; <span class="keyword">while</span> (e != <span class="keyword">null</span>);</span><br><span class="line"><span class="number">15</span>         &#125;</span><br><span class="line"><span class="number">16</span>     &#125;</span><br><span class="line"><span class="number">17</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/transfer.png?raw=true" alt=""></p>
+<p>我们使用的是2次幂的扩展(指长度扩为原来2倍)，所以，元素的位置要么是在原位置，要么是在原位置再移动2次幂的位置。看下图可以明白这句话的意思，n为table的长度，图（a）表示扩容前的key1和key2两种key确定索引位置的示例，图（b）表示扩容后key1和key2两种key确定索引位置的示例，其中hash1是key1对应的哈希与高位运算结果。</p>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/reHash.png?raw=true" alt=""></p>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Java%20%E5%AE%B9%E5%99%A8/OldCap.png?raw=true" alt=""></p>
+<p>因此，我们在扩充HashMap的时候，不需要像JDK1.7的实现那样重新计算hash，只需要看看原来的hash值新增的那个bit是1还是0就好了，是0的话索引没变，是1的话索引变成“原索引+oldCap”。</p>
+<h3 id="HashMap-线程不安全"><a href="#HashMap-线程不安全" class="headerlink" title="HashMap 线程不安全"></a>HashMap 线程不安全</h3><p>并发的多线程使用场景中使用HashMap可能造成死循环。主要是多线程同时put时，如果同时触发了rehash操作，会导致HashMap中的链表中出现循环节点，进而使得后面get的时候，会死循环。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HashMapInfiniteLoop</span> </span>&#123;  </span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> HashMap&lt;Integer,String&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">2</span>，<span class="number">0.75f</span>);  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;  </span><br><span class="line">        map.put(<span class="number">5</span>， <span class="string">"C"</span>);  </span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> Thread(<span class="string">"Thread1"</span>) &#123;  </span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">                map.put(<span class="number">7</span>, <span class="string">"B"</span>);  </span><br><span class="line">                System.out.println(map);  </span><br><span class="line">            &#125;;  </span><br><span class="line">        &#125;.start();  </span><br><span class="line">        <span class="keyword">new</span> Thread(<span class="string">"Thread2"</span>) &#123;  </span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">                map.put(<span class="number">3</span>, <span class="string">"A);  </span></span><br><span class="line"><span class="string">                System.out.println(map);  </span></span><br><span class="line"><span class="string">            &#125;;  </span></span><br><span class="line"><span class="string">        &#125;.start();        </span></span><br><span class="line"><span class="string">    &#125;  </span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p><a href="https://tech.meituan.com/2016/06/24/java-hashmap.html" target="_blank" rel="noopener">主要参考与美团的文章：Java 8系列之重新认识HashMap</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/ConcurrentHashMap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Java%20%E5%AE%B9%E5%99%A8/ConcurrentHashMap/" class="post-title-link" itemprop="url">ConcurrentHashMap</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:12:53" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java-%E5%AE%B9%E5%99%A8/" itemprop="url" rel="index"><span itemprop="name">Java 容器</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>JDK1.8版本的ConcurrentHashMap的数据结构已经接近HashMap，相对而言，ConcurrentHashMap只是增加了同步的操作来控制并发，从JDK1.7版本的ReentrantLock+Segment+HashEntry，到JDK1.8版本中synchronized+CAS+HashEntry+红黑树,相对而言，总结如下思考</p>
+<ol>
+<li><p>JDK1.8的实现降低锁的粒度，JDK1.7版本锁的粒度是基于Segment的，包含多个HashEntry，而JDK1.8锁的粒度就是HashEntry（首节点）</p>
+</li>
+<li><p>JDK1.8版本的数据结构变得更加简单，使得操作也更加清晰流畅，因为已经使用synchronized来进行同步，所以不需要分段锁的概念，也就不需要Segment这种数据结构了，由于粒度的降低，实现的复杂度也增加了</p>
+</li>
+<li><p>JDK1.8使用红黑树来优化链表，基于长度很长的链表的遍历是一个很漫长的过程，而红黑树的遍历效率是很快的，代替一定阈值的链表，这样形成一个最佳拍档</p>
+</li>
+<li><p>JDK1.8为什么使用内置锁synchronized来代替重入锁ReentrantLock，我觉得有以下几点 </p>
+<ul>
+<li><p>因为粒度降低了，在相对而言的低粒度加锁方式，synchronized并不比ReentrantLock差，在粗粒度加锁中ReentrantLock可能通过Condition来控制各个低粒度的边界，更加的灵活，而在低粒度中，Condition的优势就没有了</p>
+</li>
+<li><p>JVM的开发团队从来都没有放弃synchronized，而且基于JVM的synchronized优化空间更大，使用内嵌的关键字比使用API更加自然</p>
+</li>
+<li><p>在大量的数据操作下，对于JVM的内存压力，基于API的ReentrantLock会开销更多的内存，虽然不是瓶颈，但是也是一个选择依据</p>
+</li>
+</ul>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%20%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9AJava%E5%B9%B6%E5%8F%91%E6%9C%BA%E5%88%B6%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1429,322 +1629,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Internet/HTTP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Internet/HTTP/" class="post-title-link" itemprop="url">HTTP</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-21 10:27:26" itemprop="dateModified" datetime="2020-05-21T10:27:26+08:00">2020-05-21</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">计算机网络:自顶向下方法读书笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <ul>
-<li><p><strong>无状态协议</strong><br>HTTP服务器并不保存关于客户的任何信息，所以我们说 HTTP 是一个无状态协议（stateless protocol）</p>
-</li>
-<li><p><strong>怎么实现有状态呢？</strong><br>Cookie 和 Session 保存会话状态，用 Session 来唯一标识用户，用 Cookie 当作用户通行证。</p>
-<p>session 有如用户信息档案表, 里面包含了用户的认证信息和登录状态等信息. 而 cookie 就是用户通行证。</p>
-</li>
-</ul>
-<ol>
-<li><p><strong>cookie</strong>(客户端)</p>
-<ul>
-<li>cookie 的4个技术组件：</li>
-</ul>
-<ol>
-<li>在 HTTP 响应报文中的一个 cookie 首部行</li>
-<li>在 HTTP 请求报文中的一个 cookie 首部行</li>
-<li>在用户端系统中保留有一个 cookie 文件，并由用户的浏览器进行管理</li>
-<li>位于 Web 站点的一个后端数据库<br><img src="https://github.com/Wayne-98/image/blob/master/Internet/Cookie.png?raw=true" alt=""></li>
-</ol>
-</li>
-</ol>
-<ol start="2">
-<li><strong>session</strong>(服务端)</li>
-</ol>
-<p>Session 是服务器在和客户端建立连接时添加客户端连接标志，最终会在服务器软件（Apache、Tomcat、JBoss）转化为一个临时 Cookie 发送给给客户端，当客户端第一请求时服务器会检查是否携带了这个Session（临时 Cookie ），如果没有则会添加 Session，如果有就拿出这个 Session 来做相关操作</p>
-<ul>
-<li>session 安全性的保证<ul>
-<li>HttpOnly 属性<br>Cookie 的 HttpOnly 属性是 Cookie 的扩展功能，它使 JavaScript 脚本无法获得 Cookie。其主要目的为防止跨站脚本攻击（Cross-site scripting，XSS）对 Cookie 的信息窃取。</li>
-<li>HTTPS传输</li>
-</ul>
-</li>
-</ul>
-<ol start="3">
-<li><strong>token</strong></li>
-</ol>
-<p>token 也称作令牌，由 uid + time + sign[+固定参数]</p>
-<p><strong>token认证流程</strong></p>
-<ul>
-<li>token 的认证流程与 cookie 很相似，用户登录成功后服务器返回 Token 给客户端。</li>
-<li>客户端收到数据后保存在客户端</li>
-<li>再次访问服务器，将 token 放入 headers 中</li>
-<li>服务器端采用 filter 过滤器校验。校验成功则返回请求数据，校验失败则返回错误码。</li>
-</ul>
-<p><strong>区别和联系</strong><br>session 存储于服务器，可以理解为一个状态列表，拥有一个唯一识别符号 sessionId，通常存放于 cookie 中。服务器收到 cookie 后解析出 sessionId ，再去 session 列表中查找，才能找到相应 session ，依赖cookie。cookie 类似一个令牌，装有 sessionId ，存储在客户端，浏览器通常会自动添加。token 也类似一个令牌，无状态，用户信息都被加密到 token 中，服务器收到 token 后解密就可知道是哪个用户。需要开发者手动添加。</p>
-<hr>
-<ul>
-<li><strong>非持续性</strong>连接和<strong>持续性</strong>连接<br>每个请求/响应对是经一个单独的TCP连接发送，还是所有的请求及响应经相同的TCP连接发送呢？<br>前者是非持续性连接，后者是持续性连接。（HTTP在其默认方式下使用持续性连接）<ul>
-<li>非持续连接的缺点<ol>
-<li>每个连接，在客户和服务器中都要分配TCP的缓冲区和保持TCP变量，浪费资源</li>
-<li>每个对象经受2倍的RTT(Round-Trip Time，往返时间),一个RTT用于创建TCP,一个RTT用于请求和接收一个对象。</li>
-</ol>
-</li>
-</ul>
-</li>
-</ul>
-<hr>
-<ul>
-<li><strong>HTTP报文格式</strong></li>
-<li>HTTP请求报文<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">GET &#x2F;somedir&#x2F;page.html HTTP&#x2F;1.1</span><br><span class="line">Host: www.someschool.edu</span><br><span class="line">Connection: close</span><br><span class="line">User-agent: Mozilla&#x2F;5.0     &#x2F;&#x2F;浏览器类型</span><br><span class="line">Accept-language: fr</span><br></pre></td></tr></table></figure>
-HTTP请求报文的第一行叫做请求行（request line），其后继的行叫做首部行（header line）</li>
-</ul>
-<ol>
-<li><strong>请求行</strong></li>
-</ol>
-<ul>
-<li>方法字段：方法字段可以取不同的值：<ol>
-<li>GET：实体体为空</li>
-<li>POST：实体体中包含的就是用户在表单字段中的输入值。</li>
-</ol>
-<ul>
-<li>当用户向搜索引擎提供搜索关键词时，使用post报文时，用户仍可以向服务器请求一个Web界面，但Web界面的特定内容依赖于用户在表单字段中输入的内容。  </li>
-<li>GET方法也可以提交表单，在所请求的URL中包括输入的数据。<br><code>www.somesite.com/animalsearch?monkey&amp;bananas</code></li>
-</ul>
-<ol start="3">
-<li>HEAD：HEAD方法类似与GET方法。当服务器收到一个使用HEAD方法的请求时，将会用一个HTTP报文进行响应，但是并不返回对象。应用程序开发者常用HEAD方法进行调试跟踪，用于确认 URL 的有效性以及资源更新的日期时间等。</li>
-<li>PUT：它允许用户上传对象到指定的Web服务器上指定的路径。由于自身不带验证机制，任何人都可以上传文件，因此存在安全性问题，一般不使用该方法。</li>
-<li>PATCH：修改资源，PATCH 允许部分修改。</li>
-<li>DELETE：允许用户或者应用程序删除Web服务器上的对象。并且同样不带验证机制。</li>
-<li>OPTIONS：查询指定的 URL 能够支持的方法。</li>
-<li>CONNECT：要求在与代理服务器通信时建立隧道</li>
-</ol>
-</li>
-<li>URL字段：URL字段带有请求对象的标识</li>
-<li>HTTP版本字段</li>
-</ul>
-<ol start="2">
-<li><strong>首部行</strong><br> Host：指明了对象所在的主机。（为什么已经有一条TCP连接存在了，还需要这个字段呢，因为Web代理高速缓存需要该首部行提供的信息）<br> Connection：close首部行，该浏览器告诉服务器不要麻烦地使用持续连接，它要求服务器在发送完被请求的对象后就关闭这条连接。</li>
-</ol>
-<ul>
-<li>HTTP响应报文<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">HTTP&#x2F;1.1 200 OK</span><br><span class="line">Connection: close</span><br><span class="line">Date: Tue, 18 Aug 2015 15:44:04 GMT</span><br><span class="line">Server: Apache&#x2F;2.2.3 (CentOS)</span><br><span class="line">Last-Modified: Tue, 18 Aug 2015 15:11:04 GMT</span><br><span class="line">Content-Length: 6821</span><br><span class="line">Content-Type: text&#x2F;html</span><br><span class="line"></span><br><span class="line">(data data data data ....)</span><br></pre></td></tr></table></figure></li>
-</ul>
-<ol>
-<li>初始状态行(status line)<br> 协议版本字段，状态码和相应状态信息<ul>
-<li>200 OK ：请求成功，信息在返回的响应报文中</li>
-<li>301 Moved Permanently：请求的对象已经被永久转移了，新的URL定义在响应报文的Location：首部行中。客户软件将自动获取新的URL</li>
-<li>400 Bad Request：一个通用差错代码，指示该请求不能被服务器理解</li>
-<li>404 Not Found：被请求的文档不在服务器上</li>
-<li>505 HTTP Version Not Supported：服务器不支持请求报文使用的HTTP协议版本。</li>
-</ul>
-</li>
-<li>6个首部行(header line)<ul>
-<li>Connection: close：首部行告诉客户，发送完报文后关闭该TCP连接</li>
-<li>Date：首部行指示服务器产生并发送该响应报文的日期和时间。（不是指这个对象创建或者最后修改的时间，而是服务器从它的文件系统中检索到该对象，将该对象插入响应报文，并发送该响应报文的时间）</li>
-<li>Server</li>
-<li>Last-Modified：指示了这个对象创建或者最后修改的时间。(对既可能在本地客户也可能在网络缓存服务器上的对象缓存来说非常重要)</li>
-<li>Length：指示了被发送对象中的字节数</li>
-<li>Content-Type：</li>
-</ul>
-</li>
-<li>实体体(entity body)</li>
-</ol>
-<hr>
-<ul>
-<li>Web缓存<br>Web缓存器(Web cache)也叫代理服务器(proxy server)，它是能够代表初始Web服务器来满足HTTP请求的网络实体。<ul>
-<li>可以配置用户的浏览器，使得用户所有的HTTP请求首先指向Web缓存器。</li>
-</ul>
-</li>
-</ul>
-<ol>
-<li>浏览器建立一个到web缓存器的TCP连接，并向web缓存器发送一个请求报文；</li>
-<li>web缓存器检查本地是否存储了该对象的拷贝：如果有，向初始服务器发送一个条件GET请求报文（if-modified-since标记），检查本地拷贝是否是最新的：服务器会返回一个响应报文，如果是最新的，响应报文中不会包含请求对象(304 Not Modified)；如果不是最新的，响应报文中会包含请求对象，web缓存器更新其本地存储及相应的if-modified-since标记。如果没有，向初始服务器发送一个请求报文，收到请求后，更新本地存储。发送响应报文给客户端浏览器。</li>
-</ol>
-<p>GET /fruit/kiwi.gif HTTP/1.1<br>Host: <a href="http://www.exotiquecuisine.com" target="_blank" rel="noopener">www.exotiquecuisine.com</a></p>
-<p>HTTP/1.1 200 Ok<br>Date: Sat, 3 Oct 2015 15:39:29<br>Server: Apache/1.3.0 (Unix)<br>Last-Modified: Wed, 9 Sep 2015 09:23:24<br>Content-Type: image/gif<br>(data data data data … ) </p>
-<p>GET /fruit/kiwi.gif HTTP/1.1<br>Host: <a href="http://www.exotiquecuisine.com" target="_blank" rel="noopener">www.exotiquecuisine.com</a><br>If-modified-since：Wed, 9 Sep 2015 09:23:24</p>
-<p>HTTP/1.1 304 Not Modified<br>Date: Sat, 10 Oct 2015 15:39:29<br>Server: Apache/1.3.0 (Unix)<br>(empty entity body)</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Internet/DNS/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Internet/DNS/" class="post-title-link" itemprop="url">DNS</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-21 10:27:23" itemprop="dateModified" datetime="2020-05-21T10:27:23+08:00">2020-05-21</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">计算机网络:自顶向下方法读书笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h2><p>域名系统(Domain Name System)能进行<strong>主机名到IP地址转换</strong>的目录服务。</p>
-<ul>
-<li>DNS：</li>
-</ul>
-<ol>
-<li><strong>一个由分层的 DNS 服务器实现的分布式数据库</strong></li>
-<li><strong>一个使得主机能够查询分布式数据的应用层协议</strong></li>
-</ol>
-<p>DNS 协议运行在 UDP 之上，使用53端口号。</p>
-<blockquote>
-<p>DNS 可以使用 UDP 或者 TCP 进行传输，使用的端口号都为 53。大多数情况下 DNS 使用 UDP 进行传输，这就要求域名解析器和域名服务器都必须自己处理超时和重传从而保证可靠性。在两种情况下会使用 TCP 进行传输：</p>
-<p>如果返回的响应超过的 512 字节（UDP 最大只支持 512 字节的数据）。<br>区域传送（区域传送是主域名服务器向辅助域名服务器传送变化的那部分数据）。</p>
-</blockquote>
-<ol>
-<li>主机向本地域名服务器的查询一般都是采用<strong>递归查询</strong>。        </li>
-</ol>
-<p>所谓递归查询就是：如果主机所询问的本地域名服务器不知道被查询的域名的IP地址，那么本地域名服务器就以DNS客户的身份，向其它根域名服务器继续发出查询请求报文(即替主机继续查询)，而不是让主机自己进行下一步查询。因此，递归查询返回的查询结果或者是所要查询的IP地址，或者是报错，表示无法查询到所需的IP地址。</p>
-<ol start="2">
-<li><p>本地域名服务器向根域名服务器的查询的<strong>迭代查询</strong><br> 迭代查询的特点：当根域名服务器收到本地域名服务器发出的迭代查询请求报文时，要么给出所要查询的IP地址，要么告诉本地服务器：“你下一步应当向哪一个域名服务器进行查询”。然后让本地服务器进行后续的查询。</p>
-<p> 搜索浏览器DNS缓存 –&gt; 操作系统DNS缓存 –&gt; 向本地DNS服务器发起DNS请求</p>
-</li>
-</ol>
-<p>本地DNS服务器 –&gt; 根DNS服务器 –&gt; 根DNS服务器向本地DNS服务器响应：你去找哪个哪个顶级域DNS服务器 –&gt; 顶级域DNS服务器：你去找哪个哪个权威DNS服务器</p>
-<ul>
-<li>除了进行主机名到IP地址的转换之外，DNS还提供了一些重要的服务：</li>
-</ul>
-<ol>
-<li>主机别名 2. 邮件服务器别名 3. 负载分配</li>
-</ol>
-<h1 id="DNS工作机理"><a href="#DNS工作机理" class="headerlink" title="DNS工作机理"></a>DNS工作机理</h1><ul>
-<li>分布式、层次数据库<br>大致来说，有三种类型的 DNS 服务器：<ol>
-<li>根 DNS 服务器</li>
-<li>顶级域(Top-Level Domain, TLD)DNS服务器(com. org. net. edu. fr. ca. jp)</li>
-<li>权威 DNS 服务器。</li>
-</ol>
-</li>
-</ul>
-<p><strong>本地DNS服务器</strong>并不属于该服务器的层级结构，但它对DNS层次结构是至关重要的。每个ISP都有一台本地DNS服务器。</p>
-<ul>
-<li>DNS 缓存<br>在一个请求链中，当某 DNS 服务器接受一个 DNS 回答时，它能将映射换存在本地存储器中。</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1812,7 +1700,7 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">50</span>
+          <span class="site-state-item-count">52</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
