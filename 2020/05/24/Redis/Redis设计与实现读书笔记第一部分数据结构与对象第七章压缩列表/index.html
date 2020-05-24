@@ -20,19 +20,20 @@
     var CONFIG = {"hostname":"wayne-98.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Collections.sort() 原理：归并 图的一些算法，需要复习一下 JVM 调优 参数 设计模式： 单例模式（懒汉饿汉） 工厂方法模式  观察者模式   责任链模式 红黑树 ThreadLocal B 树和 B+树的区别：  B 树，每个节点都存储 key 和 data，所有节点组成这棵树，并且叶子节点指针为 nul，叶子结点不包含任何关键字信息。 B+树，所有的叶子结点中包含了全部关键">
+  <meta name="description" content="压缩列表压缩列表(ziplist)是列表键和哈希键的底层实现之一。当一个列表键(哈希键)只包含少量列表项，并且每个列表项要么就是小数值，要么就是长度比较短的字符串，Redis 就会使用压缩列表来作为底层实现。 压缩列表的构成 zlbytes ：记录整个压缩列表占用的字节数：在对压缩列表进行内存重分配，或者计算 zlend 的位置时使用。 zltail：记录压缩列表表尾节点距离压缩列表的起始地址有多">
 <meta property="og:type" content="article">
-<meta property="og:title" content="需要提升的点">
-<meta property="og:url" content="http://wayne-98.github.io/2020/05/10/%E9%9D%A2%E8%AF%95/%E9%9C%80%E8%A6%81%E6%8F%90%E5%8D%87%E7%9A%84%E7%82%B9/index.html">
+<meta property="og:title" content="Redis设计与实现读书笔记:第一部分:数据结构与对象:第七章:压缩列表">
+<meta property="og:url" content="http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8/index.html">
 <meta property="og:site_name" content="Wayne">
-<meta property="og:description" content="Collections.sort() 原理：归并 图的一些算法，需要复习一下 JVM 调优 参数 设计模式： 单例模式（懒汉饿汉） 工厂方法模式  观察者模式   责任链模式 红黑树 ThreadLocal B 树和 B+树的区别：  B 树，每个节点都存储 key 和 data，所有节点组成这棵树，并且叶子节点指针为 nul，叶子结点不包含任何关键字信息。 B+树，所有的叶子结点中包含了全部关键">
+<meta property="og:description" content="压缩列表压缩列表(ziplist)是列表键和哈希键的底层实现之一。当一个列表键(哈希键)只包含少量列表项，并且每个列表项要么就是小数值，要么就是长度比较短的字符串，Redis 就会使用压缩列表来作为底层实现。 压缩列表的构成 zlbytes ：记录整个压缩列表占用的字节数：在对压缩列表进行内存重分配，或者计算 zlend 的位置时使用。 zltail：记录压缩列表表尾节点距离压缩列表的起始地址有多">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-05-10T13:39:10.600Z">
-<meta property="article:modified_time" content="2020-05-10T14:15:52.022Z">
+<meta property="article:published_time" content="2020-05-24T13:15:37.506Z">
+<meta property="article:modified_time" content="2020-05-24T13:53:55.768Z">
 <meta property="article:author" content="Wayne">
+<meta property="article:tag" content="Redis">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://wayne-98.github.io/2020/05/10/%E9%9D%A2%E8%AF%95/%E9%9C%80%E8%A6%81%E6%8F%90%E5%8D%87%E7%9A%84%E7%82%B9/">
+<link rel="canonical" href="http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8/">
 
 
 <script id="page-configurations">
@@ -45,7 +46,7 @@
   };
 </script>
 
-  <title>需要提升的点 | Wayne</title>
+  <title>Redis设计与实现读书笔记:第一部分:数据结构与对象:第七章:压缩列表 | Wayne</title>
   
 
 
@@ -167,7 +168,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/%E9%9D%A2%E8%AF%95/%E9%9C%80%E8%A6%81%E6%8F%90%E5%8D%87%E7%9A%84%E7%82%B9/">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/808.jpg">
@@ -180,7 +181,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          需要提升的点
+          Redis设计与实现读书笔记:第一部分:数据结构与对象:第七章:压缩列表
         </h1>
 
         <div class="post-meta">
@@ -191,7 +192,16 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:15:52" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+              <time title="创建时间：2020-05-24 21:15:37 / 修改时间：21:53:55" itemprop="dateCreated datePublished" datetime="2020-05-24T21:15:37+08:00">2020-05-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
+                </span>
             </span>
 
           
@@ -205,21 +215,36 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>Collections.sort() 原理：归并</p>
-<p>图的一些算法，需要复习一下</p>
-<p>JVM 调优 参数</p>
-<p>设计模式： 单例模式（懒汉饿汉） 工厂方法模式  观察者模式   责任链模式</p>
-<p>红黑树</p>
-<p>ThreadLocal</p>
-<p><strong>B 树和 B+树的区别</strong>：</p>
-<ul>
-<li>B 树，每个节点都存储 key 和 data，所有节点组成这棵树，并且叶子节点指针为 nul，叶子结点不包含任何关键字信息。</li>
-<li>B+树，所有的叶子结点中包含了全部关键字的信息，及指向含有这些关键字记录的指针，且叶子结点本身依关键字的大小自小而大的顺序链接，所有的非终端结点可以看成是索引部分，结点中仅含有其子树根结点中最大（或最小）关键字。(而 B 树的非终节点也包含需要查找的有效信息)</li>
+        <h2 id="压缩列表"><a href="#压缩列表" class="headerlink" title="压缩列表"></a>压缩列表</h2><p>压缩列表(ziplist)是列表键和哈希键的底层实现之一。当一个列表键(哈希键)只包含少量列表项，并且每个列表项要么就是小数值，要么就是长度比较短的字符串，Redis 就会使用压缩列表来作为底层实现。</p>
+<h2 id="压缩列表的构成"><a href="#压缩列表的构成" class="headerlink" title="压缩列表的构成"></a>压缩列表的构成</h2><ul>
+<li>zlbytes ：记录整个压缩列表占用的字节数：在对压缩列表进行内存重分配，或者计算 zlend 的位置时使用。</li>
+<li>zltail：记录压缩列表表尾节点距离压缩列表的起始地址有多少字节：通过这个偏移量，程序无须遍历整个压缩列表就可以确定表尾节点的地址。</li>
+<li>zllen：记录了压缩列表包含的节点数量。2字节，如果长度超过65535需要遍历一遍。</li>
+<li>entryX：压缩列表包含的各个节点，节点的长度由节点保存的内容决定。</li>
+<li>zlen：特殊值 0xFF ，用于标记压缩列表的末端。</li>
 </ul>
-<p><strong>为什么说 B+比 B 树更适合实际应用中操作系统的文件索引和数据库索引？</strong></p>
+<h2 id="压缩列表节点的构成"><a href="#压缩列表节点的构成" class="headerlink" title="压缩列表节点的构成"></a>压缩列表节点的构成</h2><p>节点可以保存一个字节数组或者一个整数值</p>
 <ul>
-<li>B+的磁盘读写代价更低。B+的内部结点并没有指向关键字具体信息的指针。因此其内部结点相对 B树更小。如果把所有同一内部结点的关键字存放在同一盘块中，那么盘块所能容纳的关键字数量也越多。一次性读入内存中的需要查找的关键字也就越多。相对来说 IO 读写次数也就降低了。</li>
-<li>B+-tree 的查询效率更加稳定<br>由于非终结点并不是最终指向文件内容的结点，而只是叶子结点中关键字的索引。所以任何关键字的查找必须走一条从根结点到叶子结点的路。所有关键字查询的路径长度相同，导致每一个数据的查询效率相当。</li>
+<li>previous_entry_length：保存前一个节点的字节长度<ul>
+<li>如果前一个节点的长度小于 254 字节，previous_entry_length 属性长度为 1 字节，前一个节点的长度就保存在这一个字节里面。</li>
+<li>如果前一个节点的长度大于等于 254 字节，那么 previous_entry_length 属性的长度为 5 字节，第一个字节会被设置为 0xFE ，之后的四个字节保存前一节点的长度。</li>
+<li>通过 previous_entry_length 可以实现压缩列表的反向遍历。</li>
+</ul>
+</li>
+<li>encoding：记录了节点 content 属性所保存数据的类型和长度<ul>
+<li>一字节、两字节或者五字节长，值的最高位为 00， 01 或者 10 的是字节数组编码：这种编码表示节点的 content 属性保存着字节数组，数组的长度由编码除去最高两位之后的其他位记录。</li>
+<li>一字节长，值的最高位以 11 开头的是整数编码：种编码表示节点的 content 属性保存着整数值，整数值的类型和长度由编码除去最高两位之后的其他位记录。</li>
+</ul>
+</li>
+<li>content：负责保存节点的值，节点的值可以是一个字节数组或者整数，值的类型和长度由节点的 encoding 属性决定。</li>
+</ul>
+<h2 id="连锁更新"><a href="#连锁更新" class="headerlink" title="连锁更新"></a>连锁更新</h2><p>因为 previous_entry_length 的长度不确定，在特殊情况下会导致连锁更新。</p>
+<p>连锁更新在最坏的情况下需要对压缩列表执行 N 次空间重分配操作，而每次空间重分配的最坏复杂度为 <em>O(N)</em>, 所以连锁更新的最坏复杂度为 <em>O(N²)</em>. （最坏情况出现几率小）</p>
+<h2 id="重点回顾"><a href="#重点回顾" class="headerlink" title="重点回顾"></a>重点回顾</h2><ul>
+<li>压缩列表是一种为节约内存而开发的顺序型数据结构。</li>
+<li>压缩列表被用作列表键和哈希键的底层实现之一。</li>
+<li>压缩列表可以包含多个节点，每个节点可以保存一个字节数组或者整数值。</li>
+<li>添加新节点到压缩列表，或者从压缩列表中删除节点，可能会引发连锁更新操作，但这种操作出现的几率不高。</li>
 </ul>
 
     </div>
@@ -229,6 +254,9 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+          </div>
 
         
 
@@ -236,13 +264,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/05/10/Scoket/socket%20IO/" rel="prev" title="Socket I/O">
-      <i class="fa fa-chevron-left"></i> Socket I/O
+    <a href="/2020/05/24/%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/1%202%203%20%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/" rel="prev" title="软件过程与管理/1 2 3 软件过程与管理">
+      <i class="fa fa-chevron-left"></i> 软件过程与管理/1 2 3 软件过程与管理
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/05/10/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/5.5%20~%205.12%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" rel="next" title="5.5 ~ 5.12 学习计划">
-      5.5 ~ 5.12 学习计划 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -301,6 +326,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#压缩列表"><span class="nav-number">1.</span> <span class="nav-text">压缩列表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#压缩列表的构成"><span class="nav-number">2.</span> <span class="nav-text">压缩列表的构成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#压缩列表节点的构成"><span class="nav-number">3.</span> <span class="nav-text">压缩列表节点的构成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#连锁更新"><span class="nav-number">4.</span> <span class="nav-text">连锁更新</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重点回顾"><span class="nav-number">5.</span> <span class="nav-text">重点回顾</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

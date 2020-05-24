@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://wayne-98.github.io/"/>
-  <updated>2020-05-24T05:55:43.477Z</updated>
+  <updated>2020-05-24T13:53:55.768Z</updated>
   <id>http://wayne-98.github.io/</id>
   
   <author>
@@ -17,11 +17,59 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Redis设计与实现读书笔记:第一部分:数据结构与对象:第七章:压缩列表</title>
+    <link href="http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8/"/>
+    <id>http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8/</id>
+    <published>2020-05-24T13:15:37.506Z</published>
+    <updated>2020-05-24T13:53:55.768Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;压缩列表&quot;&gt;&lt;a href=&quot;#压缩列表&quot; class=&quot;headerlink&quot; title=&quot;压缩列表&quot;&gt;&lt;/a&gt;压缩列表&lt;/h2&gt;&lt;p&gt;压缩列表(ziplist)是列表键和哈希键的底层实现之一。当一个列表键(哈希键)只包含少量列表项，并且每个列表项要么就是小数
+      
+    
+    </summary>
+    
+    
+      <category term="Redis设计与实现读书笔记" scheme="http://wayne-98.github.io/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="Redis" scheme="http://wayne-98.github.io/tags/Redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>软件过程与管理/1 2 3 软件过程与管理</title>
+    <link href="http://wayne-98.github.io/2020/05/24/%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/1%202%203%20%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/"/>
+    <id>http://wayne-98.github.io/2020/05/24/%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/1%202%203%20%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/</id>
+    <published>2020-05-24T11:46:38.245Z</published>
+    <updated>2020-05-24T11:46:38.410Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;软件工程的三要素：过程、方法、工具&lt;/p&gt;
+&lt;p&gt;软件过程将技术和管理结合起来，使得软件能够被合理地、及时地开发出来。&lt;/p&gt;
+&lt;p&gt;通用框架活动：沟通、策划、建模、构建、部署&lt;/p&gt;
+&lt;p&gt;构建活动的过程模式属&lt;strong&gt;步骤模式&lt;/strong&gt;类型&lt;/p&gt;
+&lt;p&gt;
+      
+    
+    </summary>
+    
+    
+    
+  </entry>
+  
+  <entry>
     <title>Redis设计与实现读书笔记:第一部分:数据结构与对象:第六章:整数集合</title>
     <link href="http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E5%85%AD%E7%AB%A0%E6%95%B4%E6%95%B0%E9%9B%86%E5%90%88/"/>
     <id>http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E5%85%AD%E7%AB%A0%E6%95%B4%E6%95%B0%E9%9B%86%E5%90%88/</id>
     <published>2020-05-24T04:52:42.592Z</published>
-    <updated>2020-05-24T05:55:43.477Z</updated>
+    <updated>2020-05-24T13:15:32.713Z</updated>
     
     <summary type="html">
     
@@ -314,7 +362,7 @@
     <link href="http://wayne-98.github.io/2020/05/12/Internet/%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%EF%BC%9A%E7%BD%91%E7%BB%9C%E5%B1%82-%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/"/>
     <id>http://wayne-98.github.io/2020/05/12/Internet/%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%EF%BC%9A%E7%BD%91%E7%BB%9C%E5%B1%82-%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/</id>
     <published>2020-05-12T00:56:53.938Z</published>
-    <updated>2020-05-21T02:27:19.436Z</updated>
+    <updated>2020-05-24T11:54:13.484Z</updated>
     
     <summary type="html">
     
@@ -448,54 +496,6 @@
       
       
         &lt;h1 id=&quot;前端编译与优化&quot;&gt;&lt;a href=&quot;#前端编译与优化&quot; class=&quot;headerlink&quot; title=&quot;前端编译与优化&quot;&gt;&lt;/a&gt;前端编译与优化&lt;/h1&gt;&lt;p&gt;Java中即时编译器在运行期的优化过程对于程序运行来说更重要，而前端编译器在编译期的优化过程对于程序
-      
-    
-    </summary>
-    
-    
-      <category term="JVM读书笔记" scheme="http://wayne-98.github.io/categories/JVM%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
-    
-    
-      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>深入理解Java虚拟机读书笔记第二部分：走进内存管理</title>
-    <link href="http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%EF%BC%9A%E8%B5%B0%E8%BF%9B%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/"/>
-    <id>http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%EF%BC%9A%E8%B5%B0%E8%BF%9B%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</id>
-    <published>2020-05-10T13:39:10.556Z</published>
-    <updated>2020-05-21T02:25:58.065Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;Java内存区域与内存溢出异常&quot;&gt;&lt;a href=&quot;#Java内存区域与内存溢出异常&quot; class=&quot;headerlink&quot; title=&quot;Java内存区域与内存溢出异常&quot;&gt;&lt;/a&gt;Java内存区域与内存溢出异常&lt;/h1&gt;&lt;h2 id=&quot;运行时数据区域&quot;&gt;&lt;a h
-      
-    
-    </summary>
-    
-    
-      <category term="JVM读书笔记" scheme="http://wayne-98.github.io/categories/JVM%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
-    
-    
-      <category term="Java" scheme="http://wayne-98.github.io/tags/Java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>深入理解Java虚拟机读书笔记第三部分：虚拟机执行子系统</title>
-    <link href="http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%B8%89%E9%83%A8%E5%88%86%EF%BC%9A%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%A7%E8%A1%8C%E5%AD%90%E7%B3%BB%E7%BB%9F/"/>
-    <id>http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%B8%89%E9%83%A8%E5%88%86%EF%BC%9A%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%A7%E8%A1%8C%E5%AD%90%E7%B3%BB%E7%BB%9F/</id>
-    <published>2020-05-10T13:39:10.549Z</published>
-    <updated>2020-05-21T02:26:10.327Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;类文件结构&quot;&gt;&lt;a href=&quot;#类文件结构&quot; class=&quot;headerlink&quot; title=&quot;类文件结构&quot;&gt;&lt;/a&gt;类文件结构&lt;/h1&gt;&lt;h2 id=&quot;无关系的基石&quot;&gt;&lt;a href=&quot;#无关系的基石&quot; class=&quot;headerlink&quot; title=&quot;无
       
     
     </summary>

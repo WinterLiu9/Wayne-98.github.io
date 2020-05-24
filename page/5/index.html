@@ -164,6 +164,195 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Database/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%AE%BA/%E5%85%B3%E7%B3%BB%E6%95%B0%E6%8D%AE%E7%90%86%E8%AE%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Database/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%AE%BA/%E5%85%B3%E7%B3%BB%E6%95%B0%E6%8D%AE%E7%90%86%E8%AE%BA/" class="post-title-link" itemprop="url">关系数据理论</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:02:00" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%AE%BA/" itemprop="url" rel="index"><span itemprop="name">数据库系统概论</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="不规范的模式存在的问题"><a href="#不规范的模式存在的问题" class="headerlink" title="不规范的模式存在的问题"></a>不规范的模式存在的问题</h1><ol>
+<li>数据冗余</li>
+<li>更新异常</li>
+<li>插入异常</li>
+<li>删除异常</li>
+</ol>
+<h1 id="规范化"><a href="#规范化" class="headerlink" title="规范化"></a>规范化</h1><h2 id="函数依赖"><a href="#函数依赖" class="headerlink" title="函数依赖"></a>函数依赖</h2><p>定义：设 R(U) 是属性集 U 上的关系模式，X, Y 是 U 的子集。若对于 R(U) 的任意一个可能的关系r, r中不可能存在两个元组在 X 上的属性值相等，而在 Y 上的属性值不相等，则称 <strong>X 函数决定于 Y 或 Y 函数依赖于 X</strong>, 记作 X –&gt; Y</p>
+<p>X 函数决定于 Y, 但 Y ∉ X，则称 X 函数决定于 Y 是非平凡的函数依赖。</p>
+<p>X 函数决定于 Y, 但 Y ∈ X，则称X 函数决定于 Y 是平凡的函数依赖。(必然成立)</p>
+<p>在 R(U) 中，如果 X 函数决定于 Y, 并且对于 X 的任意一个真子集 X’, 都有 X‘ 不能函数决定于 Y, 则称 Y 对 X <strong>完全函数依赖</strong>。</p>
+<p>在 R(U)中，如果 X 函数决定于 Y (Y ∉ X)，Y 不函数决定于 X，Y 函数决定于 Z，Z ∉ Y 则称 Z 对 X 传递函数依赖。 </p>
+<h2 id="范式"><a href="#范式" class="headerlink" title="范式"></a>范式</h2><p>第一范式：二维表中每一个分量必须是不可分的数据项。</p>
+<hr>
+<p><strong>第二范式</strong>：若 R ∈ 1 NF, 并且每一个非主属性完全函数依赖于任何一个候选键。</p>
+<p>例如 S-L-C(<u>Sno</u>, Sdept, Sloc, <u>Cno</u>, Grade)</p>
+<p>函数依赖有</p>
+<p>(Sno, Cno) –&gt; Grande 完全函数依赖</p>
+<p>Sno –&gt; Sdept</p>
+<p>Sno –&gt; Sloc</p>
+<p>Sdept –&gt; Sloc</p>
+<p>(Sno, Cno) –&gt; Sdept 部分函数依赖</p>
+<p>(Sno, Cno) –&gt; Sloc 部分函数依赖</p>
+<p>则 S-L-C 不属于第二范式，因为非主属性 Sdept, Sloc 并不完全函数依赖于键。</p>
+<p>因此可能产生的问题：</p>
+<ol>
+<li><p>插入异常：如果此学生还未选课，则不能插入。因为键值一部分为空。</p>
+</li>
+<li><p>删除异常：如果一个学生只选了一门课，则他退课的时候，所有关于该生的信息都删除了。</p>
+</li>
+<li><p>修改复杂：如果一个学生转系了，则需要更新所有的 Sdept, Sloc。</p>
+</li>
+</ol>
+<p>进行模式分解：SC(<u>Sno, Cno</u>, Grade) 和 SL(<u>Sno</u>, Sdept, Sloc)</p>
+<hr>
+<p><strong>第三范式</strong>：若 R 属于第三范式，则每一个非主属性既不传递依赖于键，也不部分依赖于键。</p>
+<p>例如 SL(<u>Sno</u>, Sdept, Sloc), 其中 Sloc 传递依赖于 Sno，因此SL不属于第三范式。</p>
+<p>继续模式分解：SD(Sno, Sdept) 和 DL(Sdept, Sloc)</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Database/SQL/sql%20%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Database/SQL/sql%20%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">SQL 语句</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:00:39" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SQL/" itemprop="url" rel="index"><span itemprop="name">SQL</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 获取 Employee 表中第 n 高的薪水（Salary）</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">FUNCTION</span> getNthHighestSalary(N <span class="built_in">INT</span>) <span class="keyword">RETURNS</span> <span class="built_in">INT</span></span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">    <span class="keyword">set</span> n = N - <span class="number">1</span>;</span><br><span class="line">  RETURN (</span><br><span class="line">      <span class="comment"># Write your MySQL query statement below.</span></span><br><span class="line">            <span class="keyword">select</span> <span class="keyword">ifnull</span>( <span class="comment"># 如果第一个值为 null，则返回第二个值</span></span><br><span class="line">            (</span><br><span class="line">              <span class="keyword">select</span> <span class="keyword">distinct</span> salary </span><br><span class="line">              <span class="keyword">from</span> employee </span><br><span class="line">              <span class="keyword">order</span> <span class="keyword">by</span> salary <span class="keyword">desc</span></span><br><span class="line">               <span class="keyword">limit</span> n, <span class="number">1</span> <span class="comment"># 从第 n 行开始，返回一行数据</span></span><br><span class="line">            ), <span class="literal">null</span>)</span><br><span class="line">  );</span><br><span class="line"><span class="keyword">END</span></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> Score, </span><br><span class="line">       <span class="keyword">dense_rank</span>() <span class="keyword">over</span>(<span class="keyword">order</span> <span class="keyword">by</span> score <span class="keyword">desc</span>) <span class="keyword">as</span> <span class="string">'Rank'</span></span><br><span class="line"><span class="keyword">from</span> Scores;</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> Email</span><br><span class="line"><span class="keyword">from</span> person</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> Email</span><br><span class="line"><span class="keyword">having</span> <span class="keyword">count</span>(Email) &gt; <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="string">'Name'</span> <span class="keyword">as</span> Customers</span><br><span class="line"><span class="keyword">from</span> Customers a <span class="keyword">left</span> <span class="keyword">join</span> Orders b <span class="keyword">on</span> a.id = b.CustomerId <span class="keyword">where</span> b.id <span class="keyword">is</span> <span class="literal">null</span>;</span><br><span class="line"><span class="comment"># 要判断一个数是否等于NULL只能用 IS NULL 或者 IS NOT NULL 来判断</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> <span class="keyword">Name</span> <span class="keyword">as</span> Customers</span><br><span class="line"><span class="keyword">from</span> Customers</span><br><span class="line"><span class="keyword">where</span> <span class="keyword">id</span> <span class="keyword">not</span> <span class="keyword">in</span> (</span><br><span class="line">    <span class="keyword">select</span> <span class="keyword">distinct</span> CustomerId </span><br><span class="line">    <span class="keyword">from</span> orders</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span> p1</span><br><span class="line"><span class="keyword">from</span> (person p1 <span class="keyword">left</span> <span class="keyword">join</span> person p2 <span class="keyword">on</span> p1.email = p2.email )</span><br><span class="line"><span class="keyword">where</span> p1.id &gt; p2.id;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Database/MySQL/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E7%AC%AC%E5%8D%81%E7%AB%A0%EF%BC%9A%E5%A4%8D%E5%88%B6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1917,161 +2106,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Algorithms/April/%E5%AD%90%E4%B8%B0%E5%93%A5%E5%88%B7%E9%A2%98%E7%BB%8F%E9%AA%8C/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Algorithms/April/%E5%AD%90%E4%B8%B0%E5%93%A5%E5%88%B7%E9%A2%98%E7%BB%8F%E9%AA%8C/" class="post-title-link" itemprop="url">子丰哥刷题经验</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：21:50:32" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Algorithms/" itemprop="url" rel="index"><span itemprop="name">Algorithms</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>可以多反问自己<br>就是为什么没做出来之类的问题</p>
-<ul>
-<li>是思路困难</li>
-<li>还是实现困难<br>如果是思路困难就想 是因为不知道什么 才导致自己没想出来<br>或者去练这个tag<br>如果是实现困难<br>那说明练的还不够多..</li>
-</ul>
-<ul>
-<li>多总结</li>
-<li>前期做题保质量</li>
-<li>不太贪图数量 数量没啥用的</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Algorithms/April/KMP%20Algorithm/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Algorithms/April/KMP%20Algorithm/" class="post-title-link" itemprop="url">KMP Algorithm</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：21:53:20" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Algorithms/" itemprop="url" rel="index"><span itemprop="name">Algorithms</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>字符串的前缀：除最后一个字符以外，字符串的所有头部子串。</p>
-<p>字符串的后缀：除第一个字符以外，字符串的所有尾部子串。</p>
-<p>部分匹配值：字符串的前缀和后缀的最长相等前后缀长度。</p>
-<ul>
-<li>‘a’ 的前缀和后缀都为空集，最长相等前后缀长度为0</li>
-<li>‘aba’ 的前缀为 {a, ab}, 后缀为{a, ba}, 最长相等前后缀长度为1</li>
-</ul>
-<p>移动位数 = 已匹配的字符数 - 对应的部分匹配值</p>
-<p>如下图所示，当 c 与 b 不匹配时，已匹配 ‘abca’ 的前缀 a 和后缀 a 为最长的公共元素。已知前缀 a 与 b、c 均不同，与后缀 a 相同，故无须比较，直接将子串移动“已匹配的字符数 - 对应的部分匹配值”，用子串前缀后面的元素与主串匹配失败的元素开始比较即可。</p>
-<p><img src="https://github.com/Wayne-98/image/blob/master/Algorithms/KMP%20next.png?raw=true" alt=""></p>
-<p>next数组的求解方法</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -2143,7 +2177,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-count">54</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

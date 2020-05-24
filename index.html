@@ -164,6 +164,189 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8/" class="post-title-link" itemprop="url">Redis设计与实现读书笔记:第一部分:数据结构与对象:第七章:压缩列表</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-24 21:15:37 / 修改时间：21:53:55" itemprop="dateCreated datePublished" datetime="2020-05-24T21:15:37+08:00">2020-05-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="压缩列表"><a href="#压缩列表" class="headerlink" title="压缩列表"></a>压缩列表</h2><p>压缩列表(ziplist)是列表键和哈希键的底层实现之一。当一个列表键(哈希键)只包含少量列表项，并且每个列表项要么就是小数值，要么就是长度比较短的字符串，Redis 就会使用压缩列表来作为底层实现。</p>
+<h2 id="压缩列表的构成"><a href="#压缩列表的构成" class="headerlink" title="压缩列表的构成"></a>压缩列表的构成</h2><ul>
+<li>zlbytes ：记录整个压缩列表占用的字节数：在对压缩列表进行内存重分配，或者计算 zlend 的位置时使用。</li>
+<li>zltail：记录压缩列表表尾节点距离压缩列表的起始地址有多少字节：通过这个偏移量，程序无须遍历整个压缩列表就可以确定表尾节点的地址。</li>
+<li>zllen：记录了压缩列表包含的节点数量。2字节，如果长度超过65535需要遍历一遍。</li>
+<li>entryX：压缩列表包含的各个节点，节点的长度由节点保存的内容决定。</li>
+<li>zlen：特殊值 0xFF ，用于标记压缩列表的末端。</li>
+</ul>
+<h2 id="压缩列表节点的构成"><a href="#压缩列表节点的构成" class="headerlink" title="压缩列表节点的构成"></a>压缩列表节点的构成</h2><p>节点可以保存一个字节数组或者一个整数值</p>
+<ul>
+<li>previous_entry_length：保存前一个节点的字节长度<ul>
+<li>如果前一个节点的长度小于 254 字节，previous_entry_length 属性长度为 1 字节，前一个节点的长度就保存在这一个字节里面。</li>
+<li>如果前一个节点的长度大于等于 254 字节，那么 previous_entry_length 属性的长度为 5 字节，第一个字节会被设置为 0xFE ，之后的四个字节保存前一节点的长度。</li>
+<li>通过 previous_entry_length 可以实现压缩列表的反向遍历。</li>
+</ul>
+</li>
+<li>encoding：记录了节点 content 属性所保存数据的类型和长度<ul>
+<li>一字节、两字节或者五字节长，值的最高位为 00， 01 或者 10 的是字节数组编码：这种编码表示节点的 content 属性保存着字节数组，数组的长度由编码除去最高两位之后的其他位记录。</li>
+<li>一字节长，值的最高位以 11 开头的是整数编码：种编码表示节点的 content 属性保存着整数值，整数值的类型和长度由编码除去最高两位之后的其他位记录。</li>
+</ul>
+</li>
+<li>content：负责保存节点的值，节点的值可以是一个字节数组或者整数，值的类型和长度由节点的 encoding 属性决定。</li>
+</ul>
+<h2 id="连锁更新"><a href="#连锁更新" class="headerlink" title="连锁更新"></a>连锁更新</h2><p>因为 previous_entry_length 的长度不确定，在特殊情况下会导致连锁更新。</p>
+<p>连锁更新在最坏的情况下需要对压缩列表执行 N 次空间重分配操作，而每次空间重分配的最坏复杂度为 <em>O(N)</em>, 所以连锁更新的最坏复杂度为 <em>O(N²)</em>. （最坏情况出现几率小）</p>
+<h2 id="重点回顾"><a href="#重点回顾" class="headerlink" title="重点回顾"></a>重点回顾</h2><ul>
+<li>压缩列表是一种为节约内存而开发的顺序型数据结构。</li>
+<li>压缩列表被用作列表键和哈希键的底层实现之一。</li>
+<li>压缩列表可以包含多个节点，每个节点可以保存一个字节数组或者整数值。</li>
+<li>添加新节点到压缩列表，或者从压缩列表中删除节点，可能会引发连锁更新操作，但这种操作出现的几率不高。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/24/%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/1%202%203%20%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/24/%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/1%202%203%20%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/" class="post-title-link" itemprop="url">软件过程与管理/1 2 3 软件过程与管理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-24 19:46:38" itemprop="dateCreated datePublished" datetime="2020-05-24T19:46:38+08:00">2020-05-24</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>软件工程的三要素：过程、方法、工具</p>
+<p>软件过程将技术和管理结合起来，使得软件能够被合理地、及时地开发出来。</p>
+<p>通用框架活动：沟通、策划、建模、构建、部署</p>
+<p>构建活动的过程模式属<strong>步骤模式</strong>类型</p>
+<p><strong>惯例过程模型</strong>是包括活动、动作、任务、里程碑和工作产品的明确的集合，旨在开发高质量的软件。</p>
+<p>惯例过程模型的<strong>优点</strong>：为活动提供稳定、控制和有组织性，以有序和项目的一致性为首要目标。为软件工程工作增加了大量有用的结构化设计，为项目团队提供了有效的路线图。</p>
+<p>惯例过程模型的<strong>不足</strong>：使用过程中需要调整才能适应不同项目需要。缺乏灵活性、应对变更能力不强。</p>
+<p><strong>瀑布模型</strong>从沟通开始，通过策划、建模、构建和部署的过程，最终提供完整的软件并提供持续的技术支持,又称为经典生命周期模型。</p>
+<p>瀑布模型的<strong>特点</strong>：阶段间具有 顺序性和 依赖性；推迟程序的物理 实现；质量保证：− 每个阶段必须完成规定的文档− 每个阶段结束前完成<strong>文档</strong>审查；瀑布模型是一种严格线性的、按阶段顺序的、逐步细化的过程模型。</p>
+<p>瀑布模型的<strong>优点</strong>：有利于人员的组织与管理；有利于软件开发方法和工具的研究；可以提高大型软件项目开发的质量和效率</p>
+<p>瀑布模型的<strong>缺点</strong>：不适应需求经常发生变更的环境，难以解决需求不明确的问题；用户在过程终端才能看到产品，反馈时间长，风险大；易于陷入“阻塞状态”；；强调一次性交付完整系统，导致开发周期长；缺乏灵活性，可操作性差</p>
+<p>瀑布模型的<strong>适用范围</strong>：需求明确、全面，开发过程中没有或很少变更的项目；开发人员熟悉项目产品的目标、环境、应用领域的低风险项目；开发过程很少或不需要用户参与的项目；用户使用环境稳定且能够容忍长开发周期的项目</p>
+<p><strong>增量过程模型</strong>是一种以增量的形式生产软件产品的过程模型，适用于以下场景：初始的软件需求有明确的定义，但是，受时间或资源的限制，受时间或资源的限制，不宜单纯运用线性模型；迫切需要 迅速提供一套功能有限的产品，允许在后续版本中细化和扩充。</p>
+<p><strong>增量模型</strong>以迭代的方式运用瀑布模型。每一个增量都提交一个可以操作的产品。</p>
+<p>增量模型的<strong>特点</strong>：融合 瀑布模型的基本成分和 迭代的特征；以功能递增的方式进行软件开发；能较快地产生可操作的系统；在每一步递增中，均发布一个可操作的 增量版本，把用户/开发者的经验结合到不断求精的产品中。</p>
+<p>增量模型<strong>优点</strong>：人员分配灵活，刚开始不用投入大量人力资源；规避技术风险；在短时间内提交核心产品，对用户起到镇静剂的作用，具有一定市场</p>
+<p>增量模型<strong>缺点</strong>：并行开发构建，有可能遇到不能集成的风险，对软件体系结构要求高；容易退化为“边做边改”模型，导致对软件过程的控制失去整体性。</p>
+<p>增量模型的<strong>适用范围</strong>：已有产品升级项目或新版本的开发项目；需求明确并对使用开始时间有严格要求的项目</p>
+<p><strong>演化过程模型</strong>利用迭代的思想方法，使软件工程师 渐进地开发逐步完善的软件版本。演化过程模型主要适用于在项目开发初期项目需求不明确，把握不充分的项目。</p>
+<p><strong>原型模型针</strong>对需求不明确的情况通过迅速构建可以运行的软件原型 ，以便理解和澄清问题，使开发人员与用户达成共识，最终在确定的需求基础上开发出满意的产品。原型模型是用户驱动的。</p>
+<p>原型的分类：<strong>探索型原型</strong>：用于 需求分析阶段，目的是要澄清用户的需求，确定所期望的特性，并探索各<br>种方案的可行性。<strong>实验型原型</strong>：用于 设计阶段，考核实现方案是否合适。<strong>演化型原型</strong>：用于及早向用户提交一个原型系统，在得到用户的认可后不断扩充演变为最终的产品。</p>
+<p>原型的使用策略：<strong>抛弃策略</strong>：原型仅用于开发过程的某个阶段，该阶段结束后，原型随之作废。<strong>附加策略</strong>：原型用于开发的全过程，由最基本的核心开始，逐步增加新的功能和新的需求，最后发展为用户满意的最终系统。</p>
+<p>原型模型的<strong>优点</strong>：克服 瀑布模型的缺点，减少由于软件需求不明确带来的开发风险。<br>原型模型的<strong>缺点</strong>：容易引起用户误解。对用户参与程度要求高。缺少项目标准，用户可能不断提出新要求，原型<br>迭代的周期很难控制。额外的花费：研究结果表明构造一个原型可能需要10%额外花费。为了尽快实现原型，采用了 不合适的技术，运行效率可能会受影响。</p>
+<p>原型模型的<strong>适用范围</strong>：适合于那些不能确切定义需求的中小型项目；用户未能详细定义输入、处理、输出；开发人员对算法效率、OS、人机交互的形式不确定。</p>
+<p><strong>螺旋模型</strong>，综合了原型模型的迭代特征原型模型的迭代特征和 瀑布模型的系统性和可控制性的特点， 增加风险分析，是以风险为导向的生命期模型。采用循环方式逐步加深系统定义和实现的深度，同时降低风险。确定一系列里程碑，确保项目干系人都支持可行的和令人满意的解决方案。</p>
+<p>螺旋模型<strong>特点</strong>：把软件开发过程组成为一个 逐步细化的螺旋周期序列，每经历一个周期，系统就得到进一步的细化和完善；紧密围绕开发中的风险问题，用 风险分析推动软件设计向深一层扩展、求精；强调 持续地判断、确定和修改用户任务目标，并按成本效益来分析候选的软件产品性质对任务目标的贡献；可结合采用 多种软件开发方法，但究竟结合哪一种方法仍由风险分析来决定。</p>
+<p>螺旋模型的<strong>优势</strong>：设计上具有灵活性，可以在产品的各个阶段进行变更；以小的分段来构建大型系统，易于成本计算；客户参与各阶段的开发，保证项目不偏离正确方向和项目的可控性；引入风险分析，随着迭代的增加风险程度随之降低。</p>
+<p>螺旋模型的<strong>不足</strong>：对风险评估技术和经验有较高要求，评估不当会造成重大损失；过多的迭代次数会延长交付时间，增加开发成本螺旋模型只适合于那些不能确切定义需求的大型软件项目的开发</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E5%85%AD%E7%AB%A0%E6%95%B4%E6%95%B0%E9%9B%86%E5%90%88/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -189,7 +372,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-05-24 12:52:42 / 修改时间：13:55:43" itemprop="dateCreated datePublished" datetime="2020-05-24T12:52:42+08:00">2020-05-24</time>
+              <time title="创建时间：2020-05-24 12:52:42 / 修改时间：21:15:32" itemprop="dateCreated datePublished" datetime="2020-05-24T12:52:42+08:00">2020-05-24</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -215,6 +398,26 @@
           <h1 id="整数集合"><a href="#整数集合" class="headerlink" title="整数集合"></a>整数集合</h1><p>整数集合( intset )是集合键的底层实现之一，当一个集合中只包含整数值元素，并且这个集合的元素数量不多时，Redis就会只用整数集合来作为集合键的底层实现。</p>
 <h2 id="整数集合的实现"><a href="#整数集合的实现" class="headerlink" title="整数集合的实现"></a>整数集合的实现</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">intset</span>&#123;</span></span><br><span class="line">    <span class="comment">// 编码方式</span></span><br><span class="line">    <span class="keyword">uint_32_t</span> enconding;</span><br><span class="line">    <span class="comment">// 集合包含的元素数量</span></span><br><span class="line">    <span class="keyword">uint_32_t</span> length;</span><br><span class="line">    <span class="comment">// 保存元素的数组</span></span><br><span class="line">    <span class="keyword">int8_t</span> contents[];</span><br><span class="line">&#125; intset;</span><br></pre></td></tr></table></figure>
 
+
+
+<h2 id="升级"><a href="#升级" class="headerlink" title="升级"></a>升级</h2><p>添加到整数集合中的新元素（<em>O(N)</em>）的类型比整数集合现有所有的元素的类型都要长时，整数集合就需要先进行升级。</p>
+<p>升级的步骤：</p>
+<ol>
+<li>根据新元素的类型，扩展整数集合底层数组的空间大小，并为新元素分配空间。</li>
+<li>将底层数组现有的所有元素转换成与新元素相同的数据类型，并将类型转换后的元素放置到正确的位置上，放置的过程中，维持底层数组的有序性质不变。</li>
+<li>将新元素添加到底层数组里面。</li>
+</ol>
+<h2 id="升级的好处"><a href="#升级的好处" class="headerlink" title="升级的好处"></a>升级的好处</h2><ul>
+<li>提升灵活性</li>
+<li>节约内存：相对于直接用 int64_t 类型的数组作为整数集合的底层实现。</li>
+</ul>
+<h2 id="降级"><a href="#降级" class="headerlink" title="降级"></a>降级</h2><p>不支持降级</p>
+<h2 id="重点回顾"><a href="#重点回顾" class="headerlink" title="重点回顾"></a>重点回顾</h2><ul>
+<li>整数集合是集合键的底层实现之一。</li>
+<li>整数集合的底层实现为数组，这个数组以有序、无重复的方式保存集合元素，有需要时候，程序会根据新添加元素的类型，改变这个数组的类型。</li>
+<li>升级操作为整数数组集合带来了操作上的灵活性，并且尽可能的节约了内存。</li>
+<li>整数集合只支持升级操作，不支持降级操作。</li>
+</ul>
 
       
     </div>
@@ -1069,173 +1272,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/13/life/amanda%E5%87%8F%E8%84%82%E9%A4%90/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/13/life/amanda%E5%87%8F%E8%84%82%E9%A4%90/" class="post-title-link" itemprop="url">amanda减脂餐</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-13 22:35:14" itemprop="dateCreated datePublished" datetime="2020-05-13T22:35:14+08:00">2020-05-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-17 19:03:19" itemprop="dateModified" datetime="2020-05-17T19:03:19+08:00">2020-05-17</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/life/" itemprop="url" rel="index"><span itemprop="name">life</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="amanda-减脂便当"><a href="#amanda-减脂便当" class="headerlink" title="amanda 减脂便当"></a><a href="https://www.bilibili.com/video/BV1EV411C7hu" target="_blank" rel="noopener">amanda 减脂便当</a></h1><p>火腿口蘑毛豆糙米饭（两餐量）：糙米、口蘑、火腿、姜末煮饭，结束十分钟前加毛豆仁。</p>
-<p>虾仁奶汁炖菜（两餐量）：1、虾仁汆水捞出；2、黄油、橄榄油，下面粉炒到发黄，加脱脂牛奶，煮成奶酱。3、橄榄油、蒜蓉、大葱、胡萝卜、口蘑。加水炖煮，加魔芋结、山药，下奶酱，下虾仁、毛豆仁、加盐、黑胡椒。（4、加车打芝士。） </p>
-<p>剁椒蒸银鳕鱼（一餐量）：1、银鳕鱼加盐、米酒腌制。2、放在大葱上，抹上姜末铺剁椒。香油，蒸熟。</p>
-<p>茭白毛豆炒鸡丁（两餐量）：1、鸡胸肉切丁、加盐、白胡椒、米酒、蒜末、姜末、玉米淀粉；2、水沸后关火，下鸡胸肉丁。变色后捞出。3、炒蒜蓉、茭白、毛豆仁、魔芋块。生抽、耗油、糖，鸡胸肉回锅。</p>
-<p>盐水鸭腿（两餐量）：1、鸭腿、盐、八角、香叶、花椒、小茴香腌制；2、鸭腿下锅煮熟，加葱段、姜片。凉了以后去皮切块。</p>
-<p>茄汁牛肉酱（两餐量）：1、牛肉末炒黄捞出；2、大葱末、蒜蓉、口蘑、胡萝卜、西芹炒香、加番茄、番茄酱、魔芋块。牛肉末回锅加水炖。3、加盐、黑胡椒、脱脂牛奶。</p>
-<p>豆腐肉丸（一餐量）：1、猪肉馅、耗油、生抽、老抽、米酒、香油、白胡椒、姜末、盐、水淀粉腌制；2、猪肉末加老豆腐，做成肉丸子，蒸熟或烤熟。</p>
-<p>紫苏辣椒酱汁：生抽、清水、木鱼花、柠檬汁、紫苏叶、糖、煮熟后放入过滤放小米椒。</p>
-<p>南瓜、山药、土豆、芋头带皮蒸熟后去皮。</p>
-<p>魔芋块切小块，大葱、口蘑、胡萝卜、部分切片部分切细丁，番茄切碎、西芹切丁、茭白切小块。</p>
-<p>周一：火腿口蘑毛豆糙米饭、虾仁奶汁炖菜、剁椒蒸银鳕鱼。水煮菠菜加芝麻酱<br>周二：蒸南瓜、蒸芋头。茭白毛豆炒鸡丁、盐水鸭腿。水煮西蓝花加辣椒酱汁<br>周三：火腿口蘑毛豆糙米饭、茄汁牛肉酱、豆腐肉丸。水煮芥蓝加紫苏辣椒酱汁。<br>周四：芋头土豆泥、虾仁奶汁炖菜、盐水鸭腿。水煮菠菜、豆芽，加芝麻酱<br>周五：山药土豆泥、茄汁牛肉酱、茭白炒鸡丁，水煮秋葵加辣椒酱汁。  </p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/13/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/5.13%20~%205.18%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/13/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/5.13%20~%205.18%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" class="post-title-link" itemprop="url">5.13 ~ 5.18 学习计划</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-13 21:16:55 / 修改时间：21:25:43" itemprop="dateCreated datePublished" datetime="2020-05-13T21:16:55+08:00">2020-05-13</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">学习记录</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="5-13-5-18-学习计划"><a href="#5-13-5-18-学习计划" class="headerlink" title="5.13 ~ 5.18 学习计划"></a>5.13 ~ 5.18 学习计划</h2><ul>
-<li>每天写 LeetCode，复习 200 英语单词</li>
-<li>牛客网项目跟着做</li>
-<li>Head First Design Pattern</li>
-<li>CSAPP 学习</li>
-<li>Redis</li>
-<li>Zookeeper</li>
-<li>高性能MySQL 再看一遍 5 6 章节</li>
-<li>美团文章读一篇</li>
-<li>计算机网络 SDN 数据链路层 多播 任播</li>
-</ul>
-<h2 id="上周回顾"><a href="#上周回顾" class="headerlink" title="上周回顾"></a>上周回顾</h2><ul>
-<li>上周的学习状态一般般，有效学习时间不多。</li>
-<li>现在是基础学的不深入，并且没有实战经验</li>
-<li>英语的学习不能落下，重视一下</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1307,7 +1343,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-count">54</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
