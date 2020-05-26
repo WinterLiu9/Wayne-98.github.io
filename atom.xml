@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://wayne-98.github.io/"/>
-  <updated>2020-05-24T13:53:55.768Z</updated>
+  <updated>2020-05-26T03:52:03.868Z</updated>
   <id>http://wayne-98.github.io/</id>
   
   <author>
@@ -17,11 +17,61 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Redis设计与实现读书笔记:第二部分:单机数据的实现:第九章:数据库</title>
+    <link href="http://wayne-98.github.io/2020/05/26/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%AC%AC%E4%B9%9D%E7%AB%A0%E5%AF%B9%E8%B1%A1/"/>
+    <id>http://wayne-98.github.io/2020/05/26/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%AC%AC%E4%B9%9D%E7%AB%A0%E5%AF%B9%E8%B1%A1/</id>
+    <published>2020-05-26T02:44:43.057Z</published>
+    <updated>2020-05-26T03:52:03.868Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;服务器中的数据库&quot;&gt;&lt;a href=&quot;#服务器中的数据库&quot; class=&quot;headerlink&quot; title=&quot;服务器中的数据库&quot;&gt;&lt;/a&gt;服务器中的数据库&lt;/h1&gt;&lt;figure class=&quot;highlight c&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=
+      
+    
+    </summary>
+    
+    
+      <category term="Redis设计与实现读书笔记" scheme="http://wayne-98.github.io/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="Redis" scheme="http://wayne-98.github.io/tags/Redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis设计与实现读书笔记:第一部分:数据结构与对象:第八章:对象</title>
+    <link href="http://wayne-98.github.io/2020/05/25/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E5%85%AB%E7%AB%A0%E5%AF%B9%E8%B1%A1/"/>
+    <id>http://wayne-98.github.io/2020/05/25/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E5%85%AB%E7%AB%A0%E5%AF%B9%E8%B1%A1/</id>
+    <published>2020-05-25T01:33:18.748Z</published>
+    <updated>2020-05-26T02:57:36.815Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Redis 没有直接使用数据结构来实现键值对数据库，而是基于这些数据结构创建了一个对象系统。这个系统包含了字符串对象、列表对象、哈希对象、集合对象和有序集合对象这五种。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Redis 可以在执行命令之前，根据对象的类型来判断一个对象是否可以执行给定的
+      
+    
+    </summary>
+    
+    
+      <category term="Redis设计与实现读书笔记" scheme="http://wayne-98.github.io/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="Redis" scheme="http://wayne-98.github.io/tags/Redis/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Redis设计与实现读书笔记:第一部分:数据结构与对象:第七章:压缩列表</title>
     <link href="http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8/"/>
     <id>http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8/</id>
     <published>2020-05-24T13:15:37.506Z</published>
-    <updated>2020-05-24T13:53:55.768Z</updated>
+    <updated>2020-05-26T01:21:32.502Z</updated>
     
     <summary type="html">
     
@@ -69,7 +119,7 @@
     <link href="http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E5%85%AD%E7%AB%A0%E6%95%B4%E6%95%B0%E9%9B%86%E5%90%88/"/>
     <id>http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E5%85%AD%E7%AB%A0%E6%95%B4%E6%95%B0%E9%9B%86%E5%90%88/</id>
     <published>2020-05-24T04:52:42.592Z</published>
-    <updated>2020-05-24T13:15:32.713Z</updated>
+    <updated>2020-05-26T01:11:00.415Z</updated>
     
     <summary type="html">
     
@@ -190,7 +240,7 @@
     <link href="http://wayne-98.github.io/2020/05/19/Algorithms/May/5%E6%9C%8819%E5%8F%B7~5%E6%9C%8831%E5%8F%B7%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/"/>
     <id>http://wayne-98.github.io/2020/05/19/Algorithms/May/5%E6%9C%8819%E5%8F%B7~5%E6%9C%8831%E5%8F%B7%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/</id>
     <published>2020-05-19T07:40:20.225Z</published>
-    <updated>2020-05-21T11:03:11.708Z</updated>
+    <updated>2020-05-25T08:07:21.272Z</updated>
     
     <summary type="html">
     
@@ -231,55 +281,6 @@
     
     
       <category term="计算机网络" scheme="http://wayne-98.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>减脂心得</title>
-    <link href="http://wayne-98.github.io/2020/05/13/life/%E5%87%8F%E8%84%82%E5%BF%83%E5%BE%97/"/>
-    <id>http://wayne-98.github.io/2020/05/13/life/%E5%87%8F%E8%84%82%E5%BF%83%E5%BE%97/</id>
-    <published>2020-05-13T14:37:48.961Z</published>
-    <updated>2020-05-17T10:56:30.848Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h2 id=&quot;减脂最重要的点&quot;&gt;&lt;a href=&quot;#减脂最重要的点&quot; class=&quot;headerlink&quot; title=&quot;减脂最重要的点&quot;&gt;&lt;/a&gt;减脂最重要的点&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;如果只是单纯的减脂，做好饮食就可以成功。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;饮食要遵循
-      
-    
-    </summary>
-    
-    
-      <category term="life" scheme="http://wayne-98.github.io/categories/life/"/>
-    
-    
-      <category term="life" scheme="http://wayne-98.github.io/tags/life/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>amanda减脂餐</title>
-    <link href="http://wayne-98.github.io/2020/05/13/life/amanda%E5%87%8F%E8%84%82%E9%A4%90/"/>
-    <id>http://wayne-98.github.io/2020/05/13/life/amanda%E5%87%8F%E8%84%82%E9%A4%90/</id>
-    <published>2020-05-13T14:35:14.398Z</published>
-    <updated>2020-05-17T11:03:19.678Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;amanda-减脂便当&quot;&gt;&lt;a href=&quot;#amanda-减脂便当&quot; class=&quot;headerlink&quot; title=&quot;amanda 减脂便当&quot;&gt;&lt;/a&gt;&lt;a href=&quot;https://www.bilibili.com/video/BV1EV411C7hu&quot;
-      
-    
-    </summary>
-    
-    
-      <category term="life" scheme="http://wayne-98.github.io/categories/life/"/>
-    
-    
-      <category term="life" scheme="http://wayne-98.github.io/tags/life/"/>
     
   </entry>
   
