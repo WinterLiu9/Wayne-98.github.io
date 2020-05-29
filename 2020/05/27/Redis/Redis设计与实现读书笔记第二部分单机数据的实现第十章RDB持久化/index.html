@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"wayne-98.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Keep Moving">
+  <meta name="description" content="RDB 持久化RDB 持久化功能生成的 RDB 文件是一个经过压缩的二进制文件。 RDB 文件的创建与载入 SAVE 命令会阻塞服务器进程，直到 RDB 文件创建完毕为止，在服务器进程阻塞期间，服务器不能处理任何请求。  BGSAVE 命令会派生出一个子进程，然后由子进程负责创建 RDB 文件，服务器进程（父进程）继续处理请求。  RDB 文件的载入工作是在服务器启动时自动执行的。   AOF 文">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis设计与实现读书笔记:第二部分:单机数据的实现:第十章:RDB持久化">
 <meta property="og:url" content="http://wayne-98.github.io/2020/05/27/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%AC%AC%E5%8D%81%E7%AB%A0RDB%E6%8C%81%E4%B9%85%E5%8C%96/index.html">
 <meta property="og:site_name" content="Wayne">
-<meta property="og:description" content="Keep Moving">
+<meta property="og:description" content="RDB 持久化RDB 持久化功能生成的 RDB 文件是一个经过压缩的二进制文件。 RDB 文件的创建与载入 SAVE 命令会阻塞服务器进程，直到 RDB 文件创建完毕为止，在服务器进程阻塞期间，服务器不能处理任何请求。  BGSAVE 命令会派生出一个子进程，然后由子进程负责创建 RDB 文件，服务器进程（父进程）继续处理请求。  RDB 文件的载入工作是在服务器启动时自动执行的。   AOF 文">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-05-27T03:27:08.135Z">
-<meta property="article:modified_time" content="2020-05-27T03:27:45.540Z">
+<meta property="article:modified_time" content="2020-05-28T07:53:21.412Z">
 <meta property="article:author" content="Wayne">
 <meta property="article:tag" content="Redis">
 <meta name="twitter:card" content="summary">
@@ -190,10 +190,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-05-27 11:27:08 / 修改时间：11:27:45" itemprop="dateCreated datePublished" datetime="2020-05-27T11:27:08+08:00">2020-05-27</time>
+              <time title="创建时间：2020-05-27 11:27:08" itemprop="dateCreated datePublished" datetime="2020-05-27T11:27:08+08:00">2020-05-27</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-28 15:53:21" itemprop="dateModified" datetime="2020-05-28T15:53:21+08:00">2020-05-28</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -215,7 +221,81 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <h1 id="RDB-持久化"><a href="#RDB-持久化" class="headerlink" title="RDB 持久化"></a>RDB 持久化</h1><p>RDB 持久化功能生成的 RDB 文件是一个经过压缩的二进制文件。</p>
+<h2 id="RDB-文件的创建与载入"><a href="#RDB-文件的创建与载入" class="headerlink" title="RDB 文件的创建与载入"></a>RDB 文件的创建与载入</h2><ul>
+<li><p><em>SAVE</em> 命令会阻塞服务器进程，直到 RDB 文件创建完毕为止，在服务器进程阻塞期间，服务器不能处理任何请求。</p>
+</li>
+<li><p><em>BGSAVE</em> 命令会派生出一个子进程，然后由子进程负责创建 RDB 文件，服务器进程（父进程）继续处理请求。</p>
+</li>
+<li><p>RDB 文件的载入工作是在服务器启动时自动执行的。</p>
+</li>
+</ul>
+<p>AOF 文件的更新频率通常比 RDB 文件的更新频率高，所以：</p>
+<ul>
+<li>如果服务器开启了 AOF 持久化功能，那么服务器会优先使用 AOF 文件来还原数据库状态。</li>
+<li>之后在 AOF 持久化功能处于关闭状态时，服务器才会使用 RDB 文件来还原数据库状态。</li>
+</ul>
+<h3 id="SAVE-命令执行时的服务器状态"><a href="#SAVE-命令执行时的服务器状态" class="headerlink" title="SAVE 命令执行时的服务器状态"></a>SAVE 命令执行时的服务器状态</h3><h3 id="BGSAVE-命令执行时的服务器状态"><a href="#BGSAVE-命令执行时的服务器状态" class="headerlink" title="BGSAVE 命令执行时的服务器状态"></a>BGSAVE 命令执行时的服务器状态</h3><ul>
+<li>BGSAVE 命令执行期间，客户端发送的 SAVE 命令会被服务器拒绝。</li>
+<li>BGSAVE 命令执行期间，客户端发送的 BGSAVE 命令也会被服务器拒绝。</li>
+</ul>
+<ul>
+<li>BGREWRITEAOF 和 BGSAVE 两个命令不能同时执行：<ul>
+<li>如果 BGSAVE 命令正在执行，那么客户端发送的 BGREWRITEAOF 命令会被延迟到 BGSAVE 命令执行完毕之后执行。</li>
+<li>如果 BGREWRITEAOF 命令正在执行，那么客户端发送的 BGSAVE 命令会被服务器拒绝。</li>
+</ul>
+</li>
+</ul>
+<p>BGREWRITEAOF 和 BGSAVE 两个命令的实际工作都由子进程执行，命令操作方面并不冲突，不能同时执行它们只是一个性能方面的考虑。</p>
+<h3 id="RDB-文件载入时的服务器状态"><a href="#RDB-文件载入时的服务器状态" class="headerlink" title="RDB 文件载入时的服务器状态"></a>RDB 文件载入时的服务器状态</h3><p>阻塞，直到载入工作完成。</p>
+<h2 id="自动间隔性保存"><a href="#自动间隔性保存" class="headerlink" title="自动间隔性保存"></a>自动间隔性保存</h2><p><code>save 60 10000</code> // 服务器在 60 秒之内，对数据库进行了至少 10000 次修改。</p>
+<h3 id="设置保存条件"><a href="#设置保存条件" class="headerlink" title="设置保存条件"></a>设置保存条件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">default</span><br><span class="line"></span><br><span class="line">save 900 1</span><br><span class="line"></span><br><span class="line">save 300 10</span><br><span class="line"></span><br><span class="line">save 60 10000</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisServer</span>&#123;</span></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 记录了保存条件的数组</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">saveparam</span> *<span class="title">saveparams</span>;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">saveparam</span> &#123;</span></span><br><span class="line">    <span class="comment">// 秒数</span></span><br><span class="line">    <span class="keyword">time_t</span> seconds;</span><br><span class="line">    <span class="comment">// 修改数</span></span><br><span class="line">    <span class="keyword">int</span> changes;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="dirty-计数器和-lastsave-属性"><a href="#dirty-计数器和-lastsave-属性" class="headerlink" title="dirty 计数器和 lastsave 属性"></a>dirty 计数器和 lastsave 属性</h3><ul>
+<li><p>dirty 计数器记录距离上一次成功执行 SAVE 命令或者 BGSAVE 命令之后，服务器对数据库状态（服务器中所有的数据库）进行了多少次修改（包括写入，删除，更新等操作）</p>
+</li>
+<li><p>lastsave 属性是一个 UNIX 时间戳，记录了服务器上一次成功执行 SAVE 命令或者 BGSAVE 命令的时间。</p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisServer</span>&#123;</span></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">long</span> dirty;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">time_t</span> lastsave;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="检查保存条件是否满足"><a href="#检查保存条件是否满足" class="headerlink" title="检查保存条件是否满足"></a>检查保存条件是否满足</h3><p>Redis 的服务器周期性操作函数 serverCron 默认每隔 100 毫秒就会执行一次，该函数用于对正在运行的服务器进行维护，其中一项工作就是检查 save 选项所设置的保存条件是否已经满足，如果满足，则执行 BGSAVE 命令。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">serverCron</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="comment">#...</span></span><br><span class="line">    <span class="comment"># 遍历所有保存条件</span></span><br><span class="line">    <span class="keyword">for</span> saveparam <span class="keyword">in</span> server.saveparams:</span><br><span class="line">        </span><br><span class="line">        save_interval = unixtime_now() - server.lastsave</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> server.dirty &gt;= saveparam.changes <span class="keyword">and</span> save_interval &gt; saveparam.seconds:</span><br><span class="line">            BGSAVE()</span><br><span class="line">            </span><br><span class="line">	<span class="comment">#...</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="RDB-文件结构"><a href="#RDB-文件结构" class="headerlink" title="RDB 文件结构"></a>RDB 文件结构</h2><p><code>REDIS | db_version | databases | EOF | check_sum</code></p>
+<ul>
+<li>REDIS：长度 5 字节，保存“REDIS”这五个字符，可以让程序在载入文件的时候，快速检查所载入的文件是否为 RDB 文件。</li>
+<li>db_version：长度 4 字节，字符串表示的整数，记录了 RDB 文件的版本号。“0006”</li>
+<li>databases：包含着零个或者任意多个数据库，以及各个数据库中的键值对数据</li>
+<li>EOF：长度 1 字节，标志着 RDB 文件正文内容的结束。</li>
+<li>check_sum：长度 8 字节，</li>
+</ul>
+<h3 id="databases-部分"><a href="#databases-部分" class="headerlink" title="databases 部分"></a>databases 部分</h3><p><code>SELECTDB | db_number | key_value_pairs</code></p>
+<ul>
+<li>SELECTDB：长度 1 字节，标识着接下来要读入的将是一个数据库号码。</li>
+<li>db_number：根据号码的不同，长度可以为 1 字节，2 字节，5 字节。读入 db_number 之后，服务器会调用 SELECT 命令，根据读入的数据库号码进行数据库切换，使得之后读入的键值对可以载入到正确的数据库中。</li>
+<li>key_value_pairs：保存了数据库中所有的键值对，如果键值对带有过期时间，那么过期时间也会和键值对保存在一起。</li>
+</ul>
+<h3 id="key-value-pairs-部分"><a href="#key-value-pairs-部分" class="headerlink" title="key_value_pairs 部分"></a>key_value_pairs 部分</h3><p>不带过期时间的键值对在 RDB 文件中由 TYPE, key, value 三部分组成</p>
+<p>TYPE 记录了 value 的类型，长度为 1 字节</p>
+<p>带过期时间的键值对在 RDB 文件中由 EXPIRETIME_MS, ms, TYPE, key, value 组成。</p>
+<p>EXPIRETIME_MS：常量的长度为 1 字节，标识着接下来要读入的将是一个以毫秒为单位的过期时间。</p>
+<p>ms：8 字节长的带符号整数，记录着一个以毫秒为单位的 UNIX 时间戳，是键值对的过期时间。</p>
+<h3 id="value-的编码"><a href="#value-的编码" class="headerlink" title="value 的编码"></a>value 的编码</h3><p>待学习</p>
+<h2 id="分析-RDB-文件"><a href="#分析-RDB-文件" class="headerlink" title="分析 RDB 文件"></a>分析 RDB 文件</h2><p>待学习</p>
+<h1 id="重点回顾"><a href="#重点回顾" class="headerlink" title="重点回顾"></a>重点回顾</h1><ul>
+<li>RDB 文件用于保存和还原 Redis 服务器所有数据库中的键值对数据。</li>
+<li>SAVE 命令由服务器进程直接执行保存操作，所以该命令会阻塞服务器。</li>
+<li>BGSAVE 命令由子进程执行保存操作，所以该命令不会阻塞服务器。</li>
+<li>服务器状态中会保存所有用 save 选项设置的保存条件，当任意一个条件被满足时，服务器会自动执行 BGSAVE 命令。</li>
+<li>RDB 文件是一个经过压缩的二进制文件，由多个部分组成。</li>
+<li>对于不同类型的键值对，RDB 文件会使用不同的方式来保存它们。</li>
+</ul>
+
     </div>
 
     
@@ -295,6 +375,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RDB-持久化"><span class="nav-number">1.</span> <span class="nav-text">RDB 持久化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RDB-文件的创建与载入"><span class="nav-number">1.1.</span> <span class="nav-text">RDB 文件的创建与载入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SAVE-命令执行时的服务器状态"><span class="nav-number">1.1.1.</span> <span class="nav-text">SAVE 命令执行时的服务器状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BGSAVE-命令执行时的服务器状态"><span class="nav-number">1.1.2.</span> <span class="nav-text">BGSAVE 命令执行时的服务器状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RDB-文件载入时的服务器状态"><span class="nav-number">1.1.3.</span> <span class="nav-text">RDB 文件载入时的服务器状态</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自动间隔性保存"><span class="nav-number">1.2.</span> <span class="nav-text">自动间隔性保存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设置保存条件"><span class="nav-number">1.2.1.</span> <span class="nav-text">设置保存条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dirty-计数器和-lastsave-属性"><span class="nav-number">1.2.2.</span> <span class="nav-text">dirty 计数器和 lastsave 属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#检查保存条件是否满足"><span class="nav-number">1.2.3.</span> <span class="nav-text">检查保存条件是否满足</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RDB-文件结构"><span class="nav-number">1.3.</span> <span class="nav-text">RDB 文件结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#databases-部分"><span class="nav-number">1.3.1.</span> <span class="nav-text">databases 部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#key-value-pairs-部分"><span class="nav-number">1.3.2.</span> <span class="nav-text">key_value_pairs 部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#value-的编码"><span class="nav-number">1.3.3.</span> <span class="nav-text">value 的编码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分析-RDB-文件"><span class="nav-number">1.4.</span> <span class="nav-text">分析 RDB 文件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#重点回顾"><span class="nav-number">2.</span> <span class="nav-text">重点回顾</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
