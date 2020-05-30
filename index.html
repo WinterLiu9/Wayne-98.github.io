@@ -164,6 +164,295 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/30/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%AC%AC%E5%8D%81%E4%BA%8C%E7%AB%A0%E4%BA%8B%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/30/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%AC%AC%E5%8D%81%E4%BA%8C%E7%AB%A0%E4%BA%8B%E4%BB%B6/" class="post-title-link" itemprop="url">Redis设计与实现读书笔记:第二部分:单机数据的实现:第十二章:事件</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-30 17:34:36 / 修改时间：17:35:13" itemprop="dateCreated datePublished" datetime="2020-05-30T17:34:36+08:00">2020-05-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h1><p>Redis 服务器是一个事件驱动程序。</p>
+<ul>
+<li>文件事件：Redis 服务器通过套接字与客户端(或者其他 Redis 服务器)进行连接，文件事件是服务器对套接字的抽象。服务器与客户端的通信会产生相应的文件事件，而服务器通过监听并处理这些事件来完成一系列网络通信操作。</li>
+<li>时间事件：Redis 服务器中的一些操作(serverCron 函数)需要在给定的时间点执行，而时间事件就是服务器对这类定时操作的抽象。</li>
+</ul>
+<h2 id="文件事件"><a href="#文件事件" class="headerlink" title="文件事件"></a>文件事件</h2><p>Redis 基于 Reactor 模式开发了自己的网络事件处理器（文件事件处理器）：</p>
+<ul>
+<li>文件事件处理器使用 I/O 多路复用程序来同时监听多个套接字，并根据套接字目前执行的任务来为套接字关联不同的事件处理器。</li>
+<li>当被监听的套接字准备好执行连接应答(accept)、读取(read)、写入(write)、关闭(close)等操作时，与操作相对应的文件事件就会产生，这时文件处理器就会调用套接字之前关联好的事件处理器来处理这些事件。</li>
+</ul>
+<h3 id="文件事件处理器的构成"><a href="#文件事件处理器的构成" class="headerlink" title="文件事件处理器的构成"></a>文件事件处理器的构成</h3><p>文件处理器的构成：套接字、I/O 多路复用程序、文件事件分派器以及事件处理器。</p>
+<ol>
+<li>I/O 多路复用程序负责监听多个套接字，并向文件事件分派器传送那些产生了事件的套接字。</li>
+<li>多个事件可能会并发地出现，I/O 多路复用程序会将所有产生的事件的套接字放到一个队列里，通过这个队列，以有序(sequentially)、同步(synchronously)、每次一个套接字的方式向文件事件分派器传送套接字。</li>
+<li>文件事件分派器接收 I/O 多路复用程序传来的套接字，并根据套接字产生的事件的类型，调用相应的事件处理器。</li>
+</ol>
+<h3 id="I-O-多路复用程序的实现"><a href="#I-O-多路复用程序的实现" class="headerlink" title="I/O 多路复用程序的实现"></a>I/O 多路复用程序的实现</h3><p><code>select、epoll、evport、kqueue</code></p>
+<h2 id="事件的类型"><a href="#事件的类型" class="headerlink" title="事件的类型"></a>事件的类型</h2><p>ae.h/AE_READABLE(优先级更高)</p>
+<p>ae.h/AE_WRITABLE</p>
+<h3 id="API"><a href="#API" class="headerlink" title="API"></a>API</h3><h3 id="文件事件的处理器"><a href="#文件事件的处理器" class="headerlink" title="文件事件的处理器"></a>文件事件的处理器</h3><ul>
+<li>为了对连接服务器的各个客户端进行应答，服务器要为监听套接字关联连接应答处理器。</li>
+<li>为了接受客户端传来的命令请求，服务器要为客户端套接字关联命令请求处理器。</li>
+<li>为了向客户端返回命令的执行结果，服务器要为客户端套接字关联命令回复处理器。</li>
+<li>当主服务器和从服务器进行复制操作时，主从服务器都需要关联特别为复制功能编写的复制处理器。</li>
+</ul>
+<ol>
+<li>连接应答处理器</li>
+</ol>
+<p>当 Redis 服务器进行初始化的时候，程序会将这个连接应答处理器和服务器监听套接字的 AE_READABLE 事件关联起来。</p>
+<ol start="2">
+<li>命令请求处理器</li>
+</ol>
+<p>当一个客户端通过连接应答处理器成功连接到服务器之后，服务器会将客户端套接字的 AE_READABLE 事件和命令请求处理器关联起来，当客户端向服务器发送命令请求的时候，套接字就会产生 AE_READABLE 事件，引发命令请求处理器执行，并执行相应的套接字读入操作。 </p>
+<p>在客户端连接服务器的整个过程中，服务器都会一直为客户端套接字的 AE_READABLE 事件关联命令请求处理器。</p>
+<ol start="3">
+<li>命令回复处理器</li>
+</ol>
+<p>当服务器由命令回复需要传送给客户端的时候，服务器会将客户端套接字的 AE_WRITEABLE 事件和命令回复处理器关联起来，当客户端准备好接收服务器传回的命令回复时，就会产生 AE_WRITEABLE 事件，引发命令回复处理器执行，并执行相应的套接字写入操作。</p>
+<p>命令回复发送完毕之后，服务器就会解除命令回复处理器与客户端套接字的 AE_WRITEABLE 事件之间的关联。</p>
+<hr>
+<ul>
+<li>一次完整的客户端与服务器连接事件示例</li>
+</ul>
+<ol>
+<li>Redis 服务器正在运作，那个这个服务器的监听套接字的 AE_READABLE 事件应该处于监听状态之下，而该事件所对应的处理器为连接应答处理器。</li>
+<li>有一个 Redis 客户端向服务器发起连接，那么监听套接字将产生 AE_READABLE 事件，触发连接应答处理器执行。处理器会对客户端的连接请求进行应答，然后创建客户端套接字，以及客户端状态，并将客户端套接字的 AE_READABLE 事件与命令请求处理器进行关联，使得客户端可以向主服务器发送命令请求。</li>
+<li>假设客户端发送一个命令请求，那么客户端套接字将产生 AE_READABLE 事件，引发命令请求处理器执行，处理器读取客户端的命令内容，然后传给相关程序去执行。</li>
+<li>执行命令产生相应的命令回复，为了将这些命令回复传送回客户端，服务器会将客户端套接字的 AE_WRITEABLE 事件与命令回复处理器进行关联。当客户端尝试读取命令回复的时候，客户端套接字将产生 AE_WRITEABLE 事件，触发命令回复处理器执行，当命令回复处理器将命令回复全部写入套接字之后，服务器就会解除客户端套接字的 AE_WRITEABLE 事件与命令回复处理器之间的关联。</li>
+</ol>
+<h2 id="时间事件"><a href="#时间事件" class="headerlink" title="时间事件"></a>时间事件</h2><ul>
+<li>定时事件：让程序在指定的时间之后执行一次。</li>
+<li>周期性事件：让一段程序每隔指定时间就执行一次。</li>
+</ul>
+<ul>
+<li>一个时间事件主要由以下三个属性组成：<ul>
+<li>id：服务器为时间事件创建的全局唯一 ID。</li>
+<li>when：毫秒精度的 UNIX 时间戳，记录了时间事件的到达时间。</li>
+<li>timeProc：时间事件处理器，一个函数。当时间事件到达时，服务器就会调用相应的处理器来处理事件。</li>
+</ul>
+</li>
+<li>一个时间事件时定时事件还是周期性事件取决于时间事件处理器的返回值：<ul>
+<li>返回 ae.h/AE_NOMORE 则为定时事件：该事件在达到一次之后就会被删除，之后不再到达。</li>
+<li>返回一个非 AE_NOMORE 的整数值，则为周期性事件。返回值就是这个周期。</li>
+</ul>
+</li>
+</ul>
+<p>目前版本的 Redis 只有周期性事件，没有使用定时事件。</p>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>服务器将所有时间事件都放在一个无序链表中，每当时间事件执行器运行时，它就遍历整个链表，查找所有已到达的时间事件，并调用相应的事件处理器。</p>
+<h3 id="时间事件应用实例：serverCron-函数"><a href="#时间事件应用实例：serverCron-函数" class="headerlink" title="时间事件应用实例：serverCron 函数"></a>时间事件应用实例：serverCron 函数</h3><p>持续运行的 Redis 服务器需要定期对自身的资源和状态进行检查和调整，从而确保服务器可以长期、稳定地运行，这些定期操作由 redis.c/serverCron 函数负责执行</p>
+<ul>
+<li>更新服务器的各类统计信息，比如时间、内存占用、数据库占用情况等。</li>
+<li>清理数据库中的过期键值对。</li>
+<li>关闭和清理连接失效的客户端。</li>
+<li>尝试进行 AOF 或 RDB 持久化操作。</li>
+<li>如果服务器是主服务器，那么对从服务器进行定期同步。</li>
+<li>如果处理集群模式，对集群进行定期同步和连接测试。</li>
+</ul>
+<h2 id="事件的调度与执行"><a href="#事件的调度与执行" class="headerlink" title="事件的调度与执行"></a>事件的调度与执行</h2><p>待学习</p>
+<h2 id="重点回顾"><a href="#重点回顾" class="headerlink" title="重点回顾"></a>重点回顾</h2><ul>
+<li>Redis 服务器是一个事件驱动程序，服务器处理的事件分为时间事件和文件事件两类。</li>
+<li>文件处理器是基于 Reactor 模式实现的网络通信程序。</li>
+<li>文件事件是对套接字操作的抽象：每次套接字变为可应答(acceptable)、可写入(writable)或者可读(readable)时，相应的文件事件就会产生。</li>
+<li>文件事件分为 AE_READABLE 事件和 AE_WRITEABLE 事件两类。</li>
+<li>时间事件分为定时事件和周期性事件：定时事件只在指定的时间到达一次，而周期性事件则每隔一段时间到达一次。</li>
+<li>文件事件和时间事件之间是合作关系，服务器会轮流处理这两种事件，并且处理事件的过程中也不会进行抢占。</li>
+<li>时间事件的实际处理时间通常会比设定的到达时间晚一些。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/30/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%AC%AC%E5%8D%81%E4%B8%80%E7%AB%A0AOF%E6%8C%81%E4%B9%85%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/30/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%AC%AC%E5%8D%81%E4%B8%80%E7%AB%A0AOF%E6%8C%81%E4%B9%85%E5%8C%96/" class="post-title-link" itemprop="url">Redis设计与实现读书笔记:第二部分:单机数据的实现:第十一章:AOF持久化</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-30 17:33:40 / 修改时间：17:34:25" itemprop="dateCreated datePublished" datetime="2020-05-30T17:33:40+08:00">2020-05-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="AOF-持久化"><a href="#AOF-持久化" class="headerlink" title="AOF 持久化"></a>AOF 持久化</h1><p>AOF 持久化是通过保存 Redis 服务器所执行的写命令来记录数据库状态的。</p>
+<h2 id="AOF-持久化的实现"><a href="#AOF-持久化的实现" class="headerlink" title="AOF 持久化的实现"></a>AOF 持久化的实现</h2><p> AOF 持久化功能的实现可以分为命令追加(append)、文件写入、文件同步(sync)三个步骤。</p>
+<h3 id="命令追加"><a href="#命令追加" class="headerlink" title="命令追加"></a>命令追加</h3><p>当 AOF 持久化功能打开时，服务器在执行完一个写命令之后，会以协议格式将被执行的写命令追加到服务器状态的 aof_buf 缓冲区的末尾：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">redisServer</span> &#123;</span></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    <span class="comment">//  AOF 缓冲区</span></span><br><span class="line">    sds aof_buf;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125; redisServer;</span><br></pre></td></tr></table></figure>
+
+<h2 id="AOF-文件的写入与同步"><a href="#AOF-文件的写入与同步" class="headerlink" title="AOF 文件的写入与同步"></a>AOF 文件的写入与同步</h2><p>Redis 的服务器进程就是一个事件循环(loop)，这个循环中的文件事件负责接收客户端的命令请求，以及向客户端发送命令回复，而时间事件则负责执行像 serverCron 函数这样需要定时运行的函数。</p>
+<p>因为服务器在处理文件事件时可能会执行写命令，使得一些内容被追加到 aof_buf 缓冲区里面，所以在服务器每次结束一个事件循环之前，它都会调用 flushAppendOnlyFile 函数，考虑是否将缓冲区中的内容写入和保存到 AOF 文件中。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">eventLoop</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        processFileEvents()</span><br><span class="line">        processTimeEvents()</span><br><span class="line">        fulshAppendOnlyFile()</span><br></pre></td></tr></table></figure>
+
+<p>fulshAppendOnlyFile 函数的行为由服务器配置的 appendfsync 选项的值来决定</p>
+<table>
+<thead>
+<tr>
+<th>appendfsync 选项的值</th>
+<th>fulshAppendOnlyFile 函数的行为</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>always</td>
+<td>将 aof_buf 缓冲区的所有内容写入并同步到 AOF 文件</td>
+</tr>
+<tr>
+<td>everysec(default)</td>
+<td>将 aof_buf 缓冲区的所有内容写入到 AOF 文件，间隔超过一秒才会对 AOF 文件进行同步，并且这个同步操作是由一个线程专门负责的。</td>
+</tr>
+<tr>
+<td>no</td>
+<td>将 aof_buf 缓冲区中的所有内容写入到 AOF 文件，并不对 AOF 文件进行同步，何时同步由操作系统来决定。</td>
+</tr>
+</tbody></table>
+<ul>
+<li>现代操作系统，当用户调用 write 函数，将一些数据写入到磁盘中时，操作系统通常会将写入的数据暂时保存在一个内存缓冲区中，等到缓冲区满了或者超过指定的时限之后，才真正的刷到磁盘中。提高了效率但是带来了数据的安全性问题。</li>
+<li>系统提供了 fsync 和 fdatasync 两个同步函数，可以强制让操作系统立即将缓冲区中的数据写入到磁盘中，保证数据的安全性。</li>
+</ul>
+<h2 id="AOF-文件的载入与数据还原"><a href="#AOF-文件的载入与数据还原" class="headerlink" title="AOF 文件的载入与数据还原"></a>AOF 文件的载入与数据还原</h2><p>Redis 读取 AOF 文件并还原数据库状态的详细步骤：</p>
+<ol>
+<li>创建一个不带网络连接的伪客户端。</li>
+<li>从 AOF 文件中分析并读取一条写命令。</li>
+<li>使用伪客户端执行被读出的写命令，直到文件中所有的写命令都被处理完毕。</li>
+</ol>
+<h2 id="AOF-重写"><a href="#AOF-重写" class="headerlink" title="AOF 重写"></a>AOF 重写</h2><p>为了解决 AOF 文件体积膨胀的问题，Redis 提供了 AOF 文件重写(rewrite)功能。通过该功能，Redis 服务器可以创建一个新的 AOF 文件来替代现有的 AOF 文件，新旧两个 AOF 所保存的数据库状态相同，但新的 AOF 文件不会包含任何浪费空间的冗余命令。</p>
+<h3 id="AOF-文件重写的实现"><a href="#AOF-文件重写的实现" class="headerlink" title="AOF 文件重写的实现"></a>AOF 文件重写的实现</h3><p>新的 AOF 文件是通过读取服务器当前的数据库状态来实现的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aof_rewrite</span><span class="params">(new_aof_file_name)</span>:</span></span><br><span class="line">    <span class="comment"># 创建新 AOF 文件</span></span><br><span class="line">    f = create_file(new_aof_file_name)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 遍历数据库</span></span><br><span class="line">    <span class="keyword">for</span> db <span class="keyword">in</span> redisServer.db:</span><br><span class="line">        <span class="comment"># 忽略空数据库</span></span><br><span class="line">        <span class="keyword">if</span> db.is_empty(): <span class="keyword">continue</span></span><br><span class="line">        <span class="comment"># 写入 SELECT 命令，指定数据库号码</span></span><br><span class="line">        f.write_command(<span class="string">"SELECT"</span> + db.id)</span><br><span class="line">        <span class="comment"># 遍历数据库中的所有键</span></span><br><span class="line">        <span class="keyword">for</span> key <span class="keyword">in</span> db:</span><br><span class="line">            <span class="comment"># 忽略已过期的键</span></span><br><span class="line">            <span class="keyword">if</span> key.is_expried(): <span class="keyword">continue</span></span><br><span class="line">            <span class="comment"># 根据键的类型对键进行重写</span></span><br><span class="line">            <span class="keyword">if</span> key.type == String: rewrite_string(key)</span><br><span class="line">            ...</span><br><span class="line">            <span class="comment"># 如果键带有过期时间，过期时间也需要重写</span></span><br><span class="line">            <span class="keyword">if</span> key.have_expire_time():</span><br><span class="line">                rewrite_expire_time(key)</span><br><span class="line">                </span><br><span class="line">	f.close()</span><br></pre></td></tr></table></figure>
+
+
+
+<p>实际中，为了避免在执行命令时造成客户端输入缓冲区的溢出，重写程序在处理列表、哈希表、集合、有序集合这四种可能带有多个元素的键时，会先检查所包含的元素的数量，如果元素的数量超过了 redis.h/REDIS_REWRITE_ITEMS_PER_CMD (default 64)常量的值，那么重写程序将使用多条命令来记录键的值。</p>
+<h3 id="AOF-后台重写-BGREWRITEAOF"><a href="#AOF-后台重写-BGREWRITEAOF" class="headerlink" title="AOF 后台重写(BGREWRITEAOF)"></a>AOF 后台重写(BGREWRITEAOF)</h3><ul>
+<li>子进程进行 AOF 重写期间，服务器进程(父进程)可以继续处理命令请求。</li>
+<li>子进程带有服务器进程的数据副本，使用子进程而不是线程，可以在避免使用锁的情况下，保证数据的安全性。</li>
+</ul>
+<p>因为子进程在进行 AOF 重写期间，服务器还需要继续处理命令请求，而新的命令可能会对现有的数据库状态进行修改，从而使得服务器当前的数据库状态和重写后的 AOF 文件所保存的数据库状态不一致。</p>
+<p>为了解决这种数据不一致的问题，Redis 服务器设置了一个 AOF 重写缓冲区，缓冲区在服务器创建子进程之后开始使用，当 Redis 服务器执行完一个命令之后，它同时将这个写命令发送给 AOF 缓冲区和 AOF 重写缓冲区。</p>
+<p>当子进程完成 AOF 重写工作之后，它会向父进程发送一个信号，父进程在接到该信号后，会调用一个信号函数，执行以下工作（执行这个函数时，服务器进程会被阻塞）：</p>
+<ol>
+<li>将 AOF 重写缓冲区中的所有内容写入到新的 AOF 文件中，这时新 AOF 文件所保存的数据库状态和服务器当前的数据库状态一致。</li>
+<li>对新的 AOF 文件进行改名，原子地覆盖现有的 AOF 文件，完成新旧两个 AOF 文件的替换。</li>
+</ol>
+<h2 id="重点回顾"><a href="#重点回顾" class="headerlink" title="重点回顾"></a>重点回顾</h2><ul>
+<li>AOF 文件通过保存所有修改数据库的写命令请求来记录服务器的数据库状态。</li>
+<li>AOF 文件中的所有命令都以 Redis 命令请求协议的格式保存。</li>
+<li>命令请求会先保存到 AOF 缓冲区里面，之后再定期写入并同步到 AOF 文件。</li>
+<li>appendfsync 选项的不同值对 AOF 持久化功能的安全性以及 Redis 服务器的性能有很大的影响。</li>
+<li>服务器只要载入并重新执行保存在 AOF 文件中的命令，就可以还原数据库本来的状态。</li>
+<li>AOF 重写可以产生一个新的 AOF 文件，这个新的 AOF 文件和原有的 AOF 文件所保存的数据库状态一样，但体积更小。</li>
+<li>AOF 重写是一个有歧义的名字，该功能是通过读取数据库中的键值对来实现的，程序无须对现有的 AOF 文件进行任何的读入、分析或者写入操作。</li>
+<li>在执行 <em>BGREWRITEAOF</em> 命令时，Redis 服务器会维护一个 AOF 重写缓冲区，该缓冲区会在子进程创建新 AOF 文件期间，记录服务器执行的所有写命令。当子进程完成创建 AOF 文件的工作之后，服务器会将重写缓冲区的所有内容追加到新 AOF 文件的末尾，使得新旧两个 AOF 文件所保存的数据库状态一致。最后，服务器用新的 AOF 文件替换旧的 AOF 文件，以此来完成 AOF 文件的重写操作。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/27/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%AC%AC%E5%8D%81%E7%AB%A0RDB%E6%8C%81%E4%B9%85%E5%8C%96/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1217,227 +1506,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/21/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%BA%8C%E7%AB%A0%E7%AE%80%E5%8D%95%E5%8A%A8%E6%80%81%E5%AD%97%E7%AC%A6%E4%B8%B2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/21/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%BA%8C%E7%AB%A0%E7%AE%80%E5%8D%95%E5%8A%A8%E6%80%81%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="post-title-link" itemprop="url">Redis设计与实现读书笔记:第一部分:数据结构与对象:第二章:简单动态字符串</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-21 11:27:25 / 修改时间：11:26:57" itemprop="dateCreated datePublished" datetime="2020-05-21T11:27:25+08:00">2020-05-21</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="简单动态字符串"><a href="#简单动态字符串" class="headerlink" title="简单动态字符串"></a>简单动态字符串</h1><h2 id="SDS-的定义"><a href="#SDS-的定义" class="headerlink" title="SDS 的定义"></a>SDS 的定义</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sdshdr</span>&#123;</span></span><br><span class="line">    <span class="comment">// 记录 buf 数组中已使用字节的数量</span></span><br><span class="line">    <span class="comment">// 等于 SDS 所保存字符串的长度</span></span><br><span class="line">    <span class="keyword">int</span> len;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 记录 buf 数组中未使用的字节的数量</span></span><br><span class="line">    <span class="keyword">int</span> <span class="built_in">free</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 字节数组，用于保存字符串</span></span><br><span class="line">    <span class="keyword">char</span>[] buf;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<h2 id="SDS-与-C-字符串的区别"><a href="#SDS-与-C-字符串的区别" class="headerlink" title="SDS 与 C 字符串的区别"></a>SDS 与 C 字符串的区别</h2><h3 id="常数复杂度获取字符串的长度"><a href="#常数复杂度获取字符串的长度" class="headerlink" title="常数复杂度获取字符串的长度"></a>常数复杂度获取字符串的长度</h3><ul>
-<li><p>C 字符串不记录自身的长度信息</p>
-</li>
-<li><p>SDS 在 len 属性中记录了 SDS 本身的长度。</p>
-</li>
-</ul>
-<h3 id="杜绝缓冲区溢出"><a href="#杜绝缓冲区溢出" class="headerlink" title="杜绝缓冲区溢出"></a>杜绝缓冲区溢出</h3><p>​        <code>char *(char *dest, const char *src)</code></p>
-<ul>
-<li><p>因为 C 字符串不记录自身的长度，所以 strcat 假定用户在执行这个函数的时候，已经为 dest 分配了足够的内存。</p>
-</li>
-<li><p>SDS 的空间分配策略完全杜绝了发生缓冲区溢出的可能性。</p>
-</li>
-</ul>
-<h3 id="减少修改字符串时带来的内存重分配次数"><a href="#减少修改字符串时带来的内存重分配次数" class="headerlink" title="减少修改字符串时带来的内存重分配次数"></a>减少修改字符串时带来的内存重分配次数</h3><ul>
-<li>因为 C 字符串并不记录自身的长度，所以对于一个包含了 N  个字符的 C 字符串来说，这个 C 字符串的底层实现<strong>总是</strong>一个 N + 1 个字符长的数组。</li>
-</ul>
-<ul>
-<li><p>SDS 通过未使用空间解除了字符串长度和底层数组长度之间的关联。free</p>
-</li>
-<li><p>通过未使用空间，SDS 实现了空间预分配和惰性空间释放两种优化策略。</p>
-<ul>
-<li><p><strong>空间预分配</strong></p>
-<p>当 SDS 的 API 对一个 SDS 进行修改，并且需要对 SDS 进行空间扩展的时候，程序不仅会为 SDS 分配修改所必须要的空间，还会为 SDS 分配额外的未使用空间。</p>
-<ol>
-<li>对 SDS 修改后，SDS 的长度(len) 将小于 1 MB，那么程序就会分配 len 属性相同大小的未使用空间</li>
-<li>大于 1MB，每次多分配 1MB 的未使用空间</li>
-</ol>
-<p>在扩展 SDS 空间之前， SDS API 会先检查未使用的空间是否足够。不够才会执行内存分配</p>
-</li>
-<li><p><strong>惰性空间释放</strong></p>
-<p>用于优化字符串的缩短操作：当 SDS API 需要缩短 SDS 保存的字符串时，程序并不立即使用内存重分配来回收缩短多出来的字节，而是使用 free 属性将这些字节数量记录起来，并等待将来使用。</p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="二进制安全"><a href="#二进制安全" class="headerlink" title="二进制安全"></a>二进制安全</h3><ul>
-<li>C 语言字符串的字符必须符合某种编码(ASCII, UTF-8)，并且除了字符串的末尾之外，字符串里面不能出现空字符，否则最先被程序读入的空字符将被误认为是字符串的结尾。所以 C 字符串只能保存文本数据，不能保存图片、音频、视频、压缩文件这样的二进制数据。</li>
-</ul>
-<h3 id="兼容部分-C-字符串函数"><a href="#兼容部分-C-字符串函数" class="headerlink" title="兼容部分 C 字符串函数"></a>兼容部分 C 字符串函数</h3><ul>
-<li>SDS 可以重用 &lt;String.h&gt; 函数库</li>
-</ul>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><table>
-<thead>
-<tr>
-<th align="left">C 字符串</th>
-<th align="center">SDS</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">获取字符串长度的时间复杂度为 <em>O(N)</em></td>
-<td align="center">获取字符串长度的时间复杂度为 <em>O(1)</em></td>
-</tr>
-<tr>
-<td align="left">API 是不安全的，可能会造成缓冲区溢出</td>
-<td align="center">API 是安全的，杜绝缓冲区溢出</td>
-</tr>
-<tr>
-<td align="left">修改字符串长度 N 次必然会执行 N 次内存重分配</td>
-<td align="center">修改字符串长度 N 次最多会执行 N 次内存重分配</td>
-</tr>
-<tr>
-<td align="left">只能保存文本数据</td>
-<td align="center">可以保存文本和二进制数据</td>
-</tr>
-<tr>
-<td align="left">可以使用所有 &lt;string.h&gt; 库中的函数</td>
-<td align="center">可以使用一部分&lt;string.h&gt; 库中的函数</td>
-</tr>
-</tbody></table>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/21/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%89%E7%AB%A0%E9%93%BE%E8%A1%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/21/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%89%E7%AB%A0%E9%93%BE%E8%A1%A8/" class="post-title-link" itemprop="url">Redis设计与实现读书笔记:第一部分:数据结构与对象:第三章:链表</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-21 11:25:46 / 修改时间：12:43:47" itemprop="dateCreated datePublished" datetime="2020-05-21T11:25:46+08:00">2020-05-21</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h1><h2 id="链表和链表节点的实现"><a href="#链表和链表节点的实现" class="headerlink" title="链表和链表节点的实现"></a>链表和链表节点的实现</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span>&#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">prev</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">next</span>;</span></span><br><span class="line">    <span class="keyword">void</span> *value;</span><br><span class="line">&#125;listNode;</span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">list</span>&#123;</span></span><br><span class="line">    </span><br><span class="line">    listNode *head;</span><br><span class="line">    listNode *tail;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> len;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 节点值复制函数: 用于复制链表节点所保存的值</span></span><br><span class="line">    <span class="keyword">void</span> *(*dup)(<span class="keyword">void</span> *ptr);</span><br><span class="line">	</span><br><span class="line">   	<span class="comment">// 节点值释放函数: 用于释放链表节点所保存的值</span></span><br><span class="line">    <span class="keyword">void</span> (*<span class="built_in">free</span>)(<span class="keyword">void</span> *ptr);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 节点值对比函数: 用于链表节点所保存的值是否和另一个值相等</span></span><br><span class="line">    <span class="keyword">int</span> (*match)(<span class="keyword">void</span> *ptr, <span class="keyword">void</span> *key);</span><br><span class="line">&#125;<span class="built_in">list</span>;</span><br></pre></td></tr></table></figure>
-
-
-
-<p>Redis 的链表实现的特性：</p>
-<ul>
-<li>双端：prev next 指针，获取某一个节点的前置和后驱时间复杂度为 <em>O(1)</em>.</li>
-<li>无环：表头节点的 prev 指针和表尾节点的 next 指针为 null. </li>
-<li>带头指针和尾指针</li>
-<li>带链表长度计数器</li>
-<li><strong>多态</strong>： 链表节点使用 void* 指针来保存节点值，并且可以通过 list 结构的 dup, free, match 三个属性为节点值设置类型特定函数，所以链表用户保存各种不同类型的值。</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1509,7 +1577,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-count">57</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://wayne-98.github.io/"/>
-  <updated>2020-05-28T07:53:21.412Z</updated>
+  <updated>2020-05-30T09:35:13.894Z</updated>
   <id>http://wayne-98.github.io/</id>
   
   <author>
@@ -15,6 +15,57 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Redis设计与实现读书笔记:第二部分:单机数据的实现:第十二章:事件</title>
+    <link href="http://wayne-98.github.io/2020/05/30/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%AC%AC%E5%8D%81%E4%BA%8C%E7%AB%A0%E4%BA%8B%E4%BB%B6/"/>
+    <id>http://wayne-98.github.io/2020/05/30/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%AC%AC%E5%8D%81%E4%BA%8C%E7%AB%A0%E4%BA%8B%E4%BB%B6/</id>
+    <published>2020-05-30T09:34:36.485Z</published>
+    <updated>2020-05-30T09:35:13.894Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;事件&quot;&gt;&lt;a href=&quot;#事件&quot; class=&quot;headerlink&quot; title=&quot;事件&quot;&gt;&lt;/a&gt;事件&lt;/h1&gt;&lt;p&gt;Redis 服务器是一个事件驱动程序。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;文件事件：Redis 服务器通过套接字与客户端(或者其他 Redis 服务
+      
+    
+    </summary>
+    
+    
+      <category term="Redis设计与实现读书笔记" scheme="http://wayne-98.github.io/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="Redis" scheme="http://wayne-98.github.io/tags/Redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis设计与实现读书笔记:第二部分:单机数据的实现:第十一章:AOF持久化</title>
+    <link href="http://wayne-98.github.io/2020/05/30/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%AC%AC%E5%8D%81%E4%B8%80%E7%AB%A0AOF%E6%8C%81%E4%B9%85%E5%8C%96/"/>
+    <id>http://wayne-98.github.io/2020/05/30/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%AC%AC%E5%8D%81%E4%B8%80%E7%AB%A0AOF%E6%8C%81%E4%B9%85%E5%8C%96/</id>
+    <published>2020-05-30T09:33:40.259Z</published>
+    <updated>2020-05-30T09:34:25.494Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;AOF-持久化&quot;&gt;&lt;a href=&quot;#AOF-持久化&quot; class=&quot;headerlink&quot; title=&quot;AOF 持久化&quot;&gt;&lt;/a&gt;AOF 持久化&lt;/h1&gt;&lt;p&gt;AOF 持久化是通过保存 Redis 服务器所执行的写命令来记录数据库状态的。&lt;/p&gt;
+&lt;h2 id
+      
+    
+    </summary>
+    
+    
+      <category term="Redis设计与实现读书笔记" scheme="http://wayne-98.github.io/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
+    
+    
+      <category term="Redis" scheme="http://wayne-98.github.io/tags/Redis/"/>
+    
+  </entry>
   
   <entry>
     <title>Redis设计与实现读书笔记:第二部分:单机数据的实现:第十章:RDB持久化</title>
@@ -265,7 +316,7 @@
     <link href="http://wayne-98.github.io/2020/05/19/Algorithms/May/5%E6%9C%8819%E5%8F%B7~5%E6%9C%8831%E5%8F%B7%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/"/>
     <id>http://wayne-98.github.io/2020/05/19/Algorithms/May/5%E6%9C%8819%E5%8F%B7~5%E6%9C%8831%E5%8F%B7%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/</id>
     <published>2020-05-19T07:40:20.225Z</published>
-    <updated>2020-05-28T09:10:53.426Z</updated>
+    <updated>2020-05-30T09:33:12.680Z</updated>
     
     <summary type="html">
     
@@ -455,58 +506,6 @@
     </summary>
     
     
-    
-  </entry>
-  
-  <entry>
-    <title>Socket I/O</title>
-    <link href="http://wayne-98.github.io/2020/05/10/Scoket/socket%20IO/"/>
-    <id>http://wayne-98.github.io/2020/05/10/Scoket/socket%20IO/</id>
-    <published>2020-05-10T13:39:10.589Z</published>
-    <updated>2020-05-10T14:15:22.255Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;One basic concept of Linux (actually Unix) is the rule that everything in Unix/Linux is a file. Each process has a table of file descript
-      
-    
-    </summary>
-    
-    
-      <category term="I/O" scheme="http://wayne-98.github.io/categories/I-O/"/>
-    
-    
-      <category term="I/O" scheme="http://wayne-98.github.io/tags/I-O/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>简单操作系统概念</title>
-    <link href="http://wayne-98.github.io/2020/05/10/Operating%20System/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/"/>
-    <id>http://wayne-98.github.io/2020/05/10/Operating%20System/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/</id>
-    <published>2020-05-10T13:39:10.577Z</published>
-    <updated>2020-05-10T14:14:52.059Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;1-操作系统概述&quot;&gt;&lt;a href=&quot;#1-操作系统概述&quot; class=&quot;headerlink&quot; title=&quot;1. 操作系统概述&quot;&gt;&lt;/a&gt;1. 操作系统概述&lt;/h1&gt;&lt;ul&gt;
-&lt;li&gt;操作系统的特征&lt;/li&gt;
-&lt;/ul&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong
-      
-    
-    </summary>
-    
-    
-      <category term="Operating System" scheme="http://wayne-98.github.io/categories/Operating-System/"/>
-    
-    
-      <category term="Operating System" scheme="http://wayne-98.github.io/tags/Operating-System/"/>
     
   </entry>
   

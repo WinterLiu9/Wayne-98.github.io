@@ -164,6 +164,227 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/21/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%BA%8C%E7%AB%A0%E7%AE%80%E5%8D%95%E5%8A%A8%E6%80%81%E5%AD%97%E7%AC%A6%E4%B8%B2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/21/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%BA%8C%E7%AB%A0%E7%AE%80%E5%8D%95%E5%8A%A8%E6%80%81%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="post-title-link" itemprop="url">Redis设计与实现读书笔记:第一部分:数据结构与对象:第二章:简单动态字符串</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-21 11:27:25 / 修改时间：11:26:57" itemprop="dateCreated datePublished" datetime="2020-05-21T11:27:25+08:00">2020-05-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="简单动态字符串"><a href="#简单动态字符串" class="headerlink" title="简单动态字符串"></a>简单动态字符串</h1><h2 id="SDS-的定义"><a href="#SDS-的定义" class="headerlink" title="SDS 的定义"></a>SDS 的定义</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sdshdr</span>&#123;</span></span><br><span class="line">    <span class="comment">// 记录 buf 数组中已使用字节的数量</span></span><br><span class="line">    <span class="comment">// 等于 SDS 所保存字符串的长度</span></span><br><span class="line">    <span class="keyword">int</span> len;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 记录 buf 数组中未使用的字节的数量</span></span><br><span class="line">    <span class="keyword">int</span> <span class="built_in">free</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 字节数组，用于保存字符串</span></span><br><span class="line">    <span class="keyword">char</span>[] buf;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="SDS-与-C-字符串的区别"><a href="#SDS-与-C-字符串的区别" class="headerlink" title="SDS 与 C 字符串的区别"></a>SDS 与 C 字符串的区别</h2><h3 id="常数复杂度获取字符串的长度"><a href="#常数复杂度获取字符串的长度" class="headerlink" title="常数复杂度获取字符串的长度"></a>常数复杂度获取字符串的长度</h3><ul>
+<li><p>C 字符串不记录自身的长度信息</p>
+</li>
+<li><p>SDS 在 len 属性中记录了 SDS 本身的长度。</p>
+</li>
+</ul>
+<h3 id="杜绝缓冲区溢出"><a href="#杜绝缓冲区溢出" class="headerlink" title="杜绝缓冲区溢出"></a>杜绝缓冲区溢出</h3><p>​        <code>char *(char *dest, const char *src)</code></p>
+<ul>
+<li><p>因为 C 字符串不记录自身的长度，所以 strcat 假定用户在执行这个函数的时候，已经为 dest 分配了足够的内存。</p>
+</li>
+<li><p>SDS 的空间分配策略完全杜绝了发生缓冲区溢出的可能性。</p>
+</li>
+</ul>
+<h3 id="减少修改字符串时带来的内存重分配次数"><a href="#减少修改字符串时带来的内存重分配次数" class="headerlink" title="减少修改字符串时带来的内存重分配次数"></a>减少修改字符串时带来的内存重分配次数</h3><ul>
+<li>因为 C 字符串并不记录自身的长度，所以对于一个包含了 N  个字符的 C 字符串来说，这个 C 字符串的底层实现<strong>总是</strong>一个 N + 1 个字符长的数组。</li>
+</ul>
+<ul>
+<li><p>SDS 通过未使用空间解除了字符串长度和底层数组长度之间的关联。free</p>
+</li>
+<li><p>通过未使用空间，SDS 实现了空间预分配和惰性空间释放两种优化策略。</p>
+<ul>
+<li><p><strong>空间预分配</strong></p>
+<p>当 SDS 的 API 对一个 SDS 进行修改，并且需要对 SDS 进行空间扩展的时候，程序不仅会为 SDS 分配修改所必须要的空间，还会为 SDS 分配额外的未使用空间。</p>
+<ol>
+<li>对 SDS 修改后，SDS 的长度(len) 将小于 1 MB，那么程序就会分配 len 属性相同大小的未使用空间</li>
+<li>大于 1MB，每次多分配 1MB 的未使用空间</li>
+</ol>
+<p>在扩展 SDS 空间之前， SDS API 会先检查未使用的空间是否足够。不够才会执行内存分配</p>
+</li>
+<li><p><strong>惰性空间释放</strong></p>
+<p>用于优化字符串的缩短操作：当 SDS API 需要缩短 SDS 保存的字符串时，程序并不立即使用内存重分配来回收缩短多出来的字节，而是使用 free 属性将这些字节数量记录起来，并等待将来使用。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="二进制安全"><a href="#二进制安全" class="headerlink" title="二进制安全"></a>二进制安全</h3><ul>
+<li>C 语言字符串的字符必须符合某种编码(ASCII, UTF-8)，并且除了字符串的末尾之外，字符串里面不能出现空字符，否则最先被程序读入的空字符将被误认为是字符串的结尾。所以 C 字符串只能保存文本数据，不能保存图片、音频、视频、压缩文件这样的二进制数据。</li>
+</ul>
+<h3 id="兼容部分-C-字符串函数"><a href="#兼容部分-C-字符串函数" class="headerlink" title="兼容部分 C 字符串函数"></a>兼容部分 C 字符串函数</h3><ul>
+<li>SDS 可以重用 &lt;String.h&gt; 函数库</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><table>
+<thead>
+<tr>
+<th align="left">C 字符串</th>
+<th align="center">SDS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">获取字符串长度的时间复杂度为 <em>O(N)</em></td>
+<td align="center">获取字符串长度的时间复杂度为 <em>O(1)</em></td>
+</tr>
+<tr>
+<td align="left">API 是不安全的，可能会造成缓冲区溢出</td>
+<td align="center">API 是安全的，杜绝缓冲区溢出</td>
+</tr>
+<tr>
+<td align="left">修改字符串长度 N 次必然会执行 N 次内存重分配</td>
+<td align="center">修改字符串长度 N 次最多会执行 N 次内存重分配</td>
+</tr>
+<tr>
+<td align="left">只能保存文本数据</td>
+<td align="center">可以保存文本和二进制数据</td>
+</tr>
+<tr>
+<td align="left">可以使用所有 &lt;string.h&gt; 库中的函数</td>
+<td align="center">可以使用一部分&lt;string.h&gt; 库中的函数</td>
+</tr>
+</tbody></table>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/21/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%89%E7%AB%A0%E9%93%BE%E8%A1%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/21/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%89%E7%AB%A0%E9%93%BE%E8%A1%A8/" class="post-title-link" itemprop="url">Redis设计与实现读书笔记:第一部分:数据结构与对象:第三章:链表</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-21 11:25:46 / 修改时间：12:43:47" itemprop="dateCreated datePublished" datetime="2020-05-21T11:25:46+08:00">2020-05-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h1><h2 id="链表和链表节点的实现"><a href="#链表和链表节点的实现" class="headerlink" title="链表和链表节点的实现"></a>链表和链表节点的实现</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span>&#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">prev</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">listNode</span> *<span class="title">next</span>;</span></span><br><span class="line">    <span class="keyword">void</span> *value;</span><br><span class="line">&#125;listNode;</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">list</span>&#123;</span></span><br><span class="line">    </span><br><span class="line">    listNode *head;</span><br><span class="line">    listNode *tail;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> len;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 节点值复制函数: 用于复制链表节点所保存的值</span></span><br><span class="line">    <span class="keyword">void</span> *(*dup)(<span class="keyword">void</span> *ptr);</span><br><span class="line">	</span><br><span class="line">   	<span class="comment">// 节点值释放函数: 用于释放链表节点所保存的值</span></span><br><span class="line">    <span class="keyword">void</span> (*<span class="built_in">free</span>)(<span class="keyword">void</span> *ptr);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 节点值对比函数: 用于链表节点所保存的值是否和另一个值相等</span></span><br><span class="line">    <span class="keyword">int</span> (*match)(<span class="keyword">void</span> *ptr, <span class="keyword">void</span> *key);</span><br><span class="line">&#125;<span class="built_in">list</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>Redis 的链表实现的特性：</p>
+<ul>
+<li>双端：prev next 指针，获取某一个节点的前置和后驱时间复杂度为 <em>O(1)</em>.</li>
+<li>无环：表头节点的 prev 指针和表尾节点的 next 指针为 null. </li>
+<li>带头指针和尾指针</li>
+<li>带链表长度计数器</li>
+<li><strong>多态</strong>： 链表节点使用 void* 指针来保存节点值，并且可以通过 list 结构的 dup, free, match 三个属性为节点值设置类型特定函数，所以链表用户保存各种不同类型的值。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/19/Algorithms/May/5%E6%9C%8819%E5%8F%B7~5%E6%9C%8831%E5%8F%B7%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -195,7 +416,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-28 17:10:53" itemprop="dateModified" datetime="2020-05-28T17:10:53+08:00">2020-05-28</time>
+                <time title="修改时间：2020-05-30 17:33:12" itemprop="dateModified" datetime="2020-05-30T17:33:12+08:00">2020-05-30</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -479,7 +700,90 @@
 </ol>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">multiply</span><span class="params">(String num1, String num2)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="string">"0"</span>.equals(num1) || <span class="string">"0"</span>.equals(num2)) <span class="keyword">return</span> <span class="string">"0"</span>;</span><br><span class="line">        <span class="keyword">int</span> len1 = num1.length();</span><br><span class="line">        <span class="keyword">int</span> len2 = num2.length();</span><br><span class="line">        <span class="keyword">int</span> len = len1 + len2;</span><br><span class="line">        <span class="keyword">int</span>[] res = <span class="keyword">new</span> <span class="keyword">int</span>[len];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = len1 - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            <span class="keyword">int</span> a = num1.charAt(i) - <span class="string">'0'</span>;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> j = len2 - <span class="number">1</span>; j &gt;= <span class="number">0</span>; j--) &#123;</span><br><span class="line">                <span class="keyword">int</span> b = num2.charAt(j) - <span class="string">'0'</span>;</span><br><span class="line">                res[i + j + <span class="number">1</span>] += a * b;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = len - <span class="number">1</span>; i &gt; <span class="number">0</span>; i--) &#123;</span><br><span class="line">            res[i - <span class="number">1</span>] += res[i] / <span class="number">10</span>;</span><br><span class="line">            res[i] = res[i] % <span class="number">10</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> index = <span class="number">0</span>;</span><br><span class="line">        StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        <span class="keyword">while</span>(res[index] == <span class="number">0</span>) index++;</span><br><span class="line">        <span class="keyword">while</span>(index &lt; len) &#123;</span><br><span class="line">            sb.append(res[index] + <span class="string">""</span>);</span><br><span class="line">            index++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<h2 id="5月30号"><a href="#5月30号" class="headerlink" title="5月30号"></a>5月30号</h2><ol>
+<li><a href="https://leetcode-cn.com/problems/reverse-words-in-a-string/" target="_blank" rel="noopener">翻转字符串里的单词</a> </li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">reverseWords</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(s.length() == <span class="number">0</span>) <span class="keyword">return</span> <span class="string">""</span>;</span><br><span class="line">        s = s.trim();</span><br><span class="line">        StringBuilder res = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        <span class="keyword">int</span> i = s.length() - <span class="number">1</span>, j = s.length() - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span>(i &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">while</span>(i &gt;= <span class="number">0</span> &amp;&amp; s.charAt(i) != <span class="string">' '</span>) i--;</span><br><span class="line">            res.append(s.substring(i+<span class="number">1</span>, j+<span class="number">1</span>) + <span class="string">" "</span>);</span><br><span class="line">            <span class="keyword">while</span>(i &gt;= <span class="number">0</span> &amp;&amp; s.charAt(i) == <span class="string">' '</span>) i--;</span><br><span class="line">            j = i;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res.toString().trim();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<ol start="2">
+<li><a href="https://leetcode-cn.com/problems/simplify-path/" target="_blank" rel="noopener">简化路径</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">simplifyPath</span><span class="params">(String path)</span> </span>&#123;</span><br><span class="line">        String[] paths = path.split(<span class="string">"/"</span>);</span><br><span class="line">        Stack&lt;String&gt; stack = <span class="keyword">new</span> Stack&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; paths.length; i++) &#123;</span><br><span class="line">            <span class="comment">// 如果是 "..", 则需要将上一个保存的路径删去，对应出栈</span></span><br><span class="line">            <span class="keyword">if</span>(paths[i].equals(<span class="string">".."</span>)) &#123;</span><br><span class="line">                <span class="keyword">if</span>(stack.size() &gt; <span class="number">0</span>) stack.pop();</span><br><span class="line">                <span class="comment">// 如果不为空并且不是".", 则代表是路径信息应该添加，压栈</span></span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span>(!paths[i].equals(<span class="string">""</span>) &amp;&amp; !paths[i].equals(<span class="string">"."</span>)) &#123;</span><br><span class="line">                stack.push(paths[i]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(stack.size() == <span class="number">0</span>) <span class="keyword">return</span> <span class="string">"/"</span>;</span><br><span class="line">        StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; stack.size(); i++) &#123;</span><br><span class="line">            sb.append(<span class="string">"/"</span> +  stack.get(i));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><a href="https://leetcode-cn.com/problems/restore-ip-addresses/" target="_blank" rel="noopener">复原IP地址</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    List&lt;String&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    List&lt;String&gt; path = <span class="keyword">new</span> ArrayList&lt;&gt;(<span class="number">4</span>);</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">restoreIpAddresses</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(s.length() == <span class="number">0</span>) <span class="keyword">return</span> res;</span><br><span class="line">        backtrack(s, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">backtrack</span><span class="params">(String s, <span class="keyword">int</span> len)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 递归的返回条件应该设置成 path == 4, 如果设置成 length 会超时</span></span><br><span class="line">        <span class="keyword">if</span>(path.size() == <span class="number">4</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span>(len == s.length()) &#123;</span><br><span class="line">                res.add(String.join(<span class="string">"."</span>, path));</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= <span class="number">3</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(len + i &gt; s.length()) <span class="keyword">return</span>;</span><br><span class="line">            String temp = s.substring(len, len + i);</span><br><span class="line">            <span class="keyword">if</span>((i &gt; <span class="number">1</span> &amp;&amp; temp.startsWith(<span class="string">"0"</span>)) || (i == <span class="number">3</span> &amp;&amp; Integer.parseInt(temp) &gt; <span class="number">255</span>)) <span class="keyword">return</span>;</span><br><span class="line">            path.add(temp);</span><br><span class="line">            backtrack(s, len + i);</span><br><span class="line">            path.remove(path.size() - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><a href="https://leetcode-cn.com/problems/sort-list/" target="_blank" rel="noopener">排序链表</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">sortList</span><span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mergesort(head);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">ListNode <span class="title">mergesort</span><span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(head == <span class="keyword">null</span> || head.next == <span class="keyword">null</span>) <span class="keyword">return</span> head;</span><br><span class="line">        ListNode preOfMid = findPreOfMid(head);</span><br><span class="line">        ListNode mid = preOfMid.next;</span><br><span class="line">        preOfMid.next = <span class="keyword">null</span>;</span><br><span class="line">        ListNode left = mergesort(head);</span><br><span class="line">        ListNode right = mergesort(mid);</span><br><span class="line">        <span class="keyword">return</span> merge(left, right);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">ListNode <span class="title">findPreOfMid</span><span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        ListNode slow = head, fast = head, pre = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">while</span>(fast != <span class="keyword">null</span> &amp;&amp; fast.next != <span class="keyword">null</span>) &#123;</span><br><span class="line">            pre = slow;</span><br><span class="line">            slow = slow.next;</span><br><span class="line">            fast = fast.next.next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> pre;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">ListNode <span class="title">merge</span><span class="params">(ListNode A, ListNode B)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(A == <span class="keyword">null</span> || B == <span class="keyword">null</span>) <span class="keyword">return</span> A == <span class="keyword">null</span> ? B : A;</span><br><span class="line">        ListNode newHead = <span class="keyword">new</span> ListNode(-<span class="number">1</span>);</span><br><span class="line">        ListNode p = newHead;</span><br><span class="line">        <span class="keyword">while</span>(A != <span class="keyword">null</span> &amp;&amp; B != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span>(A.val &lt; B.val) &#123;</span><br><span class="line">                p.next = A;</span><br><span class="line">                A = A.next;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                p.next = B;</span><br><span class="line">                B = B.next;</span><br><span class="line">            &#125;</span><br><span class="line">            p = p.next;</span><br><span class="line">        &#125;</span><br><span class="line">        p.next = A == <span class="keyword">null</span> ? B : A;</span><br><span class="line">        <span class="keyword">return</span> newHead.next;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li><a href="https://leetcode-cn.com/problems/intersection-of-two-linked-lists/" target="_blank" rel="noopener">相交链表</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">getIntersectionNode</span><span class="params">(ListNode headA, ListNode headB)</span> </span>&#123;</span><br><span class="line">        ListNode A = headA, B = headB;</span><br><span class="line">        <span class="keyword">while</span>(A != B) &#123;</span><br><span class="line">            A = (A != <span class="keyword">null</span>) ? A.next : headB;</span><br><span class="line">            B = (B != <span class="keyword">null</span>) ? B.next : headA;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> A;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li><a href="https://leetcode-cn.com/problems/linked-list-cycle/" target="_blank" rel="noopener">环形链表</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">hasCycle</span><span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(head == <span class="keyword">null</span> || head.next == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        ListNode slow = head, fast = head;</span><br><span class="line">        <span class="keyword">while</span>(slow != <span class="keyword">null</span> &amp;&amp; fast != <span class="keyword">null</span> &amp;&amp; fast.next != <span class="keyword">null</span>) &#123;</span><br><span class="line">            slow = slow.next;</span><br><span class="line">            fast = fast.next.next;</span><br><span class="line">            <span class="keyword">if</span>(slow == fast) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">         <span class="keyword">return</span> <span class="keyword">false</span>;   </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li><a href="https://leetcode-cn.com/problems/linked-list-cycle-ii/" target="_blank" rel="noopener">环形链表 II</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">detectCycle</span><span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        ListNode intersect = findIntersect(head);</span><br><span class="line">        <span class="keyword">if</span>(intersect == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">while</span>(intersect != head) &#123;</span><br><span class="line">            head = head.next;</span><br><span class="line">            intersect = intersect.next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> intersect;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">ListNode <span class="title">findIntersect</span><span class="params">(ListNode head)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(head == <span class="keyword">null</span> || head.next == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        ListNode slow = head, fast = head;</span><br><span class="line">        <span class="keyword">while</span>(slow != <span class="keyword">null</span> &amp;&amp; fast != <span class="keyword">null</span> &amp;&amp; fast.next != <span class="keyword">null</span>)&#123;</span><br><span class="line">            slow = slow.next;</span><br><span class="line">            fast = fast.next.next;</span><br><span class="line">            <span class="keyword">if</span>(slow == fast) <span class="keyword">return</span> fast;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="8">
+<li><a href="https://leetcode-cn.com/problems/merge-k-sorted-lists/" target="_blank" rel="noopener">合并K个排序链表</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ListNode <span class="title">mergeKLists</span><span class="params">(ListNode[] lists)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> merge(lists, <span class="number">0</span>, lists.length - <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">ListNode <span class="title">merge</span><span class="params">(ListNode[] lists, <span class="keyword">int</span> L, <span class="keyword">int</span> R)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(L &gt; R) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span>(L == R) <span class="keyword">return</span> lists[L];</span><br><span class="line">        <span class="keyword">int</span> mid = L + ((R - L) &gt;&gt; <span class="number">1</span>);</span><br><span class="line">        ListNode left = merge(lists, L, mid);</span><br><span class="line">        ListNode right = merge(lists, mid + <span class="number">1</span>, R);</span><br><span class="line">        <span class="keyword">return</span> mergeTwoList(left, right);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="9">
+<li><a href="https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/" target="_blank" rel="noopener">二叉树的最近公共祖先</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> TreeNode <span class="title">lowestCommonAncestor</span><span class="params">(TreeNode root, TreeNode p, TreeNode q)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root == p || root == q || root == <span class="keyword">null</span>) <span class="keyword">return</span> root;</span><br><span class="line">        TreeNode left = lowestCommonAncestor(root.left, p, q);</span><br><span class="line">        TreeNode right = lowestCommonAncestor(root.right, p, q);</span><br><span class="line">        <span class="keyword">if</span>(left == <span class="keyword">null</span>) <span class="keyword">return</span> right;</span><br><span class="line">        <span class="keyword">if</span>(right == <span class="keyword">null</span>) <span class="keyword">return</span> left;</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="10">
+<li><a href="https://leetcode-cn.com/problems/binary-tree-zigzag-level-order-traversal/" target="_blank" rel="noopener">二叉树的锯齿形层次遍历</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; zigzagLevelOrder(TreeNode root) &#123;</span><br><span class="line">        List&lt;List&lt;Integer&gt;&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="keyword">null</span>) <span class="keyword">return</span> res;</span><br><span class="line">        Queue&lt;TreeNode&gt; q = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        <span class="keyword">boolean</span> LTR = <span class="keyword">true</span>;</span><br><span class="line">        q.offer(root);</span><br><span class="line">        <span class="keyword">while</span>(!q.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">int</span> size = q.size();</span><br><span class="line">            List&lt;Integer&gt; level = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i++) &#123;</span><br><span class="line">                TreeNode temp = q.poll();</span><br><span class="line">                <span class="keyword">if</span>(LTR) level.add(temp.val);</span><br><span class="line">                <span class="keyword">else</span> level.add(<span class="number">0</span>, temp.val);</span><br><span class="line">                <span class="keyword">if</span>(temp.left != <span class="keyword">null</span>) q.offer(temp.left);</span><br><span class="line">                <span class="keyword">if</span>(temp.right != <span class="keyword">null</span>) q.offer(temp.right);</span><br><span class="line">            &#125;</span><br><span class="line">            LTR = !LTR;</span><br><span class="line">            res.add(level);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="11">
+<li><a href="https://leetcode-cn.com/problems/validate-binary-search-tree/" target="_blank" rel="noopener">验证二叉搜索树</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isValidBST</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> preOrder(root, Long.MAX_VALUE, Long.MIN_VALUE);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">preOrder</span><span class="params">(TreeNode root, <span class="keyword">long</span> up, <span class="keyword">long</span> down)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">if</span>(root.val &gt;= up || root.val &lt;= down) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">return</span> preOrder(root.left, root.val, down) &amp;&amp; preOrder(root.right, up, root.val);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isValidBST</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        Deque&lt;TreeNode&gt; stack = <span class="keyword">new</span> ArrayDeque&lt;&gt;();</span><br><span class="line">        TreeNode cur = root, pre = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">while</span>(stack.size() &gt; <span class="number">0</span> || cur != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">while</span>(cur != <span class="keyword">null</span>) &#123;</span><br><span class="line">                stack.push(cur);</span><br><span class="line">                cur = cur.left;</span><br><span class="line">            &#125;</span><br><span class="line">            cur = stack.pop();</span><br><span class="line">            <span class="keyword">if</span>(pre != <span class="keyword">null</span> &amp;&amp; pre.val &gt;= cur.val) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            pre = cur;</span><br><span class="line">            cur = cur.right;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="12">
+<li><a href="https://leetcode-cn.com/problems/binary-tree-preorder-traversal/" target="_blank" rel="noopener">二叉树的前序遍历</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">preorderTraversal</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        List&lt;Integer&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="keyword">null</span>) <span class="keyword">return</span> res;</span><br><span class="line">        Deque&lt;TreeNode&gt; stack = <span class="keyword">new</span> ArrayDeque&lt;&gt;();</span><br><span class="line">        stack.push(root);</span><br><span class="line">        <span class="keyword">while</span>(stack.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            TreeNode cur = stack.pop();</span><br><span class="line">            res.add(cur.val);</span><br><span class="line">            <span class="keyword">if</span>(cur.right != <span class="keyword">null</span>) stack.push(cur.right);</span><br><span class="line">            <span class="keyword">if</span>(cur.left != <span class="keyword">null</span>) stack.push(cur.left);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">preorderTraversal</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        List&lt;Integer&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="keyword">null</span>) <span class="keyword">return</span> res;</span><br><span class="line">        Deque&lt;TreeNode&gt; stack = <span class="keyword">new</span> ArrayDeque&lt;&gt;();</span><br><span class="line">        TreeNode cur = root;</span><br><span class="line">        <span class="keyword">while</span>(stack.size() &gt; <span class="number">0</span> || cur != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">while</span>(cur != <span class="keyword">null</span>) &#123;</span><br><span class="line">                res.add(cur.val);</span><br><span class="line">                stack.push(cur);</span><br><span class="line">                cur = cur.left;</span><br><span class="line">            &#125;</span><br><span class="line">            cur = stack.pop();</span><br><span class="line">            cur = cur.right;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="13">
+<li><a href="https://leetcode-cn.com/problems/binary-tree-inorder-traversal/" target="_blank" rel="noopener">二叉树的中序遍历</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">inorderTraversal</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        List&lt;Integer&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="keyword">null</span>) <span class="keyword">return</span> res;</span><br><span class="line">        Deque&lt;TreeNode&gt; stack = <span class="keyword">new</span> ArrayDeque&lt;&gt;();</span><br><span class="line">        TreeNode cur = root;</span><br><span class="line">        <span class="keyword">while</span>(stack.size() &gt; <span class="number">0</span> || cur != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">while</span>(cur != <span class="keyword">null</span>) &#123;</span><br><span class="line">                stack.push(cur);</span><br><span class="line">                cur = cur.left;</span><br><span class="line">            &#125;</span><br><span class="line">            cur = stack.pop();</span><br><span class="line">            res.add(cur.val);</span><br><span class="line">            cur = cur.right;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="14">
+<li><a href="https://leetcode-cn.com/problems/binary-tree-postorder-traversal/" target="_blank" rel="noopener">二叉树的后序遍历</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Integer&gt; <span class="title">postorderTraversal</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        List&lt;Integer&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="keyword">null</span>) <span class="keyword">return</span> res;</span><br><span class="line">        Deque&lt;TreeNode&gt; stack = <span class="keyword">new</span> ArrayDeque&lt;&gt;();</span><br><span class="line">        TreeNode lastVisited = root;</span><br><span class="line">        stack.push(root);</span><br><span class="line">        <span class="keyword">while</span>(stack.size() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            TreeNode cur = stack.peek();</span><br><span class="line">            <span class="keyword">if</span>(cur.left != <span class="keyword">null</span> &amp;&amp; lastVisited != cur.left &amp;&amp; lastVisited != cur.right) stack.push(cur.left);</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span>(cur.right != <span class="keyword">null</span> &amp;&amp; lastVisited != cur.right) stack.push(cur.right);</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                TreeNode visit = stack.pop();</span><br><span class="line">                lastVisited = visit;</span><br><span class="line">                res.add(visit.val);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="15">
+<li><a href="https://leetcode-cn.com/problems/string-to-integer-atoi/" target="_blank" rel="noopener">字符串转换整数 (atoi)</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">myAtoi</span><span class="params">(String str)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(str == <span class="keyword">null</span> || str.length() == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> index = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(index &lt; str.length() &amp;&amp; str.charAt(index) == <span class="string">' '</span>) index++;</span><br><span class="line">        <span class="keyword">if</span>(index == str.length()) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">char</span> firstChar = str.charAt(index);</span><br><span class="line">        <span class="keyword">boolean</span> positive = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">if</span>(!isAtoi(firstChar)) &#123;</span><br><span class="line">            <span class="keyword">if</span>(firstChar != <span class="string">'+'</span> &amp;&amp; firstChar != <span class="string">'-'</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">            positive = !(firstChar == <span class="string">'-'</span>);</span><br><span class="line">            index++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> limit = positive ? -Integer.MAX_VALUE : Integer.MIN_VALUE;</span><br><span class="line">        <span class="keyword">int</span> res = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(index &lt; str.length() &amp;&amp; isAtoi(str.charAt(index))) &#123;</span><br><span class="line">            <span class="keyword">int</span> cur = str.charAt(index++) - <span class="string">'0'</span>;</span><br><span class="line">            <span class="comment">// res * 10 - cur &lt; limit</span></span><br><span class="line">            <span class="keyword">if</span>(res &lt; (limit + cur) / <span class="number">10</span>) <span class="keyword">return</span> positive ? Integer.MAX_VALUE : Integer.MIN_VALUE;</span><br><span class="line">            res = res * <span class="number">10</span> - cur;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> positive ? -res : res;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isAtoi</span><span class="params">(<span class="keyword">char</span> c)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> t = c - <span class="string">'0'</span>;</span><br><span class="line">        <span class="keyword">return</span> t &gt;= <span class="number">0</span> &amp;&amp; t &lt;= <span class="number">9</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="16">
+<li><a href="https://leetcode-cn.com/problems/find-minimum-in-rotated-sorted-array/" target="_blank" rel="noopener">寻找旋转排序数组中的最小值</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">findMin</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(nums.length == <span class="number">0</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> L = <span class="number">0</span>, R = nums.length - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span>(L &lt; R) &#123;</span><br><span class="line">            <span class="keyword">if</span>(nums[L] &lt; nums[R]) <span class="keyword">return</span> nums[L];</span><br><span class="line">            <span class="keyword">int</span> mid = L + ((R - L) &gt;&gt; <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span>(nums[mid] &gt; nums[L]) L = mid + <span class="number">1</span>;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span>(nums[mid] &lt; nums[R]) R = mid;</span><br><span class="line">            <span class="keyword">else</span> L++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> nums[L];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="17">
+<li><a href="https://leetcode-cn.com/problems/search-in-rotated-sorted-array/" target="_blank" rel="noopener">搜索旋转排序数组</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">search</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(nums.length == <span class="number">0</span>) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> reverPoint = findReverPoint(nums);</span><br><span class="line">        <span class="keyword">int</span> left = binarySearch(nums, <span class="number">0</span>, reverPoint - <span class="number">1</span>, target);</span><br><span class="line">        <span class="keyword">int</span> right = binarySearch(nums, reverPoint, nums.length - <span class="number">1</span>, target);</span><br><span class="line">        <span class="keyword">if</span>(left != -<span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> left;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> right;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">findReverPoint</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> L = <span class="number">0</span>, R = nums.length - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span>(L &lt; R) &#123;</span><br><span class="line">            <span class="keyword">if</span>(nums[L] &lt; nums[R]) <span class="keyword">return</span> L;</span><br><span class="line">            <span class="keyword">int</span> mid = L + ((R - L) &gt;&gt; <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span>(nums[mid] &gt; nums[L]) L = mid + <span class="number">1</span>;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span>(nums[mid] &lt; nums[R]) R = mid;</span><br><span class="line">            <span class="keyword">else</span> L++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> L;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">binarySearch</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> L, <span class="keyword">int</span> R, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span>(L &lt;= R) &#123;</span><br><span class="line">            <span class="keyword">int</span> mid = L + ((R - L) &gt;&gt; <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span>(nums[mid] == target) <span class="keyword">return</span> mid;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span>(nums[mid] &gt; target) R = mid - <span class="number">1</span>;</span><br><span class="line">            <span class="keyword">else</span> L = mid + <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -1247,340 +1551,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Scoket/socket%20IO/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Scoket/socket%20IO/" class="post-title-link" itemprop="url">Socket I/O</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:15:22" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/I-O/" itemprop="url" rel="index"><span itemprop="name">I/O</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>One basic concept of Linux (actually Unix) is the rule that everything in Unix/Linux is a file. Each process has a table of file descriptors that point to files, sockets, devices and other operating system objects.<br>    linux系统中，一切皆文件。，每一个进程都有一个FD表，指向了与该进程有关的文件，套接字，设备或者其他操作系统对象。<br>Typical system that works with many IO sources has an initializaion phase and then enter some kind of standby mode – wait for any client to send request and response it<br>典型系统中有许多IO资源具有初始化阶段，然后进入某种待机模式——等待任意一个客户端发送请求并对其进行响应。<br>Simple solution is to create a thread (or process) for each client , block on read until a request is sent and write a response. This is working ok with a small amount of clients but if we want to scale it to hundred of clients, creating a thread for each client is a bad idea<br>简单的解决方案是为每一个客户，创建一个线程，客户请求的时候进行响应，其他时候处于阻塞状态。</p>
-<hr>
-<p>sfd = socket();    // socket 系统调用 得到一个文件描述符代表这个socket</p>
-<p>bind(sfd…)    // 绑定到一个端口号上</p>
-<p>listen(sfd)     // 开启监听状态</p>
-<p>accept(sfd)     // 接收客户端的连接 (阻塞) </p>
-<p>read recvfrom </p>
-<p>调用recv 的时候，操作系统会把该进程阻塞。当网络数据到达网卡的时候，网卡会把数据放到内存，然后中断通知CPU，CPU 执行中断程序，把网络数据写入到对应的socket的接受缓冲区中(端口号)，在唤醒阻塞的进程来读数据。</p>
-<ul>
-<li>如何如何同时监视多个socket的数据？</li>
-</ul>
-<p>每次有一个 client 新的连接，该线程就 clone 一个新的线程来执行。</p>
-<hr>
-<h1 id="IO-Multiplexing"><a href="#IO-Multiplexing" class="headerlink" title="IO Multiplexing"></a>IO Multiplexing</h1><p>The solution is to use a kernel mechanism for polling over a set of file descriptors. There are 3 options you can use in Linux:<br>IO的多路复用解决方案是利于操作系统的内核机制来轮询一组文件描述符。</p>
-<p>Multiplexing 指的其实是在单个线程通过记录跟踪每一个Sock(I/O流)的状态来同时管理多个I/O流. </p>
-<ul>
-<li>select</li>
-<li>poll</li>
-<li>epoll</li>
-</ul>
-<p>All the above methods serve the same idea, create a set of file descriptors , tell the kernel what would you like to do with each file descriptor (read, write, ..) and use one thread to block on one function call until at least one file descriptor requested operation available</p>
-<p>服务端需要管理多个客户端连接，而recv只能监视单个socket，这种矛盾下，人们开始寻找监视多个socket的方法。</p>
-<ol>
-<li><p><strong>select</strong> : 假如能够预先传入一个socket列表，<strong>如果列表中的socket都没有数据，挂起进程，直到有一个socket收到数据，唤醒进程</strong>。</p>
-<ul>
-<li>用法：先准备一个数组（下面代码中的fds），让fds存放着所有需要监视的socket。然后调用select，如果fds中的所有socket都没有数据，select会阻塞，直到有一个socket接收到数据，select返回，唤醒进程。用户可以遍历fds，通过FD_ISSET判断具体哪个socket收到数据，然后做出处理。</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> s = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);  </span><br><span class="line">bind(s, ...)</span><br><span class="line"><span class="built_in">listen</span>(s, ...)</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> fds[] =  存放需要监听的socket</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">    <span class="keyword">int</span> n = select(..., fds, ...)</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i &lt; fds.count; i++)&#123;</span><br><span class="line">        <span class="keyword">if</span>(FD_ISSET(fds[i], ...))&#123;</span><br><span class="line">            <span class="comment">//fds[i]的数据处理</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<pre><code>* **select的流程**：select的实现思路很直接。假如程序同时监视如下图的sock1、sock2和sock3三个socket，那么在调用select之后，操作系统把进程A分别加入这三个socket的等待队列中。</code></pre><p><img src="" alt=""></p>
-</li>
-</ol>
-<p><a href="https://zhuanlan.zhihu.com/p/63179839" target="_blank" rel="noopener">如果这篇文章说不清epoll的本质，那就过来掐死我吧！ （1）</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Operating%20System/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Operating%20System/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/" class="post-title-link" itemprop="url">简单操作系统概念</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:14:52" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Operating-System/" itemprop="url" rel="index"><span itemprop="name">Operating System</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="1-操作系统概述"><a href="#1-操作系统概述" class="headerlink" title="1. 操作系统概述"></a>1. 操作系统概述</h1><ul>
-<li>操作系统的特征</li>
-</ul>
-<ol>
-<li><p><strong>并发</strong>：并发是指两个或多个事件在同一时间间隔内发生。</p>
-</li>
-<li><p><strong>共享</strong>：即资源共享，是指系统中的资源可供内存中多个并发执行的程序共同使用。</p>
-</li>
-<li><p>虚拟：是指把一个物理上的实体虚拟成多个逻辑上的对应物。</p>
-<ul>
-<li>虚拟技术：时分复用技术，空分复用技术</li>
-</ul>
-</li>
-<li><p>异步：在多道程序环境下，允许多个程序并发执行，但由于资源有限，进程的执行不是一贯到底，而是走走停停，以不可预知的速度向前推进，这就是操作系统的异步性。</p>
-</li>
-</ol>
-<ul>
-<li><strong>内核</strong>（核心态）</li>
-</ul>
-<ol>
-<li>时钟管理：提供系统时间、实现进程切换</li>
-<li>中断机制：提高 CPU 的利用率</li>
-<li>原语</li>
-<li>系统控制的数据结构及处理</li>
-</ol>
-<ul>
-<li><strong>中断</strong>：当中断或者异常发生的时候， 运行用户态的 CPU 会立即进入核心态，通过硬件实现的</li>
-<li><strong>系统调用</strong>：是用户在程序中调用操作系统提供的一些子功能。系统中的各种共享资源都是由操作系统统一掌管，因此在用户程序中，凡是与资源有关的操作（存储分配、进行 I/O 传输、管理文件），都必须通过系统调用的方式向操作系统提出服务请求，并由操作系统代为完成。</li>
-</ul>
-<h1 id="2-1-进程管理"><a href="#2-1-进程管理" class="headerlink" title="2.1 进程管理"></a>2.1 进程管理</h1><p>进程映像：程序段、相关数据段和 PCB (静态的)</p>
-<p>进程：进程是进程映像的运行过程，是系统进行资源分配和调度的一个独立单位。（描述<strong>动态</strong>）</p>
-<p>进程状态：创建 就绪 运行 阻塞(等待) 结束</p>
-<p>进程之间的通信：</p>
-<ol>
-<li><p>共享存储</p>
-<ol start="2">
-<li>消息传递</li>
-<li>管道通信</li>
-</ol>
-</li>
-</ol>
-<p>线程与进程的区别：调度、拥有资源、并发性、系统开销、地址空间和其他资源、通信方面</p>
-<p>线程的实现方式：</p>
-<pre><code>1. 用户级线程：将多个用户级线程映射到一个内核级线程，线程管理在用户空间完成。此模型中，用户级线程对操作系统不可见。
-* 优点：线程管理是在用户级空间进行的，因而效率比较高
-* 缺点：当一个线程在使用内核服务的时候被阻塞，那么整个进程就会被阻塞；多个线程不能并行的运行在多处理机上。
-2. 内核级线程：将每个用户级线程映射到一个内核级线程
-* 优点：当一个线程被阻塞的时候，另一个线程继续执行，并发能力强
-* 缺点：每创建一个用户级线程都需要创建一个内核级线程与之对应，创建线程的开销比较大，会影响到用户程序的性能。</code></pre><p><img src="https://github.com/Wayne-98/image/blob/master/Operating%20System/Process.png?raw=true" alt=""></p>
-<h1 id="2-2-处理机调度"><a href="#2-2-处理机调度" class="headerlink" title="2.2 处理机调度"></a>2.2 处理机调度</h1><ul>
-<li>调度的层次（三级调度）</li>
-</ul>
-<ol>
-<li>作业调度：内存与辅存之间的调度，每个作业只调入和调出一次。</li>
-<li>中级调度(内存调度)：引入是为了提高内存的利用率和系统的吞吐量。将暂时不能运行的进程，调至外存等待，把此时的进程状态称为挂起态。</li>
-<li>进程调度：按照某种方法和策略从就绪队列中选取一个进程，将处理机分配给它。</li>
-</ol>
-<p>作业调度为进程活动做准备，进程调度使进程正常活动起来，中级调度将暂时不能运行的进程挂起，中级调度处于作业调度和进程调度之间。</p>
-<ul>
-<li>调度的时机、切换与过程</li>
-</ul>
-<p>不能进程进程调度与切换的几种情况：</p>
-<ol>
-<li><p>处理中断的过程中</p>
-<ol start="2">
-<li>进程在操作系统内核临界区中</li>
-<li>其他需要完全屏蔽中断的原子操作过程中</li>
-</ol>
-</li>
-</ol>
-<p>应当进行进程调度与切换的情况有：</p>
-<ol>
-<li><p>发生引起调度条件，并且当前进程无法继续执行下去，可以马上进行调度与切换。(非剥夺调度)</p>
-<ol start="2">
-<li>当中断处理结束或自陷处理结束后，返回被中断进程的用户态执行现场前。若置上请求调度标志，即可马上进行进程的调度与切换(剥夺式调度)</li>
-</ol>
-</li>
-</ol>
-<ul>
-<li>调度的基本准则</li>
-</ul>
-<ol>
-<li>CPU 利用率 2. 系统吞吐量 3. 周转时间 4. 等待时间 5. 响应时间</li>
-</ol>
-<ul>
-<li>典型的调度算法</li>
-</ul>
-<ol>
-<li>先来先服务 </li>
-<li>短作业优先 </li>
-<li>优先级调度 </li>
-<li>高响应比优先调度 （响应比 = （等待时间 + 要求服务时间） / 要求服务时间）</li>
-<li>时间片轮转调度</li>
-<li>多级反馈队列调度 </li>
-</ol>
-<p><img src="https://github.com/Wayne-98/image/blob/master/Operating%20System/%E8%B0%83%E5%BA%A6.png?raw=true" alt=""></p>
-<h2 id="2-3-进程同步"><a href="#2-3-进程同步" class="headerlink" title="2.3 进程同步"></a>2.3 进程同步</h2><ul>
-<li>同步和互斥</li>
-</ul>
-<ol>
-<li><p>同步：直接制约关系，指为完成某个任务而建立的两个或多个进程，这些进程因为需要在某些位置上协调它们的工作次序而等待、传递消息所产生的制约关系。进程间的直接制约关系，源于它们之间的合作。</p>
-</li>
-<li><p>互斥：简介制约关系，当一个进程进入临界区使用资源的时候，另一个进程必须等待，当占用临界资源的进程退出临界区后，另一个进程才允许去访问此临界资源。</p>
-</li>
-</ol>
-<ul>
-<li>生产者消费者、读者写者、哲学家进餐</li>
-</ul>
-<p><img src="https://github.com/Wayne-98/image/blob/master/Operating%20System/%E8%BF%9B%E7%A8%8B%E5%90%8C%E6%AD%A5.png?raw=true" alt=""></p>
-<h2 id="2-4-死锁"><a href="#2-4-死锁" class="headerlink" title="2.4 死锁"></a>2.4 死锁</h2><ul>
-<li><p>死锁：多个进程因竞争资源而造成的一种僵局，若无外力作用，这些进程都将无法向前推进。</p>
-</li>
-<li><p>死锁产生的必要条件：</p>
-<ol>
-<li>互斥</li>
-<li>不可剥夺</li>
-<li>请求和保持</li>
-<li>循环等待条件：存在一种进程资源的循环等待链，链中每一个进程已获得的资源同时被链中下一个进程所请求。</li>
-</ol>
-</li>
-<li><p>死锁的处理策略：</p>
-<ol>
-<li><p>预防死锁：破坏 4 个条件其中之一。</p>
-</li>
-<li><p>避免死锁：银行家</p>
-</li>
-<li><p>死锁的检测以及解除</p>
-</li>
-</ol>
-</li>
-<li><p>死锁预防</p>
-<ol>
-<li>破坏互斥：不可行</li>
-<li>破坏不可剥夺：不可行</li>
-<li>破坏请求和保持：一次分配所有资源，浪费资源，申请不到所有资源可能会出现“饥饿”现象</li>
-<li>破坏循环等待：给资源编序号，按序申请。</li>
-</ol>
-</li>
-<li><p>死锁避免：</p>
-<ol>
-<li>系统安全状态：系统能够按照某种进程推进顺序，为每个进程分配其所需资源，使每个进程多可以顺利的完成。</li>
-<li>银行家算法：<ul>
-<li>可用资源矢量</li>
-<li>最大需求矩阵</li>
-<li>分配矩阵</li>
-<li>需求矩阵</li>
-</ul>
-</li>
-</ol>
-</li>
-<li><p>死锁的检测与解除</p>
-<ol>
-<li>资源分配图</li>
-</ol>
-<p><img src="https://github.com/Wayne-98/image/blob/master/Operating%20System/%E8%B5%84%E6%BA%90%E5%88%86%E9%85%8D%E5%9B%BE.png?raw=true" alt=""></p>
-<ol start="2">
-<li>死锁定理：S 为死锁的条件是当且仅当 S 状态的资源分配图是不可完全简化的，该条件为死锁定理</li>
-<li>死锁解除：<ol>
-<li>资源剥夺法：挂起某些死锁进程，抢占它的资源</li>
-<li>资源撤销法：按照进程的优先级和撤销进程的代价的高低，强制撤销部分、甚至全部死锁进程并剥夺这些进程的资源</li>
-<li>进程回退法：让一个或多个进程回退到足以回避死锁的地步，进程自愿释放资源而不是被剥夺。要求系统保持进程的历史信息，设置还原点。</li>
-</ol>
-</li>
-</ol>
-<p><img src="https://github.com/Wayne-98/image/blob/master/Operating%20System/%E6%AD%BB%E9%94%81.png?raw=true" alt=""></p>
-</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1652,7 +1622,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-count">57</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

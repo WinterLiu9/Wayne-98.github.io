@@ -164,6 +164,340 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Scoket/socket%20IO/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Scoket/socket%20IO/" class="post-title-link" itemprop="url">Socket I/O</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:15:22" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/I-O/" itemprop="url" rel="index"><span itemprop="name">I/O</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>One basic concept of Linux (actually Unix) is the rule that everything in Unix/Linux is a file. Each process has a table of file descriptors that point to files, sockets, devices and other operating system objects.<br>    linux系统中，一切皆文件。，每一个进程都有一个FD表，指向了与该进程有关的文件，套接字，设备或者其他操作系统对象。<br>Typical system that works with many IO sources has an initializaion phase and then enter some kind of standby mode – wait for any client to send request and response it<br>典型系统中有许多IO资源具有初始化阶段，然后进入某种待机模式——等待任意一个客户端发送请求并对其进行响应。<br>Simple solution is to create a thread (or process) for each client , block on read until a request is sent and write a response. This is working ok with a small amount of clients but if we want to scale it to hundred of clients, creating a thread for each client is a bad idea<br>简单的解决方案是为每一个客户，创建一个线程，客户请求的时候进行响应，其他时候处于阻塞状态。</p>
+<hr>
+<p>sfd = socket();    // socket 系统调用 得到一个文件描述符代表这个socket</p>
+<p>bind(sfd…)    // 绑定到一个端口号上</p>
+<p>listen(sfd)     // 开启监听状态</p>
+<p>accept(sfd)     // 接收客户端的连接 (阻塞) </p>
+<p>read recvfrom </p>
+<p>调用recv 的时候，操作系统会把该进程阻塞。当网络数据到达网卡的时候，网卡会把数据放到内存，然后中断通知CPU，CPU 执行中断程序，把网络数据写入到对应的socket的接受缓冲区中(端口号)，在唤醒阻塞的进程来读数据。</p>
+<ul>
+<li>如何如何同时监视多个socket的数据？</li>
+</ul>
+<p>每次有一个 client 新的连接，该线程就 clone 一个新的线程来执行。</p>
+<hr>
+<h1 id="IO-Multiplexing"><a href="#IO-Multiplexing" class="headerlink" title="IO Multiplexing"></a>IO Multiplexing</h1><p>The solution is to use a kernel mechanism for polling over a set of file descriptors. There are 3 options you can use in Linux:<br>IO的多路复用解决方案是利于操作系统的内核机制来轮询一组文件描述符。</p>
+<p>Multiplexing 指的其实是在单个线程通过记录跟踪每一个Sock(I/O流)的状态来同时管理多个I/O流. </p>
+<ul>
+<li>select</li>
+<li>poll</li>
+<li>epoll</li>
+</ul>
+<p>All the above methods serve the same idea, create a set of file descriptors , tell the kernel what would you like to do with each file descriptor (read, write, ..) and use one thread to block on one function call until at least one file descriptor requested operation available</p>
+<p>服务端需要管理多个客户端连接，而recv只能监视单个socket，这种矛盾下，人们开始寻找监视多个socket的方法。</p>
+<ol>
+<li><p><strong>select</strong> : 假如能够预先传入一个socket列表，<strong>如果列表中的socket都没有数据，挂起进程，直到有一个socket收到数据，唤醒进程</strong>。</p>
+<ul>
+<li>用法：先准备一个数组（下面代码中的fds），让fds存放着所有需要监视的socket。然后调用select，如果fds中的所有socket都没有数据，select会阻塞，直到有一个socket接收到数据，select返回，唤醒进程。用户可以遍历fds，通过FD_ISSET判断具体哪个socket收到数据，然后做出处理。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> s = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);  </span><br><span class="line">bind(s, ...)</span><br><span class="line"><span class="built_in">listen</span>(s, ...)</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> fds[] =  存放需要监听的socket</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(<span class="number">1</span>)&#123;</span><br><span class="line">    <span class="keyword">int</span> n = select(..., fds, ...)</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i &lt; fds.count; i++)&#123;</span><br><span class="line">        <span class="keyword">if</span>(FD_ISSET(fds[i], ...))&#123;</span><br><span class="line">            <span class="comment">//fds[i]的数据处理</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<pre><code>* **select的流程**：select的实现思路很直接。假如程序同时监视如下图的sock1、sock2和sock3三个socket，那么在调用select之后，操作系统把进程A分别加入这三个socket的等待队列中。</code></pre><p><img src="" alt=""></p>
+</li>
+</ol>
+<p><a href="https://zhuanlan.zhihu.com/p/63179839" target="_blank" rel="noopener">如果这篇文章说不清epoll的本质，那就过来掐死我吧！ （1）</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Operating%20System/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/Operating%20System/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/" class="post-title-link" itemprop="url">简单操作系统概念</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-05-10 21:39:10 / 修改时间：22:14:52" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Operating-System/" itemprop="url" rel="index"><span itemprop="name">Operating System</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="1-操作系统概述"><a href="#1-操作系统概述" class="headerlink" title="1. 操作系统概述"></a>1. 操作系统概述</h1><ul>
+<li>操作系统的特征</li>
+</ul>
+<ol>
+<li><p><strong>并发</strong>：并发是指两个或多个事件在同一时间间隔内发生。</p>
+</li>
+<li><p><strong>共享</strong>：即资源共享，是指系统中的资源可供内存中多个并发执行的程序共同使用。</p>
+</li>
+<li><p>虚拟：是指把一个物理上的实体虚拟成多个逻辑上的对应物。</p>
+<ul>
+<li>虚拟技术：时分复用技术，空分复用技术</li>
+</ul>
+</li>
+<li><p>异步：在多道程序环境下，允许多个程序并发执行，但由于资源有限，进程的执行不是一贯到底，而是走走停停，以不可预知的速度向前推进，这就是操作系统的异步性。</p>
+</li>
+</ol>
+<ul>
+<li><strong>内核</strong>（核心态）</li>
+</ul>
+<ol>
+<li>时钟管理：提供系统时间、实现进程切换</li>
+<li>中断机制：提高 CPU 的利用率</li>
+<li>原语</li>
+<li>系统控制的数据结构及处理</li>
+</ol>
+<ul>
+<li><strong>中断</strong>：当中断或者异常发生的时候， 运行用户态的 CPU 会立即进入核心态，通过硬件实现的</li>
+<li><strong>系统调用</strong>：是用户在程序中调用操作系统提供的一些子功能。系统中的各种共享资源都是由操作系统统一掌管，因此在用户程序中，凡是与资源有关的操作（存储分配、进行 I/O 传输、管理文件），都必须通过系统调用的方式向操作系统提出服务请求，并由操作系统代为完成。</li>
+</ul>
+<h1 id="2-1-进程管理"><a href="#2-1-进程管理" class="headerlink" title="2.1 进程管理"></a>2.1 进程管理</h1><p>进程映像：程序段、相关数据段和 PCB (静态的)</p>
+<p>进程：进程是进程映像的运行过程，是系统进行资源分配和调度的一个独立单位。（描述<strong>动态</strong>）</p>
+<p>进程状态：创建 就绪 运行 阻塞(等待) 结束</p>
+<p>进程之间的通信：</p>
+<ol>
+<li><p>共享存储</p>
+<ol start="2">
+<li>消息传递</li>
+<li>管道通信</li>
+</ol>
+</li>
+</ol>
+<p>线程与进程的区别：调度、拥有资源、并发性、系统开销、地址空间和其他资源、通信方面</p>
+<p>线程的实现方式：</p>
+<pre><code>1. 用户级线程：将多个用户级线程映射到一个内核级线程，线程管理在用户空间完成。此模型中，用户级线程对操作系统不可见。
+* 优点：线程管理是在用户级空间进行的，因而效率比较高
+* 缺点：当一个线程在使用内核服务的时候被阻塞，那么整个进程就会被阻塞；多个线程不能并行的运行在多处理机上。
+2. 内核级线程：将每个用户级线程映射到一个内核级线程
+* 优点：当一个线程被阻塞的时候，另一个线程继续执行，并发能力强
+* 缺点：每创建一个用户级线程都需要创建一个内核级线程与之对应，创建线程的开销比较大，会影响到用户程序的性能。</code></pre><p><img src="https://github.com/Wayne-98/image/blob/master/Operating%20System/Process.png?raw=true" alt=""></p>
+<h1 id="2-2-处理机调度"><a href="#2-2-处理机调度" class="headerlink" title="2.2 处理机调度"></a>2.2 处理机调度</h1><ul>
+<li>调度的层次（三级调度）</li>
+</ul>
+<ol>
+<li>作业调度：内存与辅存之间的调度，每个作业只调入和调出一次。</li>
+<li>中级调度(内存调度)：引入是为了提高内存的利用率和系统的吞吐量。将暂时不能运行的进程，调至外存等待，把此时的进程状态称为挂起态。</li>
+<li>进程调度：按照某种方法和策略从就绪队列中选取一个进程，将处理机分配给它。</li>
+</ol>
+<p>作业调度为进程活动做准备，进程调度使进程正常活动起来，中级调度将暂时不能运行的进程挂起，中级调度处于作业调度和进程调度之间。</p>
+<ul>
+<li>调度的时机、切换与过程</li>
+</ul>
+<p>不能进程进程调度与切换的几种情况：</p>
+<ol>
+<li><p>处理中断的过程中</p>
+<ol start="2">
+<li>进程在操作系统内核临界区中</li>
+<li>其他需要完全屏蔽中断的原子操作过程中</li>
+</ol>
+</li>
+</ol>
+<p>应当进行进程调度与切换的情况有：</p>
+<ol>
+<li><p>发生引起调度条件，并且当前进程无法继续执行下去，可以马上进行调度与切换。(非剥夺调度)</p>
+<ol start="2">
+<li>当中断处理结束或自陷处理结束后，返回被中断进程的用户态执行现场前。若置上请求调度标志，即可马上进行进程的调度与切换(剥夺式调度)</li>
+</ol>
+</li>
+</ol>
+<ul>
+<li>调度的基本准则</li>
+</ul>
+<ol>
+<li>CPU 利用率 2. 系统吞吐量 3. 周转时间 4. 等待时间 5. 响应时间</li>
+</ol>
+<ul>
+<li>典型的调度算法</li>
+</ul>
+<ol>
+<li>先来先服务 </li>
+<li>短作业优先 </li>
+<li>优先级调度 </li>
+<li>高响应比优先调度 （响应比 = （等待时间 + 要求服务时间） / 要求服务时间）</li>
+<li>时间片轮转调度</li>
+<li>多级反馈队列调度 </li>
+</ol>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Operating%20System/%E8%B0%83%E5%BA%A6.png?raw=true" alt=""></p>
+<h2 id="2-3-进程同步"><a href="#2-3-进程同步" class="headerlink" title="2.3 进程同步"></a>2.3 进程同步</h2><ul>
+<li>同步和互斥</li>
+</ul>
+<ol>
+<li><p>同步：直接制约关系，指为完成某个任务而建立的两个或多个进程，这些进程因为需要在某些位置上协调它们的工作次序而等待、传递消息所产生的制约关系。进程间的直接制约关系，源于它们之间的合作。</p>
+</li>
+<li><p>互斥：简介制约关系，当一个进程进入临界区使用资源的时候，另一个进程必须等待，当占用临界资源的进程退出临界区后，另一个进程才允许去访问此临界资源。</p>
+</li>
+</ol>
+<ul>
+<li>生产者消费者、读者写者、哲学家进餐</li>
+</ul>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Operating%20System/%E8%BF%9B%E7%A8%8B%E5%90%8C%E6%AD%A5.png?raw=true" alt=""></p>
+<h2 id="2-4-死锁"><a href="#2-4-死锁" class="headerlink" title="2.4 死锁"></a>2.4 死锁</h2><ul>
+<li><p>死锁：多个进程因竞争资源而造成的一种僵局，若无外力作用，这些进程都将无法向前推进。</p>
+</li>
+<li><p>死锁产生的必要条件：</p>
+<ol>
+<li>互斥</li>
+<li>不可剥夺</li>
+<li>请求和保持</li>
+<li>循环等待条件：存在一种进程资源的循环等待链，链中每一个进程已获得的资源同时被链中下一个进程所请求。</li>
+</ol>
+</li>
+<li><p>死锁的处理策略：</p>
+<ol>
+<li><p>预防死锁：破坏 4 个条件其中之一。</p>
+</li>
+<li><p>避免死锁：银行家</p>
+</li>
+<li><p>死锁的检测以及解除</p>
+</li>
+</ol>
+</li>
+<li><p>死锁预防</p>
+<ol>
+<li>破坏互斥：不可行</li>
+<li>破坏不可剥夺：不可行</li>
+<li>破坏请求和保持：一次分配所有资源，浪费资源，申请不到所有资源可能会出现“饥饿”现象</li>
+<li>破坏循环等待：给资源编序号，按序申请。</li>
+</ol>
+</li>
+<li><p>死锁避免：</p>
+<ol>
+<li>系统安全状态：系统能够按照某种进程推进顺序，为每个进程分配其所需资源，使每个进程多可以顺利的完成。</li>
+<li>银行家算法：<ul>
+<li>可用资源矢量</li>
+<li>最大需求矩阵</li>
+<li>分配矩阵</li>
+<li>需求矩阵</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p>死锁的检测与解除</p>
+<ol>
+<li>资源分配图</li>
+</ol>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Operating%20System/%E8%B5%84%E6%BA%90%E5%88%86%E9%85%8D%E5%9B%BE.png?raw=true" alt=""></p>
+<ol start="2">
+<li>死锁定理：S 为死锁的条件是当且仅当 S 状态的资源分配图是不可完全简化的，该条件为死锁定理</li>
+<li>死锁解除：<ol>
+<li>资源剥夺法：挂起某些死锁进程，抢占它的资源</li>
+<li>资源撤销法：按照进程的优先级和撤销进程的代价的高低，强制撤销部分、甚至全部死锁进程并剥夺这些进程的资源</li>
+<li>进程回退法：让一个或多个进程回退到足以回避死锁的地步，进程自愿释放资源而不是被剥夺。要求系统保持进程的历史信息，设置还原点。</li>
+</ol>
+</li>
+</ol>
+<p><img src="https://github.com/Wayne-98/image/blob/master/Operating%20System/%E6%AD%BB%E9%94%81.png?raw=true" alt=""></p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E5%9B%9B%E9%83%A8%E5%88%86%EF%BC%9A%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1787,186 +2121,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Java%E4%B8%AD%E7%9A%84%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E7%B1%BB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Java%20Concurrent/Java%E4%B8%AD%E7%9A%84%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E7%B1%BB/" class="post-title-link" itemprop="url">Java中的并发工具类</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-21 10:29:02" itemprop="dateModified" datetime="2020-05-21T10:29:02+08:00">2020-05-21</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Java并发编程的艺术读书笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="等待多线程完成的CountDownLatch"><a href="#等待多线程完成的CountDownLatch" class="headerlink" title="等待多线程完成的CountDownLatch"></a>等待多线程完成的CountDownLatch</h2><blockquote>
-<p><a href="https://blog.csdn.net/zhutulang/article/details/48504487" target="_blank" rel="noopener">CountDownLatch理解一：与join的区别</a></p>
-</blockquote>
-<p>CountDownLatch允许一个或多个线程等待其他线程完成操作。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JoinCountDownLatchTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        Thread parser1 = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        Thread parser2 = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.out.println(<span class="string">"parser2 finish"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    parser1.start();</span><br><span class="line">    parser2.start();</span><br><span class="line">    parser1.join();</span><br><span class="line">    parser2.join();</span><br><span class="line">    System.out.println(<span class="string">"all parser finish"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>首先来看一下join，在当前线程中，如果调用某个thread的join方法，那么当前线程就会被阻塞，直到thread线程执行完毕，当前线程才能继续执行。join的原理是，不断的检查thread是否存活，如果存活，那么让当前线程一直wait，直到thread线程终止，线程的this.notifyAll 就会被调用。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CountDownLatchTest</span> </span>&#123;</span><br><span class="line">    staticCountDownLatch c = <span class="keyword">new</span> CountDownLatch(<span class="number">2</span>);</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.out.println(<span class="number">1</span>);</span><br><span class="line">            c.countDown();</span><br><span class="line">            System.out.println(<span class="number">2</span>);</span><br><span class="line">            c.countDown();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).start();</span><br><span class="line">    c.await();</span><br><span class="line">    System.out.println(<span class="string">"3"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>CountDownLatch的构造函数接收一个int类型的参数作为计数器，如果你想等待N个点完成，这里就传入N。<br>当我们调用CountDownLatch的countDown方法时，N就会减1，CountDownLatch的await方法会阻塞当前线程，直到N变成零。由于countDown方法可以用在任何地方，所以这里说的N个点，可以是N个线程，也可以是1个线程里的N个执行步骤。用在多个线程时，只需要把这个CountDownLatch的引用传递到线程里即可。</p>
-<blockquote>
-<p>CountDownLatch中我们主要用到两个方法一个是await()方法，调用这个方法的线程会被阻塞，另外一个是countDown()方法，调用这个方法会使计数器减一，当计数器的值为0时，因调用await()方法被阻塞的线程会被唤醒，继续执行。</p>
-</blockquote>
-<hr>
-<h2 id="同步屏障CyclicBarrier"><a href="#同步屏障CyclicBarrier" class="headerlink" title="同步屏障CyclicBarrier"></a>同步屏障CyclicBarrier</h2><blockquote>
-<p><a href="https://www.jianshu.com/p/9262361a1200" target="_blank" rel="noopener">CyclicBarrier 相关整理</a></p>
-</blockquote>
-<p>CyclicBarrier的字面意思是可循环使用（Cyclic）的屏障（Barrier）。它要做的事情是，让一组线程到达一个屏障（也可以叫同步点）时被阻塞，直到最后一个线程到达屏障时，屏障才会开门，所有被屏障拦截的线程才会继续运行。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CyclicBarrierTest</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 自定义工作线程</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Worker</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> CyclicBarrier cyclicBarrier;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Worker</span><span class="params">(CyclicBarrier cyclicBarrier)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.cyclicBarrier = cyclicBarrier;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">super</span>.run();</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                System.out.println(Thread.currentThread().getName() + <span class="string">"开始等待其他线程"</span>);</span><br><span class="line">                cyclicBarrier.await();</span><br><span class="line">                System.out.println(Thread.currentThread().getName() + <span class="string">"开始执行"</span>);</span><br><span class="line">                <span class="comment">// 工作线程开始处理，这里用Thread.sleep()来模拟业务处理</span></span><br><span class="line">                Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">                System.out.println(Thread.currentThread().getName() + <span class="string">"执行完毕"</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> threadCount = <span class="number">3</span>;</span><br><span class="line">        CyclicBarrier cyclicBarrier = <span class="keyword">new</span> CyclicBarrier(threadCount);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; threadCount; i++) &#123;</span><br><span class="line">            System.out.println(<span class="string">"创建工作线程"</span> + i);</span><br><span class="line">            Worker worker = <span class="keyword">new</span> Worker(cyclicBarrier);</span><br><span class="line">            worker.start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;&#125;<span class="comment">/**</span></span><br><span class="line"><span class="comment">创建工作线程0</span></span><br><span class="line"><span class="comment">创建工作线程1</span></span><br><span class="line"><span class="comment">Thread-0开始等待其他线程</span></span><br><span class="line"><span class="comment">创建工作线程2</span></span><br><span class="line"><span class="comment">Thread-1开始等待其他线程</span></span><br><span class="line"><span class="comment">Thread-2开始等待其他线程</span></span><br><span class="line"><span class="comment">Thread-2开始执行</span></span><br><span class="line"><span class="comment">Thread-0开始执行</span></span><br><span class="line"><span class="comment">Thread-1开始执行</span></span><br><span class="line"><span class="comment">Thread-1执行完毕</span></span><br><span class="line"><span class="comment">Thread-0执行完毕</span></span><br><span class="line"><span class="comment">Thread-2执行完毕</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>总结<br>CyclicBarrier 的用途是让一组线程互相等待，直到全部到达某个公共屏障点才开始继续工作。CyclicBarrier 是可以重复利用的。在等待的只要有一个线程发生中断，则其它线程就会被唤醒继续正常运行。CyclicBarrier 指定的任务是进行 barrier 处最后一个线程来调用的，如果在执行这个任务发生异常时，则会传播到此线程，其它线程不受影响继续正常运行。</li>
-<li>CyclicBarrier 和 CountDownLatch 的区别</li>
-</ul>
-<ol>
-<li>CountDownLatch 是一个线程(或者多个)，等待另外 N 个线程完成某个事情之后才能执行；CyclicBarrier 是 N 个线程相互等待，任何一个线程完成之前，所有的线程都必须等待。</li>
-<li>CountDownLatch 的计数器只能使用一次。而 CyclicBarrier 的计数器可以使用 reset() 方法重置；<br>CyclicBarrier 能处理更为复杂的业务场景，比如如果计算发生错误，可以重置计数器，并让线程们重新执行一次。</li>
-<li>CountDownLatch 采用减计数方式；CyclicBarrier 采用加计数方式。</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/Condition/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Java%20Concurrent/Condition/" class="post-title-link" itemprop="url">Condition</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-21 10:29:09" itemprop="dateModified" datetime="2020-05-21T10:29:09+08:00">2020-05-21</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Java并发编程的艺术读书笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Condition接口与示例"><a href="#Condition接口与示例" class="headerlink" title="Condition接口与示例"></a>Condition接口与示例</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BoundedQueue</span>&lt;<span class="title">T</span>&gt; </span>&#123;    </span><br><span class="line">    <span class="keyword">private</span> Object[] items;    <span class="comment">// 添加的下标，删除的下标和数组当前数量    </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> addIndex, removeIndex, count;    </span><br><span class="line">    <span class="keyword">private</span> Lock lock = <span class="keyword">new</span> ReentrantLock();    </span><br><span class="line">    <span class="keyword">private</span> Condition notEmpty = lock.newCondition();    </span><br><span class="line">    <span class="keyword">private</span> Condition notFull = lock.newCondition();    </span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BoundedQueue</span><span class="params">(<span class="keyword">int</span> size)</span> </span>&#123;        </span><br><span class="line">        items = <span class="keyword">new</span> Object[size];    </span><br><span class="line">    &#125;   </span><br><span class="line">    <span class="comment">// 添加一个元素，如果数组满，则添加线程进入等待状态，直到有"空位"    </span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(T t)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;        </span><br><span class="line">        lock.lock();<span class="comment">//首先需要获得锁，目的是确保数组修改的可见性和排他性</span></span><br><span class="line">        <span class="keyword">try</span> &#123;            </span><br><span class="line">            <span class="keyword">while</span> (count == items.length)                </span><br><span class="line">                notFull.await();            </span><br><span class="line">            items[addIndex] = t;            </span><br><span class="line">            <span class="keyword">if</span> (++addIndex == items.length)                </span><br><span class="line">                addIndex = <span class="number">0</span>;            </span><br><span class="line">            ++count;            </span><br><span class="line">            notEmpty.signal();        </span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;            </span><br><span class="line">            lock.unlock();        </span><br><span class="line">            &#125;   </span><br><span class="line">&#125;    </span><br><span class="line"><span class="comment">// 由头部删除一个元素，如果数组空，则删除线程进入等待状态，直到有新添加元素    @SuppressWarnings("unchecked")    </span></span><br><span class="line"><span class="function"><span class="keyword">public</span> T <span class="title">remove</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    lock.lock();        </span><br><span class="line">    <span class="keyword">try</span> &#123;            </span><br><span class="line">        <span class="keyword">while</span> (count == <span class="number">0</span>)                </span><br><span class="line">            notEmpty.await();            </span><br><span class="line">        Object x = items[removeIndex];            </span><br><span class="line">        <span class="keyword">if</span> (++removeIndex == items.length)                </span><br><span class="line">            removeIndex = <span class="number">0</span>;            </span><br><span class="line">        --count;            </span><br><span class="line">        notFull.signal();            </span><br><span class="line">        <span class="keyword">return</span> (T) x;        </span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;            </span><br><span class="line">        lock.unlock();        </span><br><span class="line">        &#125;    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Condition定义了等待/通知两种类型的方法，当前线程调用这些方法时，需要提前获取到Condition对象关联的锁。Condition对象是由Lock对象（调用Lock对象的newCondition()方法）创建出来的，换句话说，Condition是依赖Lock对象的。</p>
-<p>Condition的使用方式比较简单，需要注意在调用方法前获取锁。当调用await()方法后，当前线程会释放锁并在此等待，而其他线程调用Condition对象的signal()方法，通知当前线程后，当前线程才从await()方法返回，并且在返回前已经获取了锁。</p>
-<h1 id="Condition的实现分析"><a href="#Condition的实现分析" class="headerlink" title="Condition的实现分析"></a>Condition的实现分析</h1><ol>
-<li>等待队列</li>
-</ol>
-<p><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/ConditionQueue.png?raw=true" alt=""><br>如果从队列（同步队列和等待队列）的角度看await()方法，当调用await()方法时，相当于同步队列的首节点（获取了锁的节点）移动到Condition的等待队列中。<br><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/JoinConditionQueue.png?raw=true" alt=""><br>调用Condition的signal()方法，将会唤醒在等待队列中等待时间最长的节点（首节点），在唤醒节点之前，会将节点移到同步队列中。<br><img src="https://github.com/Wayne-98/image/blob/master/Java%20Concurrent/removeFromConditionQueue.png?raw=true" alt=""></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -2038,7 +2192,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-count">57</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
