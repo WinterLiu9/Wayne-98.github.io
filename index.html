@@ -164,6 +164,549 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/06/02/Redis/%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9%E5%92%8C%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/06/02/Redis/%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9%E5%92%8C%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">缓存雪崩和缓存穿透问题</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-06-02 18:23:28 / 修改时间：18:24:05" itemprop="dateCreated datePublished" datetime="2020-06-02T18:23:28+08:00">2020-06-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="缓存雪崩和缓存穿透问题"><a href="#缓存雪崩和缓存穿透问题" class="headerlink" title="缓存雪崩和缓存穿透问题"></a><a href="https://github.com/Snailclimb/JavaGuide/blob/master/docs/database/Redis/Redis.md" target="_blank" rel="noopener">缓存雪崩和缓存穿透问题</a></h1><h2 id="缓存雪崩"><a href="#缓存雪崩" class="headerlink" title="缓存雪崩"></a>缓存雪崩</h2><ul>
+<li><p>什么是缓存雪崩：缓存同一时间大面积的失效，所以，后面的请求都会落到数据库上，造成数据库短时间内承受大量请求而崩掉。</p>
+</li>
+<li><p>解决方法：</p>
+<ol>
+<li>事前：尽量保证整个 redis 集群的高可用性，发现机器宕机尽快补上。选择合适的内存淘汰策略。</li>
+<li>事中：本地 ehcache 缓存 + hystrix 限流&amp;降级，避免 MySQL 崩掉。</li>
+<li>事后：利用 redis 持久化机制保存的数据尽快恢复缓存。</li>
+</ol>
+</li>
+</ul>
+<p><img src="https://camo.githubusercontent.com/5026cff9341b3049578f9a05bdf60b2ec62f28d3/687474703a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f31382d392d32352f363037383336372e6a7067" alt=""></p>
+<h2 id="缓存穿透"><a href="#缓存穿透" class="headerlink" title="缓存穿透"></a>缓存穿透</h2><ul>
+<li><p>什么是缓存穿透：缓存穿透说简单点就是大量请求的 key 根本不存在于缓存中，导致请求直接到了数据库上，根本没有经过缓存这一层。举个例子：某个黑客故意制造我们缓存中不存在的 key 发起大量请求，导致大量请求落到数据库。</p>
+</li>
+<li><p>解决方法：</p>
+<p>最基本的就是首先做好参数校验，一些不合法的参数请求直接抛出异常信息返回给客户端。比如查询的数据库 id 不能小于 0、传入的邮箱格式不对的时候直接返回错误消息给客户端等等。</p>
+<ol>
+<li><p><strong>缓存无效 key</strong> : 如果缓存和数据库都查不到某个 key 的数据就写一个到 redis 中去并设置过期时间，具体命令如下：<code>SET key value EX 10086</code>。这种方式可以解决请求的 key 变化不频繁的情况，如果黑客恶意攻击，每次构建不同的请求 key，会导致 redis 中缓存大量无效的 key 。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">getObjectInclNullById</span><span class="params">(Integer id)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 从缓存中获取数据</span></span><br><span class="line">    Object cacheValue = cache.get(id);</span><br><span class="line">    <span class="comment">// 缓存为空</span></span><br><span class="line">    <span class="keyword">if</span> (cacheValue == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 从数据库中获取</span></span><br><span class="line">        Object storageValue = storage.get(key);</span><br><span class="line">        <span class="comment">// 缓存空对象</span></span><br><span class="line">        cache.set(key, storageValue);</span><br><span class="line">        <span class="comment">// 如果存储数据为空，需要设置一个过期时间(300秒)</span></span><br><span class="line">        <span class="keyword">if</span> (storageValue == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 必须设置过期时间，否则有被攻击的风险</span></span><br><span class="line">            cache.expire(key, <span class="number">60</span> * <span class="number">5</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> storageValue;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> cacheValue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>布隆过滤器 : 把所有可能存在的请求的值都存放在布隆过滤器中，当用户请求过来，我会先判断用户发来的请求的值是否存在于布隆过滤器中。不存在的话，直接返回请求参数错误信息给客户端，存在的话才会走下面的流程。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/06/02/Redis/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/06/02/Redis/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/" class="post-title-link" itemprop="url">布隆过滤器</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-06-02 18:22:54 / 修改时间：18:23:20" itemprop="dateCreated datePublished" datetime="2020-06-02T18:22:54+08:00">2020-06-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="布隆过滤器"><a href="#布隆过滤器" class="headerlink" title="布隆过滤器"></a>布隆过滤器</h1><h2 id="什么是布隆过滤器"><a href="#什么是布隆过滤器" class="headerlink" title="什么是布隆过滤器"></a>什么是布隆过滤器</h2><p>布隆过滤器是由二进制向量(位数组)和一系列随机映射函数(哈希函数)两部分组成的数据结构。<strong>一种来检索元素是否在给定大集合中的数据结构</strong></p>
+<ul>
+<li>优点：相比于我们平时常用的的 List、Map 、Set 等数据结构，它占用空间更少并且效率更高</li>
+<li>缺点：其返回的结果是概率性的，而不是非常准确的；存放在布隆过滤器的数据不容易删除</li>
+</ul>
+<h2 id="布隆过滤器原理介绍"><a href="#布隆过滤器原理介绍" class="headerlink" title="布隆过滤器原理介绍"></a>布隆过滤器原理介绍</h2><ul>
+<li><p><strong>当一个元素加入布隆过滤器中</strong>：</p>
+<ol>
+<li>使用布隆过滤器中的哈希函数对元素值进行计算，得到哈希值（有几个哈希函数得到几个哈希值）。</li>
+<li>根据得到的哈希值，在位数组中把对应下标的值置为 1。</li>
+</ol>
+</li>
+<li><p><strong>当我们需要判断一个元素是否存在于布隆过滤器</strong>：</p>
+<ol>
+<li>对给定元素再次进行相同的哈希计算；</li>
+<li>得到值之后判断位数组中的每个元素是否都为 1，如果值都为 1，那么说明这个值在布隆过滤器中，如果存在一个值不为 1，说明该元素不在布隆过滤器中。</li>
+</ol>
+</li>
+<li><p>因为<strong>哈希冲突</strong>的存在所以<strong>布隆过滤器说某个元素存在，小概率会误判。布隆过滤器说某个元素不在，那么这个元素一定不在。</strong></p>
+</li>
+</ul>
+<h2 id="布隆过滤器使用场景"><a href="#布隆过滤器使用场景" class="headerlink" title="布隆过滤器使用场景"></a>布隆过滤器使用场景</h2><ol>
+<li>判断给定数据是否存在：比如判断一个数字是否在于包含大量数字的数字集中（数字集很大，5亿以上！）、 防止缓存穿透（判断请求的数据是否有效避免直接绕过缓存请求数据库）等等、邮箱的垃圾邮件过滤、黑名单功能等等。</li>
+<li>去重：比如爬给定网址的时候对已经爬取过的 URL 去重。</li>
+</ol>
+<h2 id="Java-编程手动实现布隆过滤器"><a href="#Java-编程手动实现布隆过滤器" class="headerlink" title="Java 编程手动实现布隆过滤器"></a>Java 编程手动实现布隆过滤器</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> bloomFilter;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.BitSet;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyBloomFilter</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 一个合适大小的位数组保存数据</span></span><br><span class="line"><span class="comment">     * 几个不同的哈希函数</span></span><br><span class="line"><span class="comment">     * 添加元素到位数组（布隆过滤器）的方法实现</span></span><br><span class="line"><span class="comment">     * 判断给定元素是否存在于位数组（布隆过滤器）的方法实现。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEAFULT_SIZE = <span class="number">2</span> &lt;&lt; <span class="number">24</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span>[] SEEDS = <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">3</span>, <span class="number">13</span>, <span class="number">46</span>, <span class="number">71</span>, <span class="number">91</span>, <span class="number">134</span>&#125;;</span><br><span class="line">    <span class="keyword">private</span> BitSet bits = <span class="keyword">new</span> BitSet(DEAFULT_SIZE);</span><br><span class="line">    <span class="keyword">private</span> SimpleHash[] func = <span class="keyword">new</span> SimpleHash[SEEDS.length];</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyBloomFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; SEEDS.length; i++) &#123;</span><br><span class="line">            func[i] = <span class="keyword">new</span> SimpleHash(DEAFULT_SIZE, SEEDS[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(Object value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (SimpleHash simpleHash : func) &#123;</span><br><span class="line">            bits.set(simpleHash.hash(value), <span class="keyword">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">contains</span><span class="params">(Object value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">boolean</span> ret = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">for</span> (SimpleHash simpleHash : func) &#123;</span><br><span class="line">            ret = ret &amp;&amp; bits.get(simpleHash.hash(value));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleHash</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">int</span> cap;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">int</span> seed;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">SimpleHash</span><span class="params">(<span class="keyword">int</span> cap, <span class="keyword">int</span> seed)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.cap = cap;</span><br><span class="line">            <span class="keyword">this</span>.seed = seed;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object value)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">int</span> h;</span><br><span class="line">            <span class="keyword">return</span> (value == <span class="keyword">null</span>) ? <span class="number">0</span> : Math.abs(seed * (cap - <span class="number">1</span>) &amp; ((h = value.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>)));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="Redis-中的过滤器"><a href="#Redis-中的过滤器" class="headerlink" title="Redis 中的过滤器"></a>Redis 中的过滤器</h2><p><strong>Guava 提供的布隆过滤器只能单机使用（另外，容量扩展也不容易），分布式场景我们就需要用到 Redis 中的布隆过滤器了。</strong></p>
+<ul>
+<li><p>常用命令预览</p>
+<p>key:布隆过滤器的名称，item : 添加的元素。</p>
+</li>
+</ul>
+<ol>
+<li><p><strong><code>BF.ADD</code></strong>：将元素添加到布隆过滤器中，如果该过滤器尚不存在，则创建该过滤器。格式：<code>BF.ADD {key} {item}</code>。</p>
+</li>
+<li><p><strong><code>BF.MADD</code></strong>: 将一个或多个元素添加到“布隆过滤器”中，并创建一个尚不存在的过滤器。该命令的操作方式<code>BF.ADD</code>与之相同，只不过它允许多个输入并返回多个值。格式：<code>BF.MADD {key} {item} [item ...]</code> 。</p>
+</li>
+<li><p>*<em><code>BF.EXISTS</code> *</em> : 确定元素是否在布隆过滤器中存在。格式：<code>BF.EXISTS {key} {item}</code>。</p>
+</li>
+<li><p><strong><code>BF.MEXISTS</code></strong> ： 确定一个或者多个元素是否在布隆过滤器中存在格式：<code>BF.MEXISTS {key} {item} [item ...]</code>。</p>
+</li>
+<li><p><code>BF.RESERVE {key} {error_rate} {capacity} [EXPANSION expansion]</code></p>
+<ul>
+<li>key：布隆过滤器的名称</li>
+<li>error_rate :误报的期望概率。这应该是介于0到1之间的十进制值。例如，对于期望的误报率0.1％（1000中为1），error_rate应该设置为0.001。该数字越接近零，则每个项目的内存消耗越大，并且每个操作的CPU使用率越高。</li>
+<li>capacity: 过滤器的容量。当实际存储的元素个数超过这个值之后，性能将开始下降。实际的降级将取决于超出限制的程度。随着过滤器元素数量呈指数增长，性能将线性下降。</li>
+<li>expansion(可选)：如果创建了一个新的子过滤器，则其大小将是当前过滤器的大小乘以<code>expansion</code>。默认扩展值为2。这意味着每个后续子过滤器将是前一个子过滤器的两倍。</li>
+</ul>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/06/02/Redis/%E9%99%90%E6%B5%81%E7%AE%97%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/06/02/Redis/%E9%99%90%E6%B5%81%E7%AE%97%E6%B3%95/" class="post-title-link" itemprop="url">限流算法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-06-02 18:21:24 / 修改时间：18:22:26" itemprop="dateCreated datePublished" datetime="2020-06-02T18:21:24+08:00">2020-06-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="限流算法"><a href="#限流算法" class="headerlink" title="限流算法"></a><a href="https://mp.weixin.qq.com/s/qb3rg_ZpcMcvyaIRsvc1fw" target="_blank" rel="noopener">限流算法</a></h1><h2 id="固定窗口计数器算法"><a href="#固定窗口计数器算法" class="headerlink" title="固定窗口计数器算法"></a>固定窗口计数器算法</h2><ul>
+<li>将时间划分为多个窗口；</li>
+<li>在每个窗口内每有一次请求就将计数器加一；</li>
+<li>如果计数器超过了限制数量，则本窗口内所有的请求都被丢弃当时间到达下一个窗口时，计数器重置。</li>
+</ul>
+<p>固定窗口计数器是最为简单的算法，但这个算法有时会让通过请求量允许为限制的两倍。考虑如下情况：限制 1 秒内最多通过 5 个请求，在第一个窗口的最后半秒内通过了 5 个请求，第二个窗口的前半秒内又通过了 5 个请求。这样看来就是在 1 秒内通过了 10 个请求。</p>
+<h2 id="滑动窗口计数器算法"><a href="#滑动窗口计数器算法" class="headerlink" title="滑动窗口计数器算法"></a>滑动窗口计数器算法</h2><ul>
+<li>将时间划分为多个区间；</li>
+<li>在每个区间内每有一次请求就将计数器加一维持一个时间窗口，占据多个区间；</li>
+<li>每经过一个区间的时间，则抛弃最老的一个区间，并纳入最新的一个区间；</li>
+<li>如果当前窗口内区间的请求计数总和超过了限制数量，则本窗口内所有的请求都被丢弃。</li>
+</ul>
+<p>滑动窗口计数器是通过将窗口再细分，并且按照时间 “ 滑动 “，这种算法避免了固定窗口计数器带来的双倍突发请求，但时间区间的精度越高，算法所需的空间容量就越大。</p>
+<h2 id="漏桶算法"><a href="#漏桶算法" class="headerlink" title="漏桶算法"></a>漏桶算法</h2><ul>
+<li>将每个请求视作 “ 水滴 “ 放入 “ 漏桶 “ 进行存储；</li>
+<li>“漏桶 “ 以固定速率向外 “ 漏 “ 出请求来执行如果 “ 漏桶 “ 空了则停止 “ 漏水”；</li>
+<li>如果 “ 漏桶 “ 满了则多余的 “ 水滴 “ 会被直接丢弃。</li>
+</ul>
+<p>漏桶算法多使用队列实现，服务的请求会存到队列中，服务的提供方则按照固定的速率从队列中取出请求并执行，过多的请求则放在队列中排队或直接拒绝。</p>
+<p>漏桶算法的缺陷也很明显，当短时间内有大量的突发请求时，即便此时服务器没有任何负载，每个请求也都得在队列中等待一段时间才能被响应。</p>
+<h2 id="令牌桶算法"><a href="#令牌桶算法" class="headerlink" title="令牌桶算法"></a>令牌桶算法</h2><ul>
+<li>令牌以固定速率生成；</li>
+<li>生成的令牌放入令牌桶中存放，如果令牌桶满了则多余的令牌会直接丢弃，当请求到达时，会尝试从令牌桶中取令牌，取到了令牌的请求可以执行；</li>
+<li>如果桶空了，那么尝试取令牌的请求会被直接丢弃。</li>
+</ul>
+<p>令牌桶算法既能够将所有的请求平均分布到时间区间内，又能接受服务器能够承受范围内的突发请求，因此是目前使用较为广泛的一种限流算法。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/06/02/Redis/CopyOnWrite/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/06/02/Redis/CopyOnWrite/" class="post-title-link" itemprop="url">Copy-On-Write</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-06-02 18:19:35 / 修改时间：18:21:16" itemprop="dateCreated datePublished" datetime="2020-06-02T18:19:35+08:00">2020-06-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Copy-On-Write"><a href="#Copy-On-Write" class="headerlink" title="Copy-On-Write"></a><a href="https://www.cnblogs.com/biyeymyhjob/archive/2012/07/20/2601655.html" target="_blank" rel="noopener">Copy-On-Write</a></h1><h2 id="fork"><a href="#fork" class="headerlink" title="fork"></a>fork</h2><blockquote>
+<p>fork is an operation whereby a process creates a copy of itself.</p>
+</blockquote>
+<h2 id="exec"><a href="#exec" class="headerlink" title="exec"></a>exec</h2><p>exec函数的作用就是：<strong>装载一个新的程序</strong>（可执行映像）覆盖<strong>当前进程</strong>内存空间中的映像，<strong>从而执行不同的任务</strong>。</p>
+<ul>
+<li>exec系列函数在执行时会<strong>直接替换掉当前进程的地址空间</strong>。</li>
+</ul>
+<h2 id="Copy-On-Write-1"><a href="#Copy-On-Write-1" class="headerlink" title="Copy-On-Write"></a>Copy-On-Write</h2><p>在fork之后exec之前两个进程<strong>用的是相同的物理空间</strong>（内存区），子进程的代码段、数据段、堆栈都是指向父进程的物理空间，也就是说，两者的虚拟空间不同，但其对应的<strong>物理空间是同一个</strong>。</p>
+<p>Copy On Write技术<strong>实现原理：</strong></p>
+<blockquote>
+<p>fork()之后，kernel把父进程中所有的内存页的权限都设为read-only，然后子进程的地址空间指向父进程。当父子进程都只读内存时，相安无事。当其中某个进程写内存时，CPU硬件检测到内存页是read-only的，于是触发页异常中断（page-fault），陷入kernel的一个中断例程。中断例程中，kernel就会<strong>把触发的异常的页复制一份</strong>，于是父子进程各自持有独立的一份。</p>
+</blockquote>
+<p>Copy On Write技术<strong>好处</strong>是什么？</p>
+<ul>
+<li>COW技术可<strong>减少</strong>分配和复制大量资源时带来的<strong>瞬间延时</strong>。</li>
+<li>COW技术可减少<strong>不必要的资源分配</strong>。比如fork进程时，并不是所有的页面都需要复制，父进程的<strong>代码段和只读数据段都不被允许修改，所以无需复制</strong>。</li>
+</ul>
+<p>Copy On Write技术<strong>缺点</strong>是什么？</p>
+<ul>
+<li>如果在fork()之后，父子进程都还需要继续进行写操作，<strong>那么会产生大量的分页错误(页异常中断page-fault)</strong>，这样就得不偿失。</li>
+</ul>
+<h1 id="Redis-COW"><a href="#Redis-COW" class="headerlink" title="Redis COW"></a>Redis COW</h1><ul>
+<li><p>Redis在持久化时，如果是采用BGSAVE命令或者BGREWRITEAOF的方式，那Redis会<strong>fork出一个子进程来读取数据，从而写到磁盘中</strong>。</p>
+</li>
+<li><p>总体来看，Redis还是读操作比较多。如果子进程存在期间，发生了大量的写操作，那可能就会出现<strong>很多的分页错误(页异常中断page-fault)</strong>，这样就得耗费不少性能在复制上。</p>
+</li>
+<li><p>而在<strong>rehash阶段上，写操作是无法避免</strong>的。所以Redis在fork出子进程之后，<strong>将负载因子阈值提高</strong>，尽量减少写操作，避免不必要的内存写入操作，最大限度地节约内存。</p>
+</li>
+</ul>
+<h1 id="文件系统的-COW"><a href="#文件系统的-COW" class="headerlink" title="文件系统的 COW"></a>文件系统的 COW</h1><p>Copy-on-write在对数据进行修改的时候，<strong>不会直接在原来的数据位置上进行操作</strong>，而是重新找个位置修改，这样的好处是一旦系统突然断电，重启之后不需要做Fsck。好处就是能<strong>保证数据的完整性，掉电的话容易恢复</strong>。</p>
+<p>要修改数据块A的内容，先把A读出来，写到B块里面去。如果这时候断电了，原来A的内容还在！</p>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><blockquote>
+<p>写入时复制（英语：Copy-on-write，简称COW）是一种计算机程序设计领域的优化策略。其核心思想是，如果有多个调用者（callers）同时请求相同资源（如内存或磁盘上的数据存储），他们会共同获取相同的指针指向相同的资源，直到某个调用者试图修改资源的内容时，系统才会真正复制一份专用副本（private copy）给该调用者，而其他调用者所见到的最初的资源仍然保持不变。这过程对其他的调用者都是透明的（transparently）。此作法主要的优点是如果调用者没有修改该资源，就不会有副本（private copy）被建立，因此多个调用者只是读取操作时可以共享同一份资源。</p>
+</blockquote>
+<ul>
+<li>Linux通过Copy On Write技术极大地<strong>减少了Fork的开销</strong>。</li>
+<li>文件系统通过Copy On Write技术一定程度上保证<strong>数据的完整性</strong>。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/06/02/Algorithms/May/6%E6%9C%881%E5%8F%B7~6%E6%9C%8815%E5%8F%B7%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/06/02/Algorithms/May/6%E6%9C%881%E5%8F%B7~6%E6%9C%8815%E5%8F%B7%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" class="post-title-link" itemprop="url">6月1号~6月15号刷题记录</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-06-02 18:16:46 / 修改时间：18:17:42" itemprop="dateCreated datePublished" datetime="2020-06-02T18:16:46+08:00">2020-06-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Algorithms/" itemprop="url" rel="index"><span itemprop="name">Algorithms</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="6月2号"><a href="#6月2号" class="headerlink" title="6月2号"></a>6月2号</h2><ol>
+<li><a href="https://leetcode-cn.com/problems/generate-parentheses/" target="_blank" rel="noopener">括号生成</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    List&lt;String&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    StringBuilder path = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">generateParenthesis</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(n == <span class="number">0</span>) <span class="keyword">return</span> res;</span><br><span class="line">        backtrack(n, n);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// L 代表 左括号还有几个可用的</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">backtrack</span><span class="params">(<span class="keyword">int</span> L, <span class="keyword">int</span> R)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(L == <span class="number">0</span> &amp;&amp; R == <span class="number">0</span>) &#123;</span><br><span class="line">            res.add(path.toString());</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(L &gt; R) <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">if</span>(L &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            path.append(<span class="string">"("</span>);</span><br><span class="line">            backtrack(L - <span class="number">1</span>, R);</span><br><span class="line">            path.deleteCharAt(path.length() - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(R &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            path.append(<span class="string">")"</span>);</span><br><span class="line">            backtrack(L, R - <span class="number">1</span>);</span><br><span class="line">            path.deleteCharAt(path.length() - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><a href="https://leetcode-cn.com/problems/next-permutation/" target="_blank" rel="noopener">下一个排列</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">nextPermutation</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> len = nums.length;</span><br><span class="line">        <span class="keyword">if</span>(len &lt; <span class="number">2</span>) <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">int</span> i = len - <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">while</span>(i &gt;= <span class="number">0</span> &amp;&amp; nums[i] &gt;= nums[i + <span class="number">1</span>]) i--;</span><br><span class="line">        <span class="keyword">if</span>(i == -<span class="number">1</span>) &#123;</span><br><span class="line">            reverse(nums, <span class="number">0</span>, len - <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> j = len - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span>(j &gt; i &amp;&amp; nums[j] &lt;= nums[i]) j--;</span><br><span class="line">        swap(nums, i, j);</span><br><span class="line">        reverse(nums, i + <span class="number">1</span>, len - <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reverse</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> L, <span class="keyword">int</span> R)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = L, j = R; i &lt; j; i++, j--) &#123;</span><br><span class="line">            swap(nums, i, j);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> i, <span class="keyword">int</span> j)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> t = nums[i];</span><br><span class="line">        nums[i] = nums[j];</span><br><span class="line">        nums[j] = t;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><a href="https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/" target="_blank" rel="noopener">字符串的排列</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    Set&lt;String&gt; res = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">    StringBuilder path = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">    <span class="keyword">char</span>[] arr;</span><br><span class="line">    <span class="keyword">boolean</span>[] v;</span><br><span class="line">    <span class="keyword">public</span> String[] permutation(String s) &#123;</span><br><span class="line">        <span class="keyword">if</span>(s.length() == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">new</span> String[<span class="number">0</span>];</span><br><span class="line">        arr = s.toCharArray();</span><br><span class="line">        v = <span class="keyword">new</span> <span class="keyword">boolean</span>[arr.length];</span><br><span class="line">        backtrack(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> res.toArray(<span class="keyword">new</span> String[res.size()]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">backtrack</span><span class="params">(<span class="keyword">int</span> len)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(len == arr.length) &#123;</span><br><span class="line">            res.add(path.toString());</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; arr.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(!v[i]) &#123;</span><br><span class="line">                v[i] = <span class="keyword">true</span>;</span><br><span class="line">                path.append(arr[i]);</span><br><span class="line">                backtrack(len + <span class="number">1</span>);</span><br><span class="line">                v[i] = <span class="keyword">false</span>;</span><br><span class="line">                path.deleteCharAt(path.length() - <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> String[] permutation(String s) &#123;</span><br><span class="line">        <span class="keyword">if</span>(s.length() == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">new</span> String[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">char</span>[] arr = s.toCharArray();</span><br><span class="line">        Arrays.sort(arr);</span><br><span class="line">        List&lt;String&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        res.add(<span class="keyword">new</span> String(arr));</span><br><span class="line">        String nextString = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">while</span>(!(nextString = getNextString(arr)).equals(<span class="string">"-1"</span>)) &#123;</span><br><span class="line">            res.add(nextString);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res.toArray(<span class="keyword">new</span> String[<span class="number">0</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">getNextString</span><span class="params">(<span class="keyword">char</span>[] nums)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> len = nums.length;</span><br><span class="line">        <span class="keyword">if</span>(len &lt; <span class="number">2</span>) <span class="keyword">return</span> <span class="string">"-1"</span>;</span><br><span class="line">        <span class="keyword">int</span> i = len - <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">while</span>(i &gt;= <span class="number">0</span> &amp;&amp; nums[i] &gt;= nums[i + <span class="number">1</span>]) i--;</span><br><span class="line">        <span class="keyword">if</span>(i == -<span class="number">1</span>) &#123;</span><br><span class="line">            <span class="comment">// reverse(nums, 0, len - 1);</span></span><br><span class="line">            <span class="keyword">return</span> <span class="string">"-1"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> j = len - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span>(j &gt; i &amp;&amp; nums[j] &lt;= nums[i]) j--;</span><br><span class="line">        swap(nums, i, j);</span><br><span class="line">        reverse(nums, i + <span class="number">1</span>, len - <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> String(nums);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reverse</span><span class="params">(<span class="keyword">char</span>[] nums, <span class="keyword">int</span> L, <span class="keyword">int</span> R)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = L, j = R; i &lt; j; i++, j--) &#123;</span><br><span class="line">            swap(nums, i, j);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">char</span>[] nums, <span class="keyword">int</span> i, <span class="keyword">int</span> j)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">char</span> t = nums[i];</span><br><span class="line">        nums[i] = nums[j];</span><br><span class="line">        nums[j] = t;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><a href="https://leetcode-cn.com/problems/permutations/" target="_blank" rel="noopener">全排列</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    List&lt;List&lt;Integer&gt;&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    List&lt;Integer&gt; path = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">int</span>[] nums;</span><br><span class="line">    <span class="keyword">boolean</span>[] v;</span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; permute(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums.length == <span class="number">0</span>) <span class="keyword">return</span> res;</span><br><span class="line">        <span class="keyword">this</span>.nums = nums;</span><br><span class="line">        v = <span class="keyword">new</span> <span class="keyword">boolean</span>[nums.length];</span><br><span class="line">        backtrack(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">backtrack</span><span class="params">(<span class="keyword">int</span> len)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(len == nums.length) &#123;</span><br><span class="line">            res.add(<span class="keyword">new</span> ArrayList&lt;&gt;(path));</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(!v[i]) &#123;</span><br><span class="line">                v[i] = <span class="keyword">true</span>;</span><br><span class="line">                path.add(nums[i]);</span><br><span class="line">                backtrack(len + <span class="number">1</span>);</span><br><span class="line">                v[i] = <span class="keyword">false</span>;</span><br><span class="line">                path.remove(path.size() - <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    List&lt;List&lt;Integer&gt;&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; permute(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums.length == <span class="number">0</span>) <span class="keyword">return</span> res;</span><br><span class="line">        Arrays.sort(nums);</span><br><span class="line">        res.add(Arrays.stream(nums).boxed().collect(Collectors.toList()));</span><br><span class="line">        <span class="keyword">int</span>[] arr;</span><br><span class="line">        <span class="keyword">while</span>((arr = getNext(nums)) != <span class="keyword">null</span>) &#123;</span><br><span class="line">            res.add(Arrays.stream(arr).boxed().collect(Collectors.toList()));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span>[] getNext(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">        <span class="keyword">int</span> len = nums.length;</span><br><span class="line">        <span class="keyword">if</span>(len &lt; <span class="number">2</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">int</span> i = len - <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">while</span>(i &gt;= <span class="number">0</span> &amp;&amp; nums[i] &gt;= nums[i + <span class="number">1</span>]) i--;</span><br><span class="line">        <span class="keyword">if</span>(i == -<span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> j = len - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span>(j &gt; i &amp;&amp; nums[j] &lt;= nums[i]) j--;</span><br><span class="line">        swap(nums, i, j);</span><br><span class="line">        reverse(nums, i + <span class="number">1</span>, len - <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> nums;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reverse</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> L, <span class="keyword">int</span> R)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = L, j = R; i &lt; j; i++, j--) &#123;</span><br><span class="line">            swap(nums, i, j);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> i, <span class="keyword">int</span> j)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> t = nums[i];</span><br><span class="line">        nums[i] = nums[j];</span><br><span class="line">        nums[j] = t;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><a href="https://leetcode-cn.com/problems/permutations-ii/" target="_blank" rel="noopener">全排列 II</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    List&lt;List&lt;Integer&gt;&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    List&lt;Integer&gt; path = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">int</span>[] nums;</span><br><span class="line">    <span class="keyword">boolean</span>[] v;</span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; permuteUnique(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums.length == <span class="number">0</span>) <span class="keyword">return</span> res;</span><br><span class="line">        Arrays.sort(nums);</span><br><span class="line">        <span class="keyword">this</span>.nums = nums;</span><br><span class="line">        v = <span class="keyword">new</span> <span class="keyword">boolean</span>[nums.length];</span><br><span class="line">        backtrack(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">backtrack</span><span class="params">(<span class="keyword">int</span> len)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(len == nums.length) &#123;</span><br><span class="line">            res.add(<span class="keyword">new</span> ArrayList&lt;&gt;(path));</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(!v[i]) &#123;</span><br><span class="line">                <span class="keyword">if</span>(i &gt; <span class="number">0</span> &amp;&amp; nums[i] == nums[i - <span class="number">1</span>] &amp;&amp; v[i - <span class="number">1</span>]) <span class="keyword">break</span>;</span><br><span class="line">                v[i] = <span class="keyword">true</span>;</span><br><span class="line">                path.add(nums[i]);</span><br><span class="line">                backtrack(len + <span class="number">1</span>);</span><br><span class="line">                v[i] = <span class="keyword">false</span>;</span><br><span class="line">                path.remove(path.size() - <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    List&lt;List&lt;Integer&gt;&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="keyword">public</span> List&lt;List&lt;Integer&gt;&gt; permuteUnique(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums.length == <span class="number">0</span>) <span class="keyword">return</span> res;</span><br><span class="line">        Arrays.sort(nums);</span><br><span class="line">        res.add(asList(nums));</span><br><span class="line">        <span class="keyword">int</span>[] arr;</span><br><span class="line">        <span class="keyword">while</span>((arr = getNext(nums)) != <span class="keyword">null</span>) &#123;</span><br><span class="line">            res.add(asList(arr));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span>[] getNext(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">        <span class="keyword">int</span> len = nums.length;</span><br><span class="line">        <span class="keyword">if</span>(len &lt; <span class="number">2</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">int</span> i = len - <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">while</span>(i &gt;= <span class="number">0</span> &amp;&amp; nums[i] &gt;= nums[i + <span class="number">1</span>]) i--;</span><br><span class="line">        <span class="keyword">if</span>(i == -<span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> j = len - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span>(j &gt; i &amp;&amp; nums[j] &lt;= nums[i]) j--;</span><br><span class="line">        swap(nums, i, j);</span><br><span class="line">        reverse(nums, i + <span class="number">1</span>, len - <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> nums;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reverse</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> L, <span class="keyword">int</span> R)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = L, j = R; i &lt; j; i++, j--) &#123;</span><br><span class="line">            swap(nums, i, j);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> i, <span class="keyword">int</span> j)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> t = nums[i];</span><br><span class="line">        nums[i] = nums[j];</span><br><span class="line">        nums[j] = t;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">List&lt;Integer&gt; <span class="title">asList</span><span class="params">(<span class="keyword">int</span>[] nums)</span> </span>&#123;</span><br><span class="line">        List&lt;Integer&gt; res = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> num : nums) res.add(num);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li><a href="https://leetcode-cn.com/problems/sliding-window-maximum/" target="_blank" rel="noopener">滑动窗口最大值</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] maxSlidingWindow(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> k) &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums.length &lt; k) <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">0</span>];</span><br><span class="line">        LinkedList&lt;Integer&gt; queue = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        <span class="keyword">int</span>[] res = <span class="keyword">new</span> <span class="keyword">int</span>[nums.length - k + <span class="number">1</span>];</span><br><span class="line">        <span class="keyword">int</span> index = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nums.length; i++) &#123;</span><br><span class="line">            <span class="keyword">while</span>(queue.size() &gt; <span class="number">0</span> &amp;&amp; nums[i] &gt;= nums[queue.peekLast()]) queue.removeLast();</span><br><span class="line">            queue.offerLast(i);</span><br><span class="line">            <span class="comment">// 如果当前队列保存的值已经过期</span></span><br><span class="line">            <span class="keyword">if</span>(queue.peekFirst() == (i - k)) queue.removeFirst();</span><br><span class="line">            <span class="keyword">if</span>(i &gt;= (k - <span class="number">1</span>)) res[index++] = nums[queue.peekFirst()];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li><a href="https://leetcode-cn.com/problems/lru-cache/" target="_blank" rel="noopener">LRU缓存机制</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LRUCache</span> </span>&#123;</span><br><span class="line">    Map&lt;Integer, Node&gt; map;</span><br><span class="line">    DoubleList cache;</span><br><span class="line">    <span class="keyword">int</span> capacity;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LRUCache</span><span class="params">(<span class="keyword">int</span> capacity)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        <span class="keyword">this</span>.cache = <span class="keyword">new</span> DoubleList();</span><br><span class="line">        <span class="keyword">this</span>.capacity = capacity;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">(<span class="keyword">int</span> key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(map.containsKey(key)) &#123;</span><br><span class="line">            <span class="keyword">int</span> val = map.get(key).val;</span><br><span class="line">            put(key, val);</span><br><span class="line">            <span class="keyword">return</span> val;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(<span class="keyword">int</span> key, <span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">        Node node = <span class="keyword">new</span> Node(key, value);</span><br><span class="line">        <span class="keyword">if</span>(map.containsKey(key)) &#123;</span><br><span class="line">            cache.removeNode(map.get(key));</span><br><span class="line">            cache.addFirst(node);</span><br><span class="line">            map.put(key, node);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span>(capacity == cache.size) &#123;</span><br><span class="line">                Node last = cache.removeLastNode();</span><br><span class="line">                map.remove(last.key);</span><br><span class="line">            &#125;</span><br><span class="line">            cache.addFirst(node);</span><br><span class="line">            map.put(key, node);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">DoubleList</span></span>&#123;</span><br><span class="line">        Node head;</span><br><span class="line">        Node tail;</span><br><span class="line">        <span class="keyword">int</span> size;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">DoubleList</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            head = <span class="keyword">new</span> Node(-<span class="number">1</span>, -<span class="number">1</span>);</span><br><span class="line">            tail = <span class="keyword">new</span> Node(-<span class="number">1</span>, -<span class="number">1</span>);</span><br><span class="line">            head.next = tail;</span><br><span class="line">            tail.pre = head;</span><br><span class="line">            size = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeNode</span><span class="params">(Node node)</span> </span>&#123;</span><br><span class="line">            node.next.pre = node.pre;</span><br><span class="line">            node.pre.next = node.next;</span><br><span class="line">            size--;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Node <span class="title">removeLastNode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span>(tail.pre == head) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            Node last = tail.pre;</span><br><span class="line">            removeNode(last);</span><br><span class="line">            <span class="keyword">return</span> last;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addFirst</span><span class="params">(Node node)</span> </span>&#123;</span><br><span class="line">            node.pre = head;</span><br><span class="line">            node.next = head.next;</span><br><span class="line">            head.next.pre = node;</span><br><span class="line">            head.next = node;</span><br><span class="line">            size++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Node</span></span>&#123;</span><br><span class="line">        <span class="keyword">int</span> key;</span><br><span class="line">        <span class="keyword">int</span> val;</span><br><span class="line">        Node pre;</span><br><span class="line">        Node next;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Node</span><span class="params">(<span class="keyword">int</span> key, <span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.key = key;</span><br><span class="line">            <span class="keyword">this</span>.val = val;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li><a href="https://leetcode-cn.com/problems/shu-zu-zhong-shu-zi-chu-xian-de-ci-shu-lcof/" target="_blank" rel="noopener">数组中数字出现的次数</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span>[] singleNumbers(<span class="keyword">int</span>[] nums) &#123;</span><br><span class="line">        <span class="keyword">if</span>(nums.length &lt; <span class="number">2</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">int</span> all = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> num : nums) all ^= num;</span><br><span class="line">        <span class="keyword">int</span> bit = <span class="number">1</span>;</span><br><span class="line">        <span class="comment">// 找到全员异或的结果中, 从右往左第一位不为零的那一位</span></span><br><span class="line">        <span class="keyword">while</span>((bit &amp; all) == <span class="number">0</span>) &#123;</span><br><span class="line">            bit &lt;&lt;= <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> a = <span class="number">0</span>, b = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> num : nums) &#123;</span><br><span class="line">            <span class="keyword">if</span>((num &amp; bit) != <span class="number">0</span>) &#123;</span><br><span class="line">                a ^= num;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                b ^= num;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;a, b&#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="8">
+<li><a href="https://leetcode-cn.com/problems/symmetric-tree/" target="_blank" rel="noopener">对称二叉树</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSymmetric</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">return</span> help(root.left, root.right);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">help</span><span class="params">(TreeNode L, TreeNode R)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(L == <span class="keyword">null</span> &amp;&amp; R == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">if</span>(L == <span class="keyword">null</span> || R == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">if</span>(L.val != R.val) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">return</span> help(L.left, R.right) &amp;&amp; help(L.right, R.left);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="9">
+<li><a href="https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/" target="_blank" rel="noopener">二叉树的最小深度</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">minDepth</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span>(root.left == <span class="keyword">null</span>) <span class="keyword">return</span> minDepth(root.right) + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span>(root.right == <span class="keyword">null</span>) <span class="keyword">return</span> minDepth(root.left) + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> Math.min(minDepth(root.left), minDepth(root.right)) + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="10">
+<li><a href="https://leetcode-cn.com/problems/path-sum/" target="_blank" rel="noopener">路径总和</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">hasPathSum</span><span class="params">(TreeNode root, <span class="keyword">int</span> sum)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> backtrack(root, sum);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">backtrack</span><span class="params">(TreeNode root, <span class="keyword">int</span> sum)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">if</span>(root.left == <span class="keyword">null</span> &amp;&amp; root.right == <span class="keyword">null</span> &amp;&amp; sum == root.val) <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">if</span>(root.left == <span class="keyword">null</span> &amp;&amp; root.right == <span class="keyword">null</span> &amp;&amp; sum != root.val) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">return</span> backtrack(root.left, sum - root.val) || backtrack(root.right, sum - root.val);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="11">
+<li><a href="https://leetcode-cn.com/problems/flatten-binary-tree-to-linked-list/" target="_blank" rel="noopener">二叉树展开为链表</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    TreeNode pre;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">flatten</span><span class="params">(TreeNode root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="keyword">null</span>) <span class="keyword">return</span>;</span><br><span class="line">        flatten(root.right);</span><br><span class="line">        flatten(root.left);</span><br><span class="line">        root.right = pre;</span><br><span class="line">        root.left = <span class="keyword">null</span>;</span><br><span class="line">        pre = root;</span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="12">
+<li><a href="https://leetcode-cn.com/problems/er-cha-sou-suo-shu-yu-shuang-xiang-lian-biao-lcof/" target="_blank" rel="noopener">二叉搜索树与双向链表</a></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    Node pre;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Node <span class="title">treeToDoublyList</span><span class="params">(Node root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        Node head = root;</span><br><span class="line">        Node tail = root;</span><br><span class="line">        <span class="keyword">while</span>(head.left != <span class="keyword">null</span>) head = head.left;</span><br><span class="line">        <span class="keyword">while</span>(tail.right != <span class="keyword">null</span>) tail = tail.right;</span><br><span class="line">        inOrder(root);</span><br><span class="line">        head.left = tail;</span><br><span class="line">        tail.right = head;</span><br><span class="line">        <span class="keyword">return</span> head;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">inOrder</span><span class="params">(Node root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(root != <span class="keyword">null</span>)&#123;</span><br><span class="line">            inOrder(root.left);</span><br><span class="line">            <span class="keyword">if</span>(pre != <span class="keyword">null</span>) &#123;</span><br><span class="line">                root.left = pre;</span><br><span class="line">                pre.right = root;</span><br><span class="line">            &#125;</span><br><span class="line">            pre = root;</span><br><span class="line">            inOrder(root.right);</span><br><span class="line">        &#125; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/30/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%E5%8D%95%E6%9C%BA%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%AC%AC%E5%8D%81%E4%BA%8C%E7%AB%A0%E4%BA%8B%E4%BB%B6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -187,17 +730,23 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-05-30 17:34:36 / 修改时间：17:35:13" itemprop="dateCreated datePublished" datetime="2020-05-30T17:34:36+08:00">2020-05-30</time>
+              <time title="创建时间：2020-05-30 17:34:36" itemprop="dateCreated datePublished" datetime="2020-05-30T17:34:36+08:00">2020-05-30</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-06-02 18:20:24" itemprop="dateModified" datetime="2020-06-02T18:20:24+08:00">2020-06-02</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
+                  <a href="/categories/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a>
                 </span>
             </span>
 
@@ -341,17 +890,23 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-05-30 17:33:40 / 修改时间：17:34:25" itemprop="dateCreated datePublished" datetime="2020-05-30T17:33:40+08:00">2020-05-30</time>
+              <time title="创建时间：2020-05-30 17:33:40" itemprop="dateCreated datePublished" datetime="2020-05-30T17:33:40+08:00">2020-05-30</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-06-02 18:20:29" itemprop="dateModified" datetime="2020-06-02T18:20:29+08:00">2020-06-02</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
+                  <a href="/categories/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a>
                 </span>
             </span>
 
@@ -484,7 +1039,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-28 15:53:21" itemprop="dateModified" datetime="2020-05-28T15:53:21+08:00">2020-05-28</time>
+                <time title="修改时间：2020-06-02 18:20:33" itemprop="dateModified" datetime="2020-06-02T18:20:33+08:00">2020-06-02</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -492,7 +1047,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
+                  <a href="/categories/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a>
                 </span>
             </span>
 
@@ -631,7 +1186,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-27 11:27:01" itemprop="dateModified" datetime="2020-05-27T11:27:01+08:00">2020-05-27</time>
+                <time title="修改时间：2020-06-02 18:20:38" itemprop="dateModified" datetime="2020-06-02T18:20:38+08:00">2020-06-02</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -639,7 +1194,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
+                  <a href="/categories/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a>
                 </span>
             </span>
 
@@ -851,7 +1406,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-26 10:57:36" itemprop="dateModified" datetime="2020-05-26T10:57:36+08:00">2020-05-26</time>
+                <time title="修改时间：2020-06-02 18:20:42" itemprop="dateModified" datetime="2020-06-02T18:20:42+08:00">2020-06-02</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -859,7 +1414,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
+                  <a href="/categories/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a>
                 </span>
             </span>
 
@@ -1005,511 +1560,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8/" class="post-title-link" itemprop="url">Redis设计与实现读书笔记:第一部分:数据结构与对象:第七章:压缩列表</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-24 21:15:37" itemprop="dateCreated datePublished" datetime="2020-05-24T21:15:37+08:00">2020-05-24</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-26 09:21:32" itemprop="dateModified" datetime="2020-05-26T09:21:32+08:00">2020-05-26</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="压缩列表"><a href="#压缩列表" class="headerlink" title="压缩列表"></a>压缩列表</h2><p>压缩列表(ziplist)是列表键和哈希键的底层实现之一。当一个列表键(哈希键)只包含少量列表项，并且每个列表项要么就是小数值，要么就是长度比较短的字符串，Redis 就会使用压缩列表来作为底层实现。</p>
-<h2 id="压缩列表的构成"><a href="#压缩列表的构成" class="headerlink" title="压缩列表的构成"></a>压缩列表的构成</h2><ul>
-<li>zlbytes ：记录整个压缩列表占用的字节数：在对压缩列表进行内存重分配，或者计算 zlend 的位置时使用。</li>
-<li>zltail：记录压缩列表表尾节点距离压缩列表的起始地址有多少字节：通过这个偏移量，程序无须遍历整个压缩列表就可以确定表尾节点的地址。</li>
-<li>zllen：记录了压缩列表包含的节点数量。2字节，如果长度超过65535需要遍历一遍。</li>
-<li>entryX：压缩列表包含的各个节点，节点的长度由节点保存的内容决定。</li>
-<li>zlend：特殊值 0xFF ，用于标记压缩列表的末端。</li>
-</ul>
-<h2 id="压缩列表节点的构成"><a href="#压缩列表节点的构成" class="headerlink" title="压缩列表节点的构成"></a>压缩列表节点的构成</h2><p>节点可以保存一个字节数组或者一个整数值</p>
-<ul>
-<li>previous_entry_length：保存前一个节点的字节长度<ul>
-<li>如果前一个节点的长度小于 254 字节，previous_entry_length 属性长度为 1 字节，前一个节点的长度就保存在这一个字节里面。</li>
-<li>如果前一个节点的长度大于等于 254 字节，那么 previous_entry_length 属性的长度为 5 字节，第一个字节会被设置为 0xFE ，之后的四个字节保存前一节点的长度。</li>
-<li>通过 previous_entry_length 可以实现压缩列表的反向遍历。</li>
-</ul>
-</li>
-<li>encoding：记录了节点 content 属性所保存数据的类型和长度<ul>
-<li>一字节、两字节或者五字节长，值的最高位为 00， 01 或者 10 的是字节数组编码：这种编码表示节点的 content 属性保存着字节数组，数组的长度由编码除去最高两位之后的其他位记录。</li>
-<li>一字节长，值的最高位以 11 开头的是整数编码：种编码表示节点的 content 属性保存着整数值，整数值的类型和长度由编码除去最高两位之后的其他位记录。</li>
-</ul>
-</li>
-<li>content：负责保存节点的值，节点的值可以是一个字节数组或者整数，值的类型和长度由节点的 encoding 属性决定。</li>
-</ul>
-<h2 id="连锁更新"><a href="#连锁更新" class="headerlink" title="连锁更新"></a>连锁更新</h2><p>因为 previous_entry_length 的长度不确定，在特殊情况下会导致连锁更新。</p>
-<p>连锁更新在最坏的情况下需要对压缩列表执行 N 次空间重分配操作，而每次空间重分配的最坏复杂度为 <em>O(N)</em>, 所以连锁更新的最坏复杂度为 <em>O(N²)</em>. （最坏情况出现几率小）</p>
-<h2 id="重点回顾"><a href="#重点回顾" class="headerlink" title="重点回顾"></a>重点回顾</h2><ul>
-<li>压缩列表是一种为节约内存而开发的顺序型数据结构。</li>
-<li>压缩列表被用作列表键和哈希键的底层实现之一。</li>
-<li>压缩列表可以包含多个节点，每个节点可以保存一个字节数组或者整数值。</li>
-<li>添加新节点到压缩列表，或者从压缩列表中删除节点，可能会引发连锁更新操作，但这种操作出现的几率不高。</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/24/%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/1%202%203%20%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/24/%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/1%202%203%20%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/" class="post-title-link" itemprop="url">软件过程与管理/1 2 3 软件过程与管理</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-24 19:46:38" itemprop="dateCreated datePublished" datetime="2020-05-24T19:46:38+08:00">2020-05-24</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>软件工程的三要素：过程、方法、工具</p>
-<p>软件过程将技术和管理结合起来，使得软件能够被合理地、及时地开发出来。</p>
-<p>通用框架活动：沟通、策划、建模、构建、部署</p>
-<p>构建活动的过程模式属<strong>步骤模式</strong>类型</p>
-<p><strong>惯例过程模型</strong>是包括活动、动作、任务、里程碑和工作产品的明确的集合，旨在开发高质量的软件。</p>
-<p>惯例过程模型的<strong>优点</strong>：为活动提供稳定、控制和有组织性，以有序和项目的一致性为首要目标。为软件工程工作增加了大量有用的结构化设计，为项目团队提供了有效的路线图。</p>
-<p>惯例过程模型的<strong>不足</strong>：使用过程中需要调整才能适应不同项目需要。缺乏灵活性、应对变更能力不强。</p>
-<p><strong>瀑布模型</strong>从沟通开始，通过策划、建模、构建和部署的过程，最终提供完整的软件并提供持续的技术支持,又称为经典生命周期模型。</p>
-<p>瀑布模型的<strong>特点</strong>：阶段间具有 顺序性和 依赖性；推迟程序的物理 实现；质量保证：− 每个阶段必须完成规定的文档− 每个阶段结束前完成<strong>文档</strong>审查；瀑布模型是一种严格线性的、按阶段顺序的、逐步细化的过程模型。</p>
-<p>瀑布模型的<strong>优点</strong>：有利于人员的组织与管理；有利于软件开发方法和工具的研究；可以提高大型软件项目开发的质量和效率</p>
-<p>瀑布模型的<strong>缺点</strong>：不适应需求经常发生变更的环境，难以解决需求不明确的问题；用户在过程终端才能看到产品，反馈时间长，风险大；易于陷入“阻塞状态”；；强调一次性交付完整系统，导致开发周期长；缺乏灵活性，可操作性差</p>
-<p>瀑布模型的<strong>适用范围</strong>：需求明确、全面，开发过程中没有或很少变更的项目；开发人员熟悉项目产品的目标、环境、应用领域的低风险项目；开发过程很少或不需要用户参与的项目；用户使用环境稳定且能够容忍长开发周期的项目</p>
-<p><strong>增量过程模型</strong>是一种以增量的形式生产软件产品的过程模型，适用于以下场景：初始的软件需求有明确的定义，但是，受时间或资源的限制，受时间或资源的限制，不宜单纯运用线性模型；迫切需要 迅速提供一套功能有限的产品，允许在后续版本中细化和扩充。</p>
-<p><strong>增量模型</strong>以迭代的方式运用瀑布模型。每一个增量都提交一个可以操作的产品。</p>
-<p>增量模型的<strong>特点</strong>：融合 瀑布模型的基本成分和 迭代的特征；以功能递增的方式进行软件开发；能较快地产生可操作的系统；在每一步递增中，均发布一个可操作的 增量版本，把用户/开发者的经验结合到不断求精的产品中。</p>
-<p>增量模型<strong>优点</strong>：人员分配灵活，刚开始不用投入大量人力资源；规避技术风险；在短时间内提交核心产品，对用户起到镇静剂的作用，具有一定市场</p>
-<p>增量模型<strong>缺点</strong>：并行开发构建，有可能遇到不能集成的风险，对软件体系结构要求高；容易退化为“边做边改”模型，导致对软件过程的控制失去整体性。</p>
-<p>增量模型的<strong>适用范围</strong>：已有产品升级项目或新版本的开发项目；需求明确并对使用开始时间有严格要求的项目</p>
-<p><strong>演化过程模型</strong>利用迭代的思想方法，使软件工程师 渐进地开发逐步完善的软件版本。演化过程模型主要适用于在项目开发初期项目需求不明确，把握不充分的项目。</p>
-<p><strong>原型模型针</strong>对需求不明确的情况通过迅速构建可以运行的软件原型 ，以便理解和澄清问题，使开发人员与用户达成共识，最终在确定的需求基础上开发出满意的产品。原型模型是用户驱动的。</p>
-<p>原型的分类：<strong>探索型原型</strong>：用于 需求分析阶段，目的是要澄清用户的需求，确定所期望的特性，并探索各<br>种方案的可行性。<strong>实验型原型</strong>：用于 设计阶段，考核实现方案是否合适。<strong>演化型原型</strong>：用于及早向用户提交一个原型系统，在得到用户的认可后不断扩充演变为最终的产品。</p>
-<p>原型的使用策略：<strong>抛弃策略</strong>：原型仅用于开发过程的某个阶段，该阶段结束后，原型随之作废。<strong>附加策略</strong>：原型用于开发的全过程，由最基本的核心开始，逐步增加新的功能和新的需求，最后发展为用户满意的最终系统。</p>
-<p>原型模型的<strong>优点</strong>：克服 瀑布模型的缺点，减少由于软件需求不明确带来的开发风险。<br>原型模型的<strong>缺点</strong>：容易引起用户误解。对用户参与程度要求高。缺少项目标准，用户可能不断提出新要求，原型<br>迭代的周期很难控制。额外的花费：研究结果表明构造一个原型可能需要10%额外花费。为了尽快实现原型，采用了 不合适的技术，运行效率可能会受影响。</p>
-<p>原型模型的<strong>适用范围</strong>：适合于那些不能确切定义需求的中小型项目；用户未能详细定义输入、处理、输出；开发人员对算法效率、OS、人机交互的形式不确定。</p>
-<p><strong>螺旋模型</strong>，综合了原型模型的迭代特征原型模型的迭代特征和 瀑布模型的系统性和可控制性的特点， 增加风险分析，是以风险为导向的生命期模型。采用循环方式逐步加深系统定义和实现的深度，同时降低风险。确定一系列里程碑，确保项目干系人都支持可行的和令人满意的解决方案。</p>
-<p>螺旋模型<strong>特点</strong>：把软件开发过程组成为一个 逐步细化的螺旋周期序列，每经历一个周期，系统就得到进一步的细化和完善；紧密围绕开发中的风险问题，用 风险分析推动软件设计向深一层扩展、求精；强调 持续地判断、确定和修改用户任务目标，并按成本效益来分析候选的软件产品性质对任务目标的贡献；可结合采用 多种软件开发方法，但究竟结合哪一种方法仍由风险分析来决定。</p>
-<p>螺旋模型的<strong>优势</strong>：设计上具有灵活性，可以在产品的各个阶段进行变更；以小的分段来构建大型系统，易于成本计算；客户参与各阶段的开发，保证项目不偏离正确方向和项目的可控性；引入风险分析，随着迭代的增加风险程度随之降低。</p>
-<p>螺旋模型的<strong>不足</strong>：对风险评估技术和经验有较高要求，评估不当会造成重大损失；过多的迭代次数会延长交付时间，增加开发成本螺旋模型只适合于那些不能确切定义需求的大型软件项目的开发</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E5%85%AD%E7%AB%A0%E6%95%B4%E6%95%B0%E9%9B%86%E5%90%88/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E5%85%AD%E7%AB%A0%E6%95%B4%E6%95%B0%E9%9B%86%E5%90%88/" class="post-title-link" itemprop="url">Redis设计与实现读书笔记:第一部分:数据结构与对象:第六章:整数集合</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-24 12:52:42" itemprop="dateCreated datePublished" datetime="2020-05-24T12:52:42+08:00">2020-05-24</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-26 09:11:00" itemprop="dateModified" datetime="2020-05-26T09:11:00+08:00">2020-05-26</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="整数集合"><a href="#整数集合" class="headerlink" title="整数集合"></a>整数集合</h1><p>整数集合( intset )是集合键的底层实现之一，当一个集合中只包含整数值元素，并且这个集合的元素数量不多时，Redis就会只用整数集合来作为集合键的底层实现。</p>
-<h2 id="整数集合的实现"><a href="#整数集合的实现" class="headerlink" title="整数集合的实现"></a>整数集合的实现</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">intset</span>&#123;</span></span><br><span class="line">    <span class="comment">// 编码方式</span></span><br><span class="line">    <span class="keyword">uint_32_t</span> enconding;</span><br><span class="line">    <span class="comment">// 集合包含的元素数量</span></span><br><span class="line">    <span class="keyword">uint_32_t</span> length;</span><br><span class="line">    <span class="comment">// 保存元素的数组</span></span><br><span class="line">    <span class="keyword">int8_t</span> contents[];</span><br><span class="line">&#125; intset;</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="升级"><a href="#升级" class="headerlink" title="升级"></a>升级</h2><p>添加到整数集合中的新元素（<em>O(N)</em>）的类型比整数集合现有所有的元素的类型都要长时，整数集合就需要先进行升级。</p>
-<p>升级的步骤：</p>
-<ol>
-<li>根据新元素的类型，扩展整数集合底层数组的空间大小，并为新元素分配空间。</li>
-<li>将底层数组现有的所有元素转换成与新元素相同的数据类型，并将类型转换后的元素放置到正确的位置上，放置的过程中，维持底层数组的有序性质不变。</li>
-<li>将新元素添加到底层数组里面。</li>
-</ol>
-<h2 id="升级的好处"><a href="#升级的好处" class="headerlink" title="升级的好处"></a>升级的好处</h2><ul>
-<li>提升灵活性：不用担心类型不匹配</li>
-<li>节约内存：相对于直接用 int64_t 类型的数组作为整数集合的底层实现。</li>
-</ul>
-<h2 id="降级"><a href="#降级" class="headerlink" title="降级"></a>降级</h2><p>不支持降级</p>
-<h2 id="重点回顾"><a href="#重点回顾" class="headerlink" title="重点回顾"></a>重点回顾</h2><ul>
-<li>整数集合是集合键的底层实现之一。</li>
-<li>整数集合的底层实现为数组，这个数组以有序、无重复的方式保存集合元素，有需要时候，程序会根据新添加元素的类型，改变这个数组的类型。</li>
-<li>升级操作为整数数组集合带来了操作上的灵活性，并且尽可能的节约了内存。</li>
-<li>整数集合只支持升级操作，不支持降级操作。</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%BA%94%E7%AB%A0%E8%B7%B3%E8%B7%83%E8%A1%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%BA%94%E7%AB%A0%E8%B7%B3%E8%B7%83%E8%A1%A8/" class="post-title-link" itemprop="url">Redis设计与实现读书笔记:第一部分:数据结构与对象:第五章:跳跃表</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2020-05-24 08:54:46 / 修改时间：12:52:44" itemprop="dateCreated datePublished" datetime="2020-05-24T08:54:46+08:00">2020-05-24</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="跳跃表"><a href="#跳跃表" class="headerlink" title="跳跃表"></a>跳跃表</h1><p>跳跃表是一个种有序数据结构，平均 <em>O(logN)</em> 复杂度的节点查找，还可以通过顺序性操作来批量处理节点。</p>
-<p>Redis 在有序集合键和集群节点中用作内部数据结构中使用跳跃表。</p>
-<h2 id="跳跃表的实现"><a href="#跳跃表的实现" class="headerlink" title="跳跃表的实现"></a>跳跃表的实现</h2><h3 id="跳跃表节点"><a href="#跳跃表节点" class="headerlink" title="跳跃表节点"></a>跳跃表节点</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">zskiplitNode</span> &#123;</span></span><br><span class="line">    <span class="comment">// 层</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistLevel</span>&#123;</span></span><br><span class="line">        <span class="comment">// 前进指针</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">forward</span>;</span></span><br><span class="line">        <span class="comment">// 跨度</span></span><br><span class="line">        <span class="keyword">unsigned</span> <span class="keyword">int</span> span;</span><br><span class="line">    &#125; level[];</span><br><span class="line">    <span class="comment">// 后退指针</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">backword</span>;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 分值</span></span><br><span class="line">    <span class="keyword">double</span> score;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 成员对象</span></span><br><span class="line">    robj *obj;</span><br><span class="line">&#125; zskiplistNode;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>level ：程序可以通过这些层来加快访问其他节点的速度，一般来说，层的数量越多，访问其他节点的速度就越快。每次创建一个新的跳跃表节点的时候，程序根据幂次定律(power law, 越大的数出现的概率越小) 随机生成一个介于 1 和 32 之间的值作为 level 数组的大小，这个大小就是层的“高度”。</li>
-<li>前进指针：level[i].forward 属性用于从表头向表尾方向访问节点。</li>
-<li>跨度：level[i].span 用于记录两个节点之间的距离。</li>
-<li>后退指针：用于从表尾向表头方向访问节点，每个节点之后一个后退指针。每次只能后退至前一个节点。</li>
-<li>分值和成员：跳跃表中所有节点都按分值从小到大排序，成员对象指向一个 SDS.</li>
-</ul>
-<h3 id="跳跃表-1"><a href="#跳跃表-1" class="headerlink" title="跳跃表"></a>跳跃表</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">zskiplist</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">skiplistNode</span> *<span class="title">header</span>, *<span class="title">tail</span>;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 表中节点的数量</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> length;</span><br><span class="line">    <span class="comment">// 表中层数最大的节点的层数</span></span><br><span class="line">    <span class="keyword">int</span> level;</span><br><span class="line">&#125; zskiplist;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>header: 指向跳跃表的表头节点</li>
-<li>tail:</li>
-<li>level：记录目前跳跃表内，层数最大的那个节点的层数(不包括表头节点)</li>
-<li>length：记录跳跃表的长度，也是跳跃表目前包含节点的数量。</li>
-</ul>
-<p>扩展阅读：<a href="https://juejin.im/post/57fa935b0e3dd90057c50fbc" target="_blank" rel="noopener">Redis 为什么用跳表而不用平衡树？</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/21/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E5%9B%9B%E7%AB%A0%E5%AD%97%E5%85%B8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/21/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E5%9B%9B%E7%AB%A0%E5%AD%97%E5%85%B8/" class="post-title-link" itemprop="url">Redis设计与实现读书笔记:第一部分:数据结构与对象:第四章:字典</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-21 12:43:56" itemprop="dateCreated datePublished" datetime="2020-05-21T12:43:56+08:00">2020-05-21</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-22 13:26:56" itemprop="dateModified" datetime="2020-05-22T13:26:56+08:00">2020-05-22</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Redis设计与实现读书笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="字典"><a href="#字典" class="headerlink" title="字典"></a>字典</h1><h2 id="字典的实现"><a href="#字典的实现" class="headerlink" title="字典的实现"></a>字典的实现</h2><h3 id="哈希表"><a href="#哈希表" class="headerlink" title="哈希表"></a>哈希表</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictht</span>&#123;</span></span><br><span class="line">    <span class="comment">// 哈希表数组</span></span><br><span class="line">    dictEntry **table;</span><br><span class="line">    <span class="comment">// 哈希表大小</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="built_in">size</span>;</span><br><span class="line">    <span class="comment">// 哈希表大小掩码，用于计算索引值</span></span><br><span class="line">    <span class="comment">// 总是等于 size - 1</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> sizemask;</span><br><span class="line">    <span class="comment">// 该哈希表已有节点的数量</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> used;</span><br><span class="line">&#125; dictht;</span><br></pre></td></tr></table></figure>
-
-<h3 id="哈希表节点"><a href="#哈希表节点" class="headerlink" title="哈希表节点"></a>哈希表节点</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span>&#123;</span></span><br><span class="line">    <span class="comment">// 键</span></span><br><span class="line">    <span class="keyword">void</span> *key;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 值</span></span><br><span class="line">    <span class="keyword">union</span>&#123;</span><br><span class="line">        <span class="keyword">void</span> *val;</span><br><span class="line">        uint64_tu64;</span><br><span class="line">        int64_ts64;</span><br><span class="line">    &#125;v;</span><br><span class="line">    </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dictEntry</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125; dictEntry;</span><br></pre></td></tr></table></figure>
-
-<h3 id="字典-1"><a href="#字典-1" class="headerlink" title="字典"></a>字典</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dict</span>&#123;</span></span><br><span class="line">    <span class="comment">// 类型特定函数</span></span><br><span class="line">    dictType *type;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 私有数据</span></span><br><span class="line">    <span class="keyword">void</span> *privdata;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 哈希表</span></span><br><span class="line">    dictht ht[<span class="number">2</span>];<span class="comment">// ht[1] 只会在对 ht[0] 哈希表进行 rehash 使用</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// rehash 索引</span></span><br><span class="line">    <span class="comment">// 当 rehash 不在进行时, 值为 -1</span></span><br><span class="line">    <span class="keyword">int</span> trehashidx; <span class="comment">// rehashing not in progress if rehashidx == -1</span></span><br><span class="line">&#125; dict;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>type 属性和 privdata 属性是针对不同类型的键值对，为创建多态字典而设置的。</li>
-<li>type 属性是一个指向 dictType 结构的指针，每个 dictType 结构保存了一簇用于操作特定类型键值对的函数，Redis 会为用途不同的字典设置不同类型特定函数。</li>
-<li>privdata 属性则保存了需要传给那些类型特定函数的可选参数。</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dictType</span>&#123;</span></span><br><span class="line">    <span class="comment">// 计算哈希值的函数</span></span><br><span class="line">    <span class="function"><span class="keyword">unsigned</span> <span class="title">int</span> <span class="params">(*hashFunction)</span><span class="params">(<span class="keyword">const</span> <span class="keyword">void</span> *key)</span></span>;</span><br><span class="line">    <span class="comment">// 复制键的函数</span></span><br><span class="line">    <span class="keyword">void</span> *(*keyDup)(<span class="keyword">void</span> *privdata, <span class="keyword">const</span> <span class="keyword">void</span> *key);</span><br><span class="line">    <span class="comment">// 复制值的函数</span></span><br><span class="line">    <span class="keyword">void</span> *(*valDup)(<span class="keyword">void</span> *privdata, <span class="keyword">const</span> <span class="keyword">void</span> *obj);</span><br><span class="line">    <span class="comment">// 对比键的函数</span></span><br><span class="line">    <span class="keyword">int</span> (*keyCompare)(<span class="keyword">void</span> *privdata, <span class="keyword">const</span> <span class="keyword">void</span> *key1, <span class="keyword">const</span> <span class="keyword">void</span> *key2);</span><br><span class="line">    <span class="comment">// 销毁键的函数</span></span><br><span class="line">    <span class="keyword">void</span> (*keyDestructor)(<span class="keyword">void</span> *privdata, <span class="keyword">void</span> *key);</span><br><span class="line">    <span class="comment">// 销毁值的函数</span></span><br><span class="line">    <span class="keyword">void</span> (*valDestructor)(<span class="keyword">void</span> *privdata, <span class="keyword">void</span> *obj);</span><br><span class="line">&#125; dictType;</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="哈希算法"><a href="#哈希算法" class="headerlink" title="哈希算法"></a>哈希算法</h2><p>当要将一个新键值对添加到字典里时，需要先根据键值对的键计算出哈希值和索引值，然后根据索引值，将包含新键值对的哈希表节点放到哈希表数组的指定索引上面。</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用字典设置的哈希函数，计算键 key 的哈希值</span></span><br><span class="line">hash = dict -&gt; type -&gt; hashFunction(key);	// MurmurHash算法</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用哈希表的 sizemask 属性和哈希值，计算出索引值</span></span><br><span class="line"><span class="comment"># 根据情况不同，ht[x] 可以是 ht[0] 或者 ht[1]</span></span><br><span class="line">index = hash &amp; dict -&gt; ht[x].sizemask;</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="解决键冲突"><a href="#解决键冲突" class="headerlink" title="解决键冲突"></a>解决键冲突</h2><p>链地址法</p>
-<h2 id="rehash"><a href="#rehash" class="headerlink" title="rehash"></a>rehash</h2><p>rehash 的步骤：</p>
-<ol>
-<li><p>为字典的 ht[1] 哈希表分配空间</p>
-<ul>
-<li>如果执行的是扩展操作，那么 ht[1] 的大小为第一个大于等于 ht[0].used * 2 的 2 的 n 次方。</li>
-<li>如果执行的是收缩操作，那么 ht[1] 的大小为第一个大于等于 ht[0].used 的 2 的 n 次方。</li>
-</ul>
-</li>
-<li><p>将保存在 ht[0] 中的所有键值对 rehash 到 ht[1] 上面</p>
-</li>
-<li><p>rehash 完成后，释放 ht[0], 将 ht[1] 设置为 ht[0], 并在 ht[1] 新建一个空白哈希表，为下一次 rehash 做准备</p>
-</li>
-</ol>
-<h3 id="哈希表的扩展与收缩"><a href="#哈希表的扩展与收缩" class="headerlink" title="哈希表的扩展与收缩"></a>哈希表的扩展与收缩</h3><ol>
-<li>服务器目前没有在执行 <em>BGSAVE</em> 命令或者 <em>BGREWRITEAOF</em> 命令，并且哈希表的负载因子大于等于1</li>
-<li>服务器目前正在执行 <em>BGSAVE</em> 命令或者  <em>BGREWRITEAOF</em> 命令，并且哈希表的负载因子大于等于5</li>
-</ol>
-<p>因为在执行 <em>BGSAVE</em> 命令或者  <em>BGREWRITEAOF</em> 命令的过程中，Redis 需要创建当前服务器进程的子进程，而大多数操作系统都采用写时复制(copy-on-write)技术来优化子进程的使用效率，所以在子进程存在期间，服务器会提高执行扩展操作所需的负载因子，从而尽可能的避免在子进程存在期间进行哈希表扩展操作，这可以避免不必要的内存写入操作，最大限度地节约内存。</p>
-<p>哈希表的负载因子小于 0.1 时，会自动执行 收缩操作。</p>
-<h2 id="渐进式-rehash"><a href="#渐进式-rehash" class="headerlink" title="渐进式  rehash"></a>渐进式  rehash</h2><p>哈希表渐进式 rehash 的步骤：</p>
-<ol>
-<li>为字典的 ht[1] 哈希表分配空间，让字典同时持有 ht[0] 和 ht[1] 两个哈希表。</li>
-<li>在字典中维持一个索引计数器变量 rehashidx ，并将它的值设置为 0, 表示 rehash 工作正式开始。</li>
-<li>在 rehash 进行期间，每次对字典执行添加、删除、查找或者更新操作时，程序除了执行制定的操作以外，还会顺带将 ht[0] 哈希表在 rehashidx 索引上的所有键值对 rehash 到 ht[1]，当 rehash 工作完成之后，程序将 rehashidx 属性的值增一。</li>
-<li>随着字典操作的不断执行，最终在某个时间点上，ht[0] 的所有键值对都会被 rehash 到 ht[1]，这时程序将 rehashidx 属性的值设置为 -1， 表示 rehash 操作完成。</li>
-</ol>
-<p>因为在渐进式 rehash 的过程中，字典会同时使用 ht[0] 和 ht[1] 两个哈希表，字典的 delete，find，update 等操作会在两个哈希表上查找，先在 ht[0] 中找，找不到再去 ht[1] 中找。</p>
-<p>insert 操作，只会插入到 ht[1] 中。</p>
-<h2 id="重点回顾"><a href="#重点回顾" class="headerlink" title="重点回顾"></a>重点回顾</h2><ul>
-<li>字典被广泛用于实现 Redis 的各种功能，其中包括数据库和哈希键</li>
-<li>Redis 中的字典使用哈希表作为底层实现，每个字典中带有两个哈希表，一个平时使用，另一个仅在 rehash 时使用。</li>
-<li>当字典被用作数据库的底层实现，或者哈希键的底层实现时， Redis 使用 MurmurHash2 算法来计算键的哈希值</li>
-<li>哈希表使用链地址法解决键冲突，被分配到同一个索引上的多个键值对会连接成一个单向链表。</li>
-<li>在对哈希表进行扩展或者收缩操作时，程序需要将现有哈希表包含的所有键值对 rehash 到新哈希表里面，并且这个 rehash 操作过程不是一次性地完成的，而是渐进式的完成的。</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1577,7 +1631,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-count">62</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
