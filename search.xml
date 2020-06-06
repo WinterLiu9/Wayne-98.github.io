@@ -2212,30 +2212,6 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
       </tags>
   </entry>
   <entry>
-    <title>5.13 ~ 5.18 学习计划</title>
-    <url>/2020/05/13/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/5.13%20~%205.18%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/</url>
-    <content><![CDATA[<h2 id="5-13-5-18-学习计划"><a href="#5-13-5-18-学习计划" class="headerlink" title="5.13 ~ 5.18 学习计划"></a>5.13 ~ 5.18 学习计划</h2><ul>
-<li>每天写 LeetCode，复习 200 英语单词</li>
-<li>牛客网项目跟着做</li>
-<li>Head First Design Pattern</li>
-<li>CSAPP 学习</li>
-<li>Redis</li>
-<li>Zookeeper</li>
-<li>高性能MySQL 再看一遍 5 6 章节</li>
-<li>美团文章读一篇</li>
-<li>计算机网络 SDN 数据链路层 多播 任播</li>
-</ul>
-<h2 id="上周回顾"><a href="#上周回顾" class="headerlink" title="上周回顾"></a>上周回顾</h2><ul>
-<li>上周的学习状态一般般，有效学习时间不多。</li>
-<li>现在是基础学的不深入，并且没有实战经验</li>
-<li>英语的学习不能落下，重视一下</li>
-</ul>
-]]></content>
-      <categories>
-        <category>学习记录</category>
-      </categories>
-  </entry>
-  <entry>
     <title>简单操作系统概念</title>
     <url>/2020/05/10/Operating%20System/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0/</url>
     <content><![CDATA[<h1 id="1-操作系统概述"><a href="#1-操作系统概述" class="headerlink" title="1. 操作系统概述"></a>1. 操作系统概述</h1><ul>
@@ -2414,22 +2390,6 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
       </tags>
   </entry>
   <entry>
-    <title>4.28 ~ 5.5 学习计划</title>
-    <url>/2020/05/10/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/4.28%20~%205.5%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/</url>
-    <content><![CDATA[<h2 id="4-28-5-5-学习计划"><a href="#4-28-5-5-学习计划" class="headerlink" title="4.28 ~ 5.5 学习计划"></a>4.28 ~ 5.5 学习计划</h2><ul>
-<li>每天写 LeetCode</li>
-<li>JVM 第三版 第三部分以及第四部分 学习笔记重新整理 &amp; 学习</li>
-<li>Java 并发编程 复习一遍</li>
-<li>高性能MySQL 第五章第六章 学习笔记整理 &amp; 学习</li>
-<li>美团文章：JVM调优 MySQL慢优化</li>
-<li>计算机网络 IP 数据链路 学习 整理笔记</li>
-</ul>
-]]></content>
-      <categories>
-        <category>学习记录</category>
-      </categories>
-  </entry>
-  <entry>
     <title>Socket I/O</title>
     <url>/2020/05/10/Scoket/socket%20IO/</url>
     <content><![CDATA[<p>One basic concept of Linux (actually Unix) is the rule that everything in Unix/Linux is a file. Each process has a table of file descriptors that point to files, sockets, devices and other operating system objects.<br>    linux系统中，一切皆文件。，每一个进程都有一个FD表，指向了与该进程有关的文件，套接字，设备或者其他操作系统对象。<br>Typical system that works with many IO sources has an initializaion phase and then enter some kind of standby mode – wait for any client to send request and response it<br>典型系统中有许多IO资源具有初始化阶段，然后进入某种待机模式——等待任意一个客户端发送请求并对其进行响应。<br>Simple solution is to create a thread (or process) for each client , block on read until a request is sent and write a response. This is working ok with a small amount of clients but if we want to scale it to hundred of clients, creating a thread for each client is a bad idea<br>简单的解决方案是为每一个客户，创建一个线程，客户请求的时候进行响应，其他时候处于阻塞状态。</p>
@@ -2472,43 +2432,6 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
       <tags>
         <tag>I/O</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>需要提升的点</title>
-    <url>/2020/05/10/%E9%9D%A2%E8%AF%95/%E9%9C%80%E8%A6%81%E6%8F%90%E5%8D%87%E7%9A%84%E7%82%B9/</url>
-    <content><![CDATA[<p>Collections.sort() 原理：归并</p>
-<p>图的一些算法，需要复习一下</p>
-<p>JVM 调优 参数</p>
-<p>设计模式： 单例模式（懒汉饿汉） 工厂方法模式  观察者模式   责任链模式</p>
-<p>红黑树</p>
-<p>ThreadLocal</p>
-<p><strong>B 树和 B+树的区别</strong>：</p>
-<ul>
-<li>B 树，每个节点都存储 key 和 data，所有节点组成这棵树，并且叶子节点指针为 nul，叶子结点不包含任何关键字信息。</li>
-<li>B+树，所有的叶子结点中包含了全部关键字的信息，及指向含有这些关键字记录的指针，且叶子结点本身依关键字的大小自小而大的顺序链接，所有的非终端结点可以看成是索引部分，结点中仅含有其子树根结点中最大（或最小）关键字。(而 B 树的非终节点也包含需要查找的有效信息)</li>
-</ul>
-<p><strong>为什么说 B+比 B 树更适合实际应用中操作系统的文件索引和数据库索引？</strong></p>
-<ul>
-<li>B+的磁盘读写代价更低。B+的内部结点并没有指向关键字具体信息的指针。因此其内部结点相对 B树更小。如果把所有同一内部结点的关键字存放在同一盘块中，那么盘块所能容纳的关键字数量也越多。一次性读入内存中的需要查找的关键字也就越多。相对来说 IO 读写次数也就降低了。</li>
-<li>B+-tree 的查询效率更加稳定<br>由于非终结点并不是最终指向文件内容的结点，而只是叶子结点中关键字的索引。所以任何关键字的查找必须走一条从根结点到叶子结点的路。所有关键字查询的路径长度相同，导致每一个数据的查询效率相当。</li>
-</ul>
-]]></content>
-  </entry>
-  <entry>
-    <title>5.5 ~ 5.12 学习计划</title>
-    <url>/2020/05/10/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/5.5%20~%205.12%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/</url>
-    <content><![CDATA[<h2 id="5-5-5-12-学习计划"><a href="#5-5-5-12-学习计划" class="headerlink" title="5.5 ~ 5.12 学习计划"></a>5.5 ~ 5.12 学习计划</h2><ul>
-<li>每天写 LeetCode，复习 200 英语单词</li>
-<li>JVM 复习一遍笔记</li>
-<li>Java 并发 复习一遍笔记</li>
-<li>高性能MySQL 再看一遍 5 6 章节</li>
-<li>美团文章 JVM 调优</li>
-<li>计算机网络 IP 数据链路 多播 数据控制层</li>
-</ul>
-]]></content>
-      <categories>
-        <category>学习记录</category>
-      </categories>
   </entry>
   <entry>
     <title>高性能MySQL读书笔记第十一章：扩展</title>
@@ -5117,39 +5040,6 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
       </tags>
   </entry>
   <entry>
-    <title>软件过程与管理/1 2 3 软件过程与管理</title>
-    <url>/2020/05/24/%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/1%202%203%20%E8%BD%AF%E4%BB%B6%E8%BF%87%E7%A8%8B%E4%B8%8E%E7%AE%A1%E7%90%86/</url>
-    <content><![CDATA[<p>软件工程的三要素：过程、方法、工具</p>
-<p>软件过程将技术和管理结合起来，使得软件能够被合理地、及时地开发出来。</p>
-<p>通用框架活动：沟通、策划、建模、构建、部署</p>
-<p>构建活动的过程模式属<strong>步骤模式</strong>类型</p>
-<p><strong>惯例过程模型</strong>是包括活动、动作、任务、里程碑和工作产品的明确的集合，旨在开发高质量的软件。</p>
-<p>惯例过程模型的<strong>优点</strong>：为活动提供稳定、控制和有组织性，以有序和项目的一致性为首要目标。为软件工程工作增加了大量有用的结构化设计，为项目团队提供了有效的路线图。</p>
-<p>惯例过程模型的<strong>不足</strong>：使用过程中需要调整才能适应不同项目需要。缺乏灵活性、应对变更能力不强。</p>
-<p><strong>瀑布模型</strong>从沟通开始，通过策划、建模、构建和部署的过程，最终提供完整的软件并提供持续的技术支持,又称为经典生命周期模型。</p>
-<p>瀑布模型的<strong>特点</strong>：阶段间具有 顺序性和 依赖性；推迟程序的物理 实现；质量保证：− 每个阶段必须完成规定的文档− 每个阶段结束前完成<strong>文档</strong>审查；瀑布模型是一种严格线性的、按阶段顺序的、逐步细化的过程模型。</p>
-<p>瀑布模型的<strong>优点</strong>：有利于人员的组织与管理；有利于软件开发方法和工具的研究；可以提高大型软件项目开发的质量和效率</p>
-<p>瀑布模型的<strong>缺点</strong>：不适应需求经常发生变更的环境，难以解决需求不明确的问题；用户在过程终端才能看到产品，反馈时间长，风险大；易于陷入“阻塞状态”；；强调一次性交付完整系统，导致开发周期长；缺乏灵活性，可操作性差</p>
-<p>瀑布模型的<strong>适用范围</strong>：需求明确、全面，开发过程中没有或很少变更的项目；开发人员熟悉项目产品的目标、环境、应用领域的低风险项目；开发过程很少或不需要用户参与的项目；用户使用环境稳定且能够容忍长开发周期的项目</p>
-<p><strong>增量过程模型</strong>是一种以增量的形式生产软件产品的过程模型，适用于以下场景：初始的软件需求有明确的定义，但是，受时间或资源的限制，受时间或资源的限制，不宜单纯运用线性模型；迫切需要 迅速提供一套功能有限的产品，允许在后续版本中细化和扩充。</p>
-<p><strong>增量模型</strong>以迭代的方式运用瀑布模型。每一个增量都提交一个可以操作的产品。</p>
-<p>增量模型的<strong>特点</strong>：融合 瀑布模型的基本成分和 迭代的特征；以功能递增的方式进行软件开发；能较快地产生可操作的系统；在每一步递增中，均发布一个可操作的 增量版本，把用户/开发者的经验结合到不断求精的产品中。</p>
-<p>增量模型<strong>优点</strong>：人员分配灵活，刚开始不用投入大量人力资源；规避技术风险；在短时间内提交核心产品，对用户起到镇静剂的作用，具有一定市场</p>
-<p>增量模型<strong>缺点</strong>：并行开发构建，有可能遇到不能集成的风险，对软件体系结构要求高；容易退化为“边做边改”模型，导致对软件过程的控制失去整体性。</p>
-<p>增量模型的<strong>适用范围</strong>：已有产品升级项目或新版本的开发项目；需求明确并对使用开始时间有严格要求的项目</p>
-<p><strong>演化过程模型</strong>利用迭代的思想方法，使软件工程师 渐进地开发逐步完善的软件版本。演化过程模型主要适用于在项目开发初期项目需求不明确，把握不充分的项目。</p>
-<p><strong>原型模型针</strong>对需求不明确的情况通过迅速构建可以运行的软件原型 ，以便理解和澄清问题，使开发人员与用户达成共识，最终在确定的需求基础上开发出满意的产品。原型模型是用户驱动的。</p>
-<p>原型的分类：<strong>探索型原型</strong>：用于 需求分析阶段，目的是要澄清用户的需求，确定所期望的特性，并探索各<br>种方案的可行性。<strong>实验型原型</strong>：用于 设计阶段，考核实现方案是否合适。<strong>演化型原型</strong>：用于及早向用户提交一个原型系统，在得到用户的认可后不断扩充演变为最终的产品。</p>
-<p>原型的使用策略：<strong>抛弃策略</strong>：原型仅用于开发过程的某个阶段，该阶段结束后，原型随之作废。<strong>附加策略</strong>：原型用于开发的全过程，由最基本的核心开始，逐步增加新的功能和新的需求，最后发展为用户满意的最终系统。</p>
-<p>原型模型的<strong>优点</strong>：克服 瀑布模型的缺点，减少由于软件需求不明确带来的开发风险。<br>原型模型的<strong>缺点</strong>：容易引起用户误解。对用户参与程度要求高。缺少项目标准，用户可能不断提出新要求，原型<br>迭代的周期很难控制。额外的花费：研究结果表明构造一个原型可能需要10%额外花费。为了尽快实现原型，采用了 不合适的技术，运行效率可能会受影响。</p>
-<p>原型模型的<strong>适用范围</strong>：适合于那些不能确切定义需求的中小型项目；用户未能详细定义输入、处理、输出；开发人员对算法效率、OS、人机交互的形式不确定。</p>
-<p><strong>螺旋模型</strong>，综合了原型模型的迭代特征原型模型的迭代特征和 瀑布模型的系统性和可控制性的特点， 增加风险分析，是以风险为导向的生命期模型。采用循环方式逐步加深系统定义和实现的深度，同时降低风险。确定一系列里程碑，确保项目干系人都支持可行的和令人满意的解决方案。</p>
-<p>螺旋模型<strong>特点</strong>：把软件开发过程组成为一个 逐步细化的螺旋周期序列，每经历一个周期，系统就得到进一步的细化和完善；紧密围绕开发中的风险问题，用 风险分析推动软件设计向深一层扩展、求精；强调 持续地判断、确定和修改用户任务目标，并按成本效益来分析候选的软件产品性质对任务目标的贡献；可结合采用 多种软件开发方法，但究竟结合哪一种方法仍由风险分析来决定。</p>
-<p>螺旋模型的<strong>优势</strong>：设计上具有灵活性，可以在产品的各个阶段进行变更；以小的分段来构建大型系统，易于成本计算；客户参与各阶段的开发，保证项目不偏离正确方向和项目的可控性；引入风险分析，随着迭代的增加风险程度随之降低。</p>
-<p>螺旋模型的<strong>不足</strong>：对风险评估技术和经验有较高要求，评估不当会造成重大损失；过多的迭代次数会延长交付时间，增加开发成本螺旋模型只适合于那些不能确切定义需求的大型软件项目的开发</p>
-]]></content>
-  </entry>
-  <entry>
     <title>Redis设计与实现读书笔记:第一部分:数据结构与对象:第七章:压缩列表</title>
     <url>/2020/05/24/Redis/Redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%AC%AC%E4%B8%83%E7%AB%A0%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8/</url>
     <content><![CDATA[<h2 id="压缩列表"><a href="#压缩列表" class="headerlink" title="压缩列表"></a>压缩列表</h2><p>压缩列表(ziplist)是列表键和哈希键的底层实现之一。当一个列表键(哈希键)只包含少量列表项，并且每个列表项要么就是小数值，要么就是长度比较短的字符串，Redis 就会使用压缩列表来作为底层实现。</p>
@@ -6124,6 +6014,202 @@ HTTP请求报文的第一行叫做请求行（request line），其后继的行�
       </categories>
       <tags>
         <tag>Redis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ICMP</title>
+    <url>/2020/06/06/Internet/ICMP/</url>
+    <content><![CDATA[<ul>
+<li>RIP(Routing information Protocol，路由信息协议): 内部网关协议, 距离矢量算法。路由器每30秒把自己的路由表发给邻居。路由器用邻居发来的路由表根据距离向量算法修改自己的路由表。初始时每个路由器只有到直连网距离为1的路由。</li>
+<li>OSPF （Open Shortest Path Frist）：链路状态协议，使用洪泛链路状态信息和 Dijkstra 最低开销路径算法。每当一条链路的状态发生改变时，路由器就会广播链路状态信息。如未发生变化，也需要周期性的广播链路状态。</li>
+</ul>
+<h2 id="ICMP"><a href="#ICMP" class="headerlink" title="ICMP"></a>ICMP</h2><h3 id="常见的ICMP报文"><a href="#常见的ICMP报文" class="headerlink" title="常见的ICMP报文"></a>常见的ICMP报文</h3><ul>
+<li>响应请求：我们用的ping操作中就包括了相应请求（类型字段值为8）和应答（类型字段值为0）ICMP报文。<br>过程：一台主机向一个节点发送一个类型字段值为8的ICMP报文，如果途中没有异常（如果没有被路由丢弃，目标不回应ICMP或者传输失败），则目标返回类型字段值为0的ICMP报文，说明这台主机存在。</li>
+<li>目标不可达，源抑制和超时报文<ol>
+<li>目标不可到达报文在路由器或者主机不能传递数据时使用。</li>
+<li>源抑制报文（类型字段值为4，代码字段值为0）则充当一个控制流量的角色，通知主机减少数据报流量。</li>
+<li>无连接方式网络的问题就是数据报会丢失，或者长时间在网络游荡而找不到目标，或者拥塞导致主机在规定的时间内无法重组数据报分段，这时就要触发ICMP超时报文的产生。</li>
+</ol>
+</li>
+<li>时间戳请求</li>
+</ul>
+<h3 id="ping"><a href="#ping" class="headerlink" title="ping"></a>ping</h3><ul>
+<li>ping命令的功能<ol>
+<li>能验证网络的连通性</li>
+<li>会统计响应时间和TTL(IP包中的Time To Live，生存周期)</li>
+</ol>
+</li>
+<li>那么如何验证的呢？<ol>
+<li>ping命令会先发送一个 ICMP Echo Request给对端</li>
+<li>对端接收到之后, 会返回一个ICMP Echo Reply</li>
+<li>若没有返回，就是超时了，会认为指定的网络地址不存在。</li>
+</ol>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>计算机网络:自顶向下方法读书笔记</category>
+      </categories>
+      <tags>
+        <tag>计算机网络</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HTTPS</title>
+    <url>/2020/06/06/Internet/HTTPS/</url>
+    <content><![CDATA[<h1 id="HTTPS-工作原理"><a href="#HTTPS-工作原理" class="headerlink" title="HTTPS 工作原理"></a>HTTPS 工作原理</h1><p>HTTPS 通过 SSL 具有了加密(防窃听)、认证(防伪装)和完整性保护(防篡改)。</p>
+<ol>
+<li><p>浏览器将自己支持的一套加密规则发送给网站。 </p>
+</li>
+<li><p>网站从中选出一组加密算法与HASH算法，并将自己的身份信息以证书的形式发回给浏览器。证书里面包含了网站地址，加密公钥，以及证书的颁发机构等信息。 </p>
+</li>
+<li><p>浏览器获得网站证书之后浏览器要做以下工作： a) 验证证书的合法性（颁发证书的机构是否合法，证书中包含的网站地址是否与正在访问的地址一致等），如果证书受信任，则浏览器栏里面会显示一个小锁头，否则会给出证书不受信的提示。 b) 如果证书受信任，或者是用户接受了不受信的证书，浏览器会生成一串随机数的密码，并用证书中提供的公钥加密。 c) 使用约定好的HASH算法计算握手消息，并使用生成的随机数对消息进行加密，最后将之前生成的所有信息发送给网站。 </p>
+</li>
+<li><p>网站接收浏览器发来的数据之后要做以下的操作： a) 使用自己的私钥将信息解密取出密码，使用密码解密浏览器发来的握手消息，并验证HASH是否与浏览器发来的一致。 b) 使用密码加密一段握手消息，发送给浏览器。 </p>
+</li>
+<li><p>浏览器解密并计算握手消息的HASH，如果与服务端发来的HASH一致，此时握手过程结束，之后所有的通信数据将由之前浏览器生成的随机密码并利用对称加密算法进行加密。 </p>
+</li>
+</ol>
+<p><img src="http://www.runoob.com/wp-content/uploads/2017/05/201208201734403507.png" alt=""></p>
+<h1 id="TLS"><a href="#TLS" class="headerlink" title="TLS"></a>TLS</h1><p><strong>CA:</strong> 证书授权中心( certificate authority)。</p>
+<ul>
+<li><strong>CA本身是受信任的</strong> </li>
+<li><strong>给他受信任的申请对象颁发证书</strong></li>
+</ul>
+<h2 id="certificate"><a href="#certificate" class="headerlink" title="certificate"></a>certificate</h2><p>服务端将自己的公钥发送给 CA, CA 用他的私钥将其加密，生成证书。</p>
+<p>通信时，服务端将自己的证书发送给客户端，客户端用 CA 提供的公钥去校验证书的合法性。</p>
+]]></content>
+      <categories>
+        <category>计算机网络:自顶向下方法读书笔记</category>
+      </categories>
+      <tags>
+        <tag>计算机网络</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Wait-Sleep-Yield</title>
+    <url>/2020/06/06/Java%20Concurrent/Wait%20Sleep%20Yield/</url>
+    <content><![CDATA[<h1 id="Java中wait和sleep的区别"><a href="#Java中wait和sleep的区别" class="headerlink" title="Java中wait和sleep的区别"></a>Java中wait和sleep的区别</h1><ol>
+<li>wait只能在同步（synchronize）环境中被调用，而sleep不需要</li>
+<li>进入wait状态的线程能够被notify和notifyAll线程唤醒，但是进入sleeping状态的线程不能被notify方法唤醒。</li>
+<li>wait通常有条件地执行，线程会一直处于wait状态，直到某个条件变为真。但是sleep仅仅让你的线程进入睡眠状态。</li>
+<li>wait方法在进入wait状态的时候会释放对象的锁，但是sleep方法不会。</li>
+<li>wait方法是针对一个被同步代码块加锁的对象，而sleep是针对一个线程。</li>
+</ol>
+<h1 id="yield和sleep的区别"><a href="#yield和sleep的区别" class="headerlink" title="yield和sleep的区别"></a>yield和sleep的区别</h1><p>yield和sleep的主要是，yield方法会临时暂停当前正在执行的线程，来让有同样优先级的正在等待的线程有机会执行。如果没有正在等待的线程，或者所有正在等待的线程的优先级都比较低，那么该线程会继续运行。执行了yield方法的线程什么时候会继续运行由线程调度器来决定，不同的厂商可能有不同的行为。yield方法不保证当前的线程会暂停或者停止，但是可以保证当前线程在调用yield方法时会放弃CPU。</p>
+<ul>
+<li>Java中sleep方法的几个注意点：</li>
+</ul>
+<ol>
+<li>Thread.sleep()方法用来暂停线程的执行，将CPU放给线程调度器。</li>
+<li>Thread.sleep()方法是一个静态方法，它暂停的是当前执行的线程。</li>
+<li>Java有两种sleep方法，一个只有一个毫秒参数，另一个有毫秒和纳秒两个参数。<br>与wait方法不同，sleep方法不会释放锁</li>
+<li>如果其他的线程中断了一个休眠的线程，sleep方法会抛出Interrupted Exception。</li>
+<li>休眠的线程在唤醒之后不保证能获取到CPU，它会先进入就绪态，与其他线程竞争CPU。</li>
+<li>有一个易错的地方，当调用t.sleep()的时候，会暂停线程t。这是不对的，因为Thread.sleep是一个静态方法，它会使当前线程而不是线程t进入休眠状态。</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Java并发编程的艺术读书笔记</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>sync-ReentrantLock</title>
+    <url>/2020/06/06/Java%20Concurrent/sync%20ReentrantLock/</url>
+    <content><![CDATA[<h3 id="谈谈-synchronized和ReentrantLock-的区别"><a href="#谈谈-synchronized和ReentrantLock-的区别" class="headerlink" title="谈谈 synchronized和ReentrantLock 的区别"></a>谈谈 synchronized和ReentrantLock 的区别</h3><p><strong>① 两者都是可重入锁</strong></p>
+<p>两者都是可重入锁。“可重入锁”概念是：自己可以再次获取自己的内部锁。比如一个线程获得了某个对象的锁，此时这个对象锁还没有释放，当其再次想要获取这个对象的锁的时候还是可以获取的，如果不可锁重入的话，就会造成死锁。同一个线程每次获取锁，锁的计数器都自增1，所以要等到锁的计数器下降为0时才能释放锁。</p>
+<p><strong>② synchronized 依赖于 JVM 而 ReentrantLock     依赖于 API</strong></p>
+<p>synchronized 是依赖于 JVM 实现的，前面我们也讲到了 虚拟机团队在 JDK1.6 为 synchronized 关键字进行了很多优化，但是这些优化都是在虚拟机层面实现的，并没有直接暴露给我们。ReentrantLock 是 JDK 层面实现的（也就是 API 层面，需要 lock() 和 unlock() 方法配合 try/finally 语句块来完成），所以我们可以通过查看它的源代码，来看它是如何实现的。</p>
+<p><strong>③ ReentrantLock 比 synchronized 增加了一些高级功能</strong></p>
+<p>相比synchronized，ReentrantLock增加了一些高级功能。主要来说主要有三点：<strong>①等待可中断；②可实现公平锁；③可实现选择性通知（锁可以绑定多个条件）</strong></p>
+<ul>
+<li><strong>ReentrantLock提供了一种能够中断等待锁的线程的机制</strong>，通过lock.lockInterruptibly()来实现这个机制。也就是说正在等待的线程可以选择放弃等待，改为处理其他事情。(线程尝试获取锁操作失败后，在等待过程中，如果该线程被其他线程中断了，它是如何响应中断请求的。lock方法会忽略中断请求，继续获取锁直到成功；而lockInterruptibly则直接抛出中断异常来立即响应中断，由上层调用者处理中断。)</li>
+<li><strong>ReentrantLock可以指定是公平锁还是非公平锁。而synchronized只能是非公平锁。所谓的公平锁就是先等待的线程先获得锁。</strong> ReentrantLock默认情况是非公平的，可以通过 ReentrantLock类的<code>ReentrantLock(boolean fair)</code>构造方法来制定是否是公平的。</li>
+<li>synchronized关键字与wait()和notify()/notifyAll()方法相结合可以实现等待/通知机制，ReentrantLock类当然也可以实现，但是需要借助于Condition接口与newCondition() 方法。Condition是JDK1.5之后才有的，它具有很好的灵活性，比如可以实现多路通知功能也就是在一个Lock对象中可以创建多个Condition实例（即对象监视器），<strong>线程对象可以注册在指定的Condition中，从而可以有选择性的进行线程通知，在调度线程上更加灵活。 在使用notify()/notifyAll()方法进行通知时，被通知的线程是由 JVM 选择的，用ReentrantLock类结合Condition实例可以实现“选择性通知”</strong> ，这个功能非常重要，而且是Condition接口默认提供的。而synchronized关键字就相当于整个Lock对象中只有一个Condition实例，所有的线程都注册在它一个身上。如果执行notifyAll()方法的话就会通知所有处于等待状态的线程这样会造成很大的效率问题，而Condition实例的signalAll()方法 只会唤醒注册在该Condition实例中的所有等待线程。</li>
+</ul>
+<p>如果你想使用上述功能，那么选择ReentrantLock是一个不错的选择。</p>
+<p><strong>④ 性能已不是选择标准</strong></p>
+]]></content>
+      <categories>
+        <category>Java并发编程的艺术读书笔记</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Redis内存不足的缓存淘汰策略</title>
+    <url>/2020/06/06/Redis/Redis%E5%86%85%E5%AD%98%E4%B8%8D%E8%B6%B3%E7%9A%84%E7%BC%93%E5%AD%98%E6%B7%98%E6%B1%B0%E7%AD%96%E7%95%A5/</url>
+    <content><![CDATA[<h1 id="Redis内存不足的缓存淘汰策略"><a href="#Redis内存不足的缓存淘汰策略" class="headerlink" title="Redis内存不足的缓存淘汰策略"></a><a href="https://www.jianshu.com/p/c8aeb3eee6bc" target="_blank" rel="noopener">Redis内存不足的缓存淘汰策略</a></h1><ul>
+<li><p>noeviction：当内存使用超过配置的时候会返回错误，不会驱逐任何键</p>
+</li>
+<li><p>allkeys-lru：加入键的时候，如果过限，首先通过LRU算法驱逐最久没有使用的键</p>
+</li>
+<li><p>volatile-lru：加入键的时候如果过限，首先从设置了过期时间的键集合中驱逐最久没有使用的键</p>
+</li>
+<li><p>allkeys-random：加入键的时候如果过限，从所有key随机删除</p>
+</li>
+<li><p>volatile-random：加入键的时候如果过限，从过期键的集合中随机驱逐</p>
+</li>
+<li><p>volatile-ttl：从配置了过期时间的键中驱逐马上就要过期的键</p>
+</li>
+<li><p>volatile-lfu：从所有配置了过期时间的键中驱逐使用频率最少的键</p>
+</li>
+<li><p>allkeys-lfu：从所有键中驱逐使用频率最少的键</p>
+</li>
+</ul>
+<h1 id="Redis-中-LRU-的实现"><a href="#Redis-中-LRU-的实现" class="headerlink" title="Redis 中 LRU 的实现"></a>Redis 中 LRU 的实现</h1><p>Redis维护了一个24位时钟，可以简单理解为当前系统的时间戳，每隔一定时间会更新这个时钟。每个key对象内部同样维护了一个24位的时钟，当新增key对象的时候会把系统的时钟赋值到这个内部对象时钟。比如我现在要进行LRU，那么首先拿到当前的全局时钟，然后再找到内部时钟与全局时钟距离时间最久的（差最大）进行淘汰，这里值得注意的是全局时钟只有24位，按秒为单位来表示才能存储194天，所以可能会出现key的时钟大于全局时钟的情况，如果这种情况出现那么就两个相加而不是相减来求最久的key。</p>
+<p>Redis中的LRU与常规的LRU实现并不相同，常规LRU会准确的淘汰掉队头的元素，但是Redis的LRU并不维护队列，只是根据配置的策略要么从所有的key中随机选择N个（N可以配置）要么从所有的设置了过期时间的key中选出N个键，然后再从这N个键中选出最久没有使用的一个key进行淘汰。</p>
+<p>下图是常规LRU淘汰策略与Redis随机样本取一键淘汰策略的对比，浅灰色表示已经删除的键，深灰色表示没有被删除的键，绿色表示新加入的键，越往上表示键加入的时间越久。从图中可以看出，在redis 3中，设置样本数为10的时候能够很准确的淘汰掉最久没有使用的键，与常规LRU基本持平。</p>
+<h1 id="LFU"><a href="#LFU" class="headerlink" title="LFU"></a>LFU</h1><p>LFU把原来的key对象的内部时钟的24位分成两部分，前16位还代表时钟，后8位代表一个计数器。16位的情况下如果还按照秒为单位就会导致不够用，所以一般这里以时钟为单位。而后8位表示当前key对象的访问频率，8位只能代表255，但是redis并没有采用线性上升的方式，而是通过一个复杂的公式，通过配置两个参数来调整数据的递增速度。<br>下图从左到右表示key的命中次数，从上到下表示影响因子，在影响因子为100的条件下，经过10M次命中才能把后8位值加满到255.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br><span class="line"># | factor | 100 hits   | 1000 hits  | 100K hits  | 1M hits    | 10M hits   |</span><br><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br><span class="line"># | 0      | 104        | 255        | 255        | 255        | 255        |</span><br><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br><span class="line"># | 1      | 18         | 49         | 255        | 255        | 255        |</span><br><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br><span class="line"># | 10     | 10         | 18         | 142        | 255        | 255        |</span><br><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br><span class="line"># | 100    | 8          | 11         | 49         | 143        | 255        |</span><br><span class="line"># +--------+------------+------------+------------+------------+------------+</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">uint8_t</span> <span class="title">LFULogIncr</span><span class="params">(<span class="keyword">uint8_t</span> counter)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (counter == <span class="number">255</span>) <span class="keyword">return</span> <span class="number">255</span>;</span><br><span class="line">    <span class="keyword">double</span> r = (<span class="keyword">double</span>)rand()/RAND_MAX;</span><br><span class="line">    <span class="keyword">double</span> baseval = counter - LFU_INIT_VAL;</span><br><span class="line">    <span class="keyword">if</span> (baseval &lt; <span class="number">0</span>) baseval = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">double</span> p = <span class="number">1.0</span>/(baseval*server.lfu_log_factor+<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span> (r &lt; p) counter++;</span><br><span class="line">    <span class="keyword">return</span> counter;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">lfu-<span class="built_in">log</span>-factor <span class="number">10</span></span><br><span class="line">lfu-decay-time <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>上面说的情况是key一直被命中的情况，如果一个key经过几分钟没有被命中，那么后8位的值是需要递减几分钟，具体递减几分钟根据衰减因子lfu-decay-time来控制</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="title">LFUDecrAndReturn</span><span class="params">(robj *o)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> ldt = o-&gt;lru &gt;&gt; <span class="number">8</span>;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> counter = o-&gt;lru &amp; <span class="number">255</span>;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> num_periods = server.lfu_decay_time ? LFUTimeElapsed(ldt) / server.lfu_decay_time : <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (num_periods)</span><br><span class="line">        counter = (num_periods &gt; counter) ? <span class="number">0</span> : counter - num_periods;</span><br><span class="line">    <span class="keyword">return</span> counter;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line">lfu-<span class="built_in">log</span>-factor <span class="number">10</span></span><br><span class="line">lfu-decay-time <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>上面递增和衰减都有对应参数配置，那么对于新分配的key呢？如果新分配的key计数器开始为0，那么很有可能在内存不足的时候直接就给淘汰掉了，所以默认情况下新分配的key的后8位计数器的值为5（应该可配资），防止因为访问频率过低而直接被删除。</p>
+</li>
+<li><p>低8位我们描述完了，那么高16位的时钟是用来干嘛的呢？目前我的理解是用来衰减低8位的计数器的，就是根据这个时钟与全局时钟进行比较，如果过了一定时间（做差）就会对计数器进行衰减。</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Redis</category>
+      </categories>
+      <tags>
+        <tag>Redis</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>慢查询优化基本步骤</title>
+    <url>/2020/06/06/Database/MySQL/%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96%E5%9F%BA%E6%9C%AC%E6%AD%A5%E9%AA%A4/</url>
+    <content><![CDATA[<ol>
+<li>先运行看看是否真的很慢，注意设置SQL_NO_CACHE</li>
+<li>where条件单表查，锁定最小返回记录表。这句话的意思是把查询语句的where都应用到表中返回的记录数最小的表开始查起，单表每个字段分别查询，看哪个字段的区分度最高</li>
+<li>explain查看执行计划，是否与1预期一致（从锁定记录较少的表开始查询）</li>
+<li>order by limit 形式的sql语句让排序的表优先查</li>
+<li>了解业务方使用场景</li>
+<li>加索引时参照建索引的几大原则</li>
+<li>观察结果，不符合预期继续从0分析</li>
+</ol>
+]]></content>
+      <categories>
+        <category>高性能MySQL读书笔记</category>
+      </categories>
+      <tags>
+        <tag>MySQL</tag>
       </tags>
   </entry>
 </search>

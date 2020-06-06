@@ -20,19 +20,22 @@
     var CONFIG = {"hostname":"wayne-98.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="4.28 ~ 5.5 学习计划 每天写 LeetCode JVM 第三版 第三部分以及第四部分 学习笔记重新整理 &amp; 学习 Java 并发编程 复习一遍 高性能MySQL 第五章第六章 学习笔记整理 &amp; 学习 美团文章：JVM调优 MySQL慢优化 计算机网络 IP 数据链路 学习 整理笔记">
+  <meta name="description" content="HTTPS 工作原理HTTPS 通过 SSL 具有了加密(防窃听)、认证(防伪装)和完整性保护(防篡改)。  浏览器将自己支持的一套加密规则发送给网站。   网站从中选出一组加密算法与HASH算法，并将自己的身份信息以证书的形式发回给浏览器。证书里面包含了网站地址，加密公钥，以及证书的颁发机构等信息。   浏览器获得网站证书之后浏览器要做以下工作： a) 验证证书的合法性（颁发证书的机构是否合法，">
 <meta property="og:type" content="article">
-<meta property="og:title" content="4.28 ~ 5.5 学习计划">
-<meta property="og:url" content="http://wayne-98.github.io/2020/05/10/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/4.28%20~%205.5%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/index.html">
+<meta property="og:title" content="HTTPS">
+<meta property="og:url" content="http://wayne-98.github.io/2020/06/06/Internet/HTTPS/index.html">
 <meta property="og:site_name" content="Wayne">
-<meta property="og:description" content="4.28 ~ 5.5 学习计划 每天写 LeetCode JVM 第三版 第三部分以及第四部分 学习笔记重新整理 &amp; 学习 Java 并发编程 复习一遍 高性能MySQL 第五章第六章 学习笔记整理 &amp; 学习 美团文章：JVM调优 MySQL慢优化 计算机网络 IP 数据链路 学习 整理笔记">
+<meta property="og:description" content="HTTPS 工作原理HTTPS 通过 SSL 具有了加密(防窃听)、认证(防伪装)和完整性保护(防篡改)。  浏览器将自己支持的一套加密规则发送给网站。   网站从中选出一组加密算法与HASH算法，并将自己的身份信息以证书的形式发回给浏览器。证书里面包含了网站地址，加密公钥，以及证书的颁发机构等信息。   浏览器获得网站证书之后浏览器要做以下工作： a) 验证证书的合法性（颁发证书的机构是否合法，">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-05-10T12:49:19.760Z">
-<meta property="article:modified_time" content="2020-05-13T13:18:02.209Z">
+<meta property="og:image" content="http://www.runoob.com/wp-content/uploads/2017/05/201208201734403507.png">
+<meta property="article:published_time" content="2020-06-06T05:27:07.729Z">
+<meta property="article:modified_time" content="2020-06-06T05:27:50.835Z">
 <meta property="article:author" content="Wayne">
+<meta property="article:tag" content="计算机网络">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://www.runoob.com/wp-content/uploads/2017/05/201208201734403507.png">
 
-<link rel="canonical" href="http://wayne-98.github.io/2020/05/10/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/4.28%20~%205.5%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/">
+<link rel="canonical" href="http://wayne-98.github.io/2020/06/06/Internet/HTTPS/">
 
 
 <script id="page-configurations">
@@ -45,7 +48,7 @@
   };
 </script>
 
-  <title>4.28 ~ 5.5 学习计划 | Wayne</title>
+  <title>HTTPS | Wayne</title>
   
 
 
@@ -167,7 +170,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/4.28%20~%205.5%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/06/06/Internet/HTTPS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/808.jpg">
@@ -180,7 +183,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          4.28 ~ 5.5 学习计划
+          HTTPS
         </h1>
 
         <div class="post-meta">
@@ -189,23 +192,17 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020-05-10 20:49:19" itemprop="dateCreated datePublished" datetime="2020-05-10T20:49:19+08:00">2020-05-10</time>
+              <time title="创建时间：2020-06-06 13:27:07 / 修改时间：13:27:50" itemprop="dateCreated datePublished" datetime="2020-06-06T13:27:07+08:00">2020-06-06</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-13 21:18:02" itemprop="dateModified" datetime="2020-05-13T21:18:02+08:00">2020-05-13</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">学习记录</span></a>
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">计算机网络:自顶向下方法读书笔记</span></a>
                 </span>
             </span>
 
@@ -220,14 +217,27 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="4-28-5-5-学习计划"><a href="#4-28-5-5-学习计划" class="headerlink" title="4.28 ~ 5.5 学习计划"></a>4.28 ~ 5.5 学习计划</h2><ul>
-<li>每天写 LeetCode</li>
-<li>JVM 第三版 第三部分以及第四部分 学习笔记重新整理 &amp; 学习</li>
-<li>Java 并发编程 复习一遍</li>
-<li>高性能MySQL 第五章第六章 学习笔记整理 &amp; 学习</li>
-<li>美团文章：JVM调优 MySQL慢优化</li>
-<li>计算机网络 IP 数据链路 学习 整理笔记</li>
+        <h1 id="HTTPS-工作原理"><a href="#HTTPS-工作原理" class="headerlink" title="HTTPS 工作原理"></a>HTTPS 工作原理</h1><p>HTTPS 通过 SSL 具有了加密(防窃听)、认证(防伪装)和完整性保护(防篡改)。</p>
+<ol>
+<li><p>浏览器将自己支持的一套加密规则发送给网站。 </p>
+</li>
+<li><p>网站从中选出一组加密算法与HASH算法，并将自己的身份信息以证书的形式发回给浏览器。证书里面包含了网站地址，加密公钥，以及证书的颁发机构等信息。 </p>
+</li>
+<li><p>浏览器获得网站证书之后浏览器要做以下工作： a) 验证证书的合法性（颁发证书的机构是否合法，证书中包含的网站地址是否与正在访问的地址一致等），如果证书受信任，则浏览器栏里面会显示一个小锁头，否则会给出证书不受信的提示。 b) 如果证书受信任，或者是用户接受了不受信的证书，浏览器会生成一串随机数的密码，并用证书中提供的公钥加密。 c) 使用约定好的HASH算法计算握手消息，并使用生成的随机数对消息进行加密，最后将之前生成的所有信息发送给网站。 </p>
+</li>
+<li><p>网站接收浏览器发来的数据之后要做以下的操作： a) 使用自己的私钥将信息解密取出密码，使用密码解密浏览器发来的握手消息，并验证HASH是否与浏览器发来的一致。 b) 使用密码加密一段握手消息，发送给浏览器。 </p>
+</li>
+<li><p>浏览器解密并计算握手消息的HASH，如果与服务端发来的HASH一致，此时握手过程结束，之后所有的通信数据将由之前浏览器生成的随机密码并利用对称加密算法进行加密。 </p>
+</li>
+</ol>
+<p><img src="http://www.runoob.com/wp-content/uploads/2017/05/201208201734403507.png" alt=""></p>
+<h1 id="TLS"><a href="#TLS" class="headerlink" title="TLS"></a>TLS</h1><p><strong>CA:</strong> 证书授权中心( certificate authority)。</p>
+<ul>
+<li><strong>CA本身是受信任的</strong> </li>
+<li><strong>给他受信任的申请对象颁发证书</strong></li>
 </ul>
+<h2 id="certificate"><a href="#certificate" class="headerlink" title="certificate"></a>certificate</h2><p>服务端将自己的公钥发送给 CA, CA 用他的私钥将其加密，生成证书。</p>
+<p>通信时，服务端将自己的证书发送给客户端，客户端用 CA 提供的公钥去校验证书的合法性。</p>
 
     </div>
 
@@ -236,17 +246,20 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag"># 计算机网络</a>
+          </div>
 
         
 
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/2020/05/10/Algorithms/April/4%E6%9C%88%E5%88%B7%E9%A2%98%E8%AE%B0%E5%BD%95/" rel="next" title="4月刷题记录">
-      4月刷题记录 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/06/06/Internet/ICMP/" rel="prev" title="ICMP">
+      <i class="fa fa-chevron-left"></i> ICMP
     </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -305,7 +318,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-28-5-5-学习计划"><span class="nav-number">1.</span> <span class="nav-text">4.28 ~ 5.5 学习计划</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#HTTPS-工作原理"><span class="nav-number">1.</span> <span class="nav-text">HTTPS 工作原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TLS"><span class="nav-number">2.</span> <span class="nav-text">TLS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#certificate"><span class="nav-number">2.1.</span> <span class="nav-text">certificate</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -321,14 +334,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">14</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">

@@ -20,19 +20,20 @@
     var CONFIG = {"hostname":"wayne-98.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="5.5 ~ 5.12 学习计划 每天写 LeetCode，复习 200 英语单词 JVM 复习一遍笔记 Java 并发 复习一遍笔记 高性能MySQL 再看一遍 5 6 章节 美团文章 JVM 调优 计算机网络 IP 数据链路 多播 数据控制层">
+  <meta name="description" content="先运行看看是否真的很慢，注意设置SQL_NO_CACHE where条件单表查，锁定最小返回记录表。这句话的意思是把查询语句的where都应用到表中返回的记录数最小的表开始查起，单表每个字段分别查询，看哪个字段的区分度最高 explain查看执行计划，是否与1预期一致（从锁定记录较少的表开始查询） order by limit 形式的sql语句让排序的表优先查 了解业务方使用场景 加索引时参照建">
 <meta property="og:type" content="article">
-<meta property="og:title" content="5.5 ~ 5.12 学习计划">
-<meta property="og:url" content="http://wayne-98.github.io/2020/05/10/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/5.5%20~%205.12%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/index.html">
+<meta property="og:title" content="慢查询优化基本步骤">
+<meta property="og:url" content="http://wayne-98.github.io/2020/06/06/Database/MySQL/%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96%E5%9F%BA%E6%9C%AC%E6%AD%A5%E9%AA%A4/index.html">
 <meta property="og:site_name" content="Wayne">
-<meta property="og:description" content="5.5 ~ 5.12 学习计划 每天写 LeetCode，复习 200 英语单词 JVM 复习一遍笔记 Java 并发 复习一遍笔记 高性能MySQL 再看一遍 5 6 章节 美团文章 JVM 调优 计算机网络 IP 数据链路 多播 数据控制层">
+<meta property="og:description" content="先运行看看是否真的很慢，注意设置SQL_NO_CACHE where条件单表查，锁定最小返回记录表。这句话的意思是把查询语句的where都应用到表中返回的记录数最小的表开始查起，单表每个字段分别查询，看哪个字段的区分度最高 explain查看执行计划，是否与1预期一致（从锁定记录较少的表开始查询） order by limit 形式的sql语句让排序的表优先查 了解业务方使用场景 加索引时参照建">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-05-10T14:18:16.513Z">
-<meta property="article:modified_time" content="2020-05-10T14:18:51.426Z">
+<meta property="article:published_time" content="2020-06-06T05:24:06.346Z">
+<meta property="article:modified_time" content="2020-06-06T05:24:39.242Z">
 <meta property="article:author" content="Wayne">
+<meta property="article:tag" content="MySQL">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://wayne-98.github.io/2020/05/10/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/5.5%20~%205.12%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/">
+<link rel="canonical" href="http://wayne-98.github.io/2020/06/06/Database/MySQL/%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96%E5%9F%BA%E6%9C%AC%E6%AD%A5%E9%AA%A4/">
 
 
 <script id="page-configurations">
@@ -45,7 +46,7 @@
   };
 </script>
 
-  <title>5.5 ~ 5.12 学习计划 | Wayne</title>
+  <title>慢查询优化基本步骤 | Wayne</title>
   
 
 
@@ -167,7 +168,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/5.5%20~%205.12%20%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/06/06/Database/MySQL/%E6%85%A2%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96%E5%9F%BA%E6%9C%AC%E6%AD%A5%E9%AA%A4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/808.jpg">
@@ -180,7 +181,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          5.5 ~ 5.12 学习计划
+          慢查询优化基本步骤
         </h1>
 
         <div class="post-meta">
@@ -191,7 +192,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-05-10 22:18:16 / 修改时间：22:18:51" itemprop="dateCreated datePublished" datetime="2020-05-10T22:18:16+08:00">2020-05-10</time>
+              <time title="创建时间：2020-06-06 13:24:06 / 修改时间：13:24:39" itemprop="dateCreated datePublished" datetime="2020-06-06T13:24:06+08:00">2020-06-06</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -199,7 +200,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">学习记录</span></a>
+                  <a href="/categories/%E9%AB%98%E6%80%A7%E8%83%BDMySQL%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">高性能MySQL读书笔记</span></a>
                 </span>
             </span>
 
@@ -214,14 +215,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="5-5-5-12-学习计划"><a href="#5-5-5-12-学习计划" class="headerlink" title="5.5 ~ 5.12 学习计划"></a>5.5 ~ 5.12 学习计划</h2><ul>
-<li>每天写 LeetCode，复习 200 英语单词</li>
-<li>JVM 复习一遍笔记</li>
-<li>Java 并发 复习一遍笔记</li>
-<li>高性能MySQL 再看一遍 5 6 章节</li>
-<li>美团文章 JVM 调优</li>
-<li>计算机网络 IP 数据链路 多播 数据控制层</li>
-</ul>
+        <ol>
+<li>先运行看看是否真的很慢，注意设置SQL_NO_CACHE</li>
+<li>where条件单表查，锁定最小返回记录表。这句话的意思是把查询语句的where都应用到表中返回的记录数最小的表开始查起，单表每个字段分别查询，看哪个字段的区分度最高</li>
+<li>explain查看执行计划，是否与1预期一致（从锁定记录较少的表开始查询）</li>
+<li>order by limit 形式的sql语句让排序的表优先查</li>
+<li>了解业务方使用场景</li>
+<li>加索引时参照建索引的几大原则</li>
+<li>观察结果，不符合预期继续从0分析</li>
+</ol>
 
     </div>
 
@@ -230,6 +232,9 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          </div>
 
         
 
@@ -237,12 +242,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/05/10/%E9%9D%A2%E8%AF%95/%E9%9C%80%E8%A6%81%E6%8F%90%E5%8D%87%E7%9A%84%E7%82%B9/" rel="prev" title="需要提升的点">
-      <i class="fa fa-chevron-left"></i> 需要提升的点
+    <a href="/2020/06/06/Redis/Redis%E5%86%85%E5%AD%98%E4%B8%8D%E8%B6%B3%E7%9A%84%E7%BC%93%E5%AD%98%E6%B7%98%E6%B1%B0%E7%AD%96%E7%95%A5/" rel="prev" title="Redis内存不足的缓存淘汰策略">
+      <i class="fa fa-chevron-left"></i> Redis内存不足的缓存淘汰策略
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/05/12/Internet/%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%EF%BC%9A%E7%BD%91%E7%BB%9C%E5%B1%82-%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/" rel="next" title="自顶向下方法：网络层-数据平面">
-      自顶向下方法：网络层-数据平面 <i class="fa fa-chevron-right"></i>
+    <a href="/2020/06/06/Java%20Concurrent/Wait%20Sleep%20Yield/" rel="next" title="Wait-Sleep-Yield">
+      Wait-Sleep-Yield <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -302,7 +307,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-5-5-12-学习计划"><span class="nav-number">1.</span> <span class="nav-text">5.5 ~ 5.12 学习计划</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -318,14 +322,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">14</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">

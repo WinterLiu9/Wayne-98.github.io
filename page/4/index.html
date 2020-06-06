@@ -164,6 +164,516 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E5%9B%9B%E9%83%A8%E5%88%86%EF%BC%9A%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E5%9B%9B%E9%83%A8%E5%88%86%EF%BC%9A%E7%A8%8B%E5%BA%8F%E7%BC%96%E8%AF%91%E4%B8%8E%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96/" class="post-title-link" itemprop="url">深入理解Java虚拟机读书笔记第四部分：程序编译与代码优化</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-21 10:26:32" itemprop="dateModified" datetime="2020-05-21T10:26:32+08:00">2020-05-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">JVM读书笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="前端编译与优化"><a href="#前端编译与优化" class="headerlink" title="前端编译与优化"></a>前端编译与优化</h1><p>Java中即时编译器在运行期的优化过程对于程序运行来说更重要，而前端编译器在编译期的优化过程对于程序编码来说关系更加密切。</p>
+<h2 id="Javac编译器"><a href="#Javac编译器" class="headerlink" title="Javac编译器"></a>Javac编译器</h2><h3 id="解析与填充符号表过程"><a href="#解析与填充符号表过程" class="headerlink" title="解析与填充符号表过程"></a>解析与填充符号表过程</h3><ol>
+<li>词法，语法分析</li>
+</ol>
+<ul>
+<li><p>词法分析是将源代码的字符流转变为标记(Token)集合，单个字符是程序编写过程的最小元素，而标记则是编译过程中的最小元素</p>
+</li>
+<li><p>语法分析是根据Token序列构造抽象语法树的过程</p>
+<p>抽象语法树是一种用来描述程序代码语法结构的树形表示方式，语法树的每一个节点都代表着程序代码中的一个语法结构，例如包、类型、修饰符、运算符、接口、返回值甚至代码注释等都可以是一个语法结构    </p>
+</li>
+<li><p>经过这个步骤之后，编译器就基本不会再対源码文件进行操作了，后续的操作都基于抽象语法树    </p>
+</li>
+</ul>
+<ol start="2">
+<li>填充符号表</li>
+</ol>
+<p>符号表是由一组符号地址和符号信息构成的表格，符号表中所登记的信息在编译的不同阶段都要用到。</p>
+<p>在语义分析中，符号表所登记的内容将用于语义检查和产生中间代码。</p>
+<p>在目标代码生成阶段，当对符号名进行地址分配时，符号表是地址分配的依据。</p>
+<h2 id="注解处理器"><a href="#注解处理器" class="headerlink" title="注解处理器"></a>注解处理器</h2><h2 id="语义分析与字节码生成"><a href="#语义分析与字节码生成" class="headerlink" title="语义分析与字节码生成"></a>语义分析与字节码生成</h2><p>语法树能够表示一个结构正确的源程序的抽象，但无法保证源程序是符合逻辑的。语义分析的主要任务是对结构上正确的源程序进行上下文有关性质的审查，如进行类型审查。</p>
+<ul>
+<li>标注检查步骤检查的内容包括诸如变量使用前是否被声明、变量与赋值之间的数据类型是否匹配；标注检查中还有一个重要的动作称为常量折叠。</li>
+<li>数据及控制流分析是对程序上下文逻辑更进一步的验证，它可以检查出诸如程序局部变量在使用前是否有赋值，方法的每条路径是否都有返回值，是否所有的受查异常都被正确处理了等问题</li>
+<li>解语法糖：语法糖指在计算机语言中添加的某种语法，这种语法对语言的功能并没有影响，但是更方便程序员使用</li>
+<li>字节码生成阶段不仅仅是把前面各个步骤所生成的信息转化成字节码写到磁盘中，编译器还进行了少量的代码添加和转换工作</li>
+</ul>
+<h2 id="Java语法糖的味道"><a href="#Java语法糖的味道" class="headerlink" title="Java语法糖的味道"></a>Java语法糖的味道</h2><h3 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h3><p>泛型的本质是参数化类型（Parameterized Type）或者参数化多态（Parametric Polymorphism）的应用，即可以将操作的数据类型指定为方法签名中的一种特殊参数，这种参数类型能够用在类、接口和方法的创建中，分别构成泛型类、泛型接口和泛型方法。泛型让程序员能够针对泛化的数据类型编写相同的算法，这极大地增强了编程语言的类型系统及抽象能力。</p>
+<p>C#里面的泛型无论在程序源码中、编译后的 Intermediate Language 中，或是运行期的CLR中，都是切实存在的，List(int)与List(String)就是两个不同的类型，它们在系统运行期生成，有自己的虚方法表和类型数据，这种实现称为类型膨胀，基于这种方法实现的泛型称为<strong>真实泛型</strong>。</p>
+<p>Java语言中的泛型则不一样，它只在程序源码中存在，编译后的字节码文件中，就已经替换为原始类型了，并且在相应的地方插入了强制类型转换。因此对于运行期的Java语言来说，ArrayList(Integer)与ArrayList(String)就是同一个类，所以泛型技术实际上是Java语言的一颗语法糖，Java语言中的泛型实现方法称为<strong>类型擦除</strong>，基于这种方法实现的泛型称为伪泛型</p>
+<p>擦除法所谓的擦除，仅仅是对方法的Code属性中的字节码进行擦除，实际上元数据中还是保留了泛型信息，这也是我们能通过反射手段取得参数化类型的根本依据。</p>
+<h3 id="自动装箱、拆箱与遍历循环"><a href="#自动装箱、拆箱与遍历循环" class="headerlink" title="自动装箱、拆箱与遍历循环"></a>自动装箱、拆箱与遍历循环</h3><h3 id="条件编译"><a href="#条件编译" class="headerlink" title="条件编译"></a>条件编译</h3><p>Java语言中条件编译的实现，也是Java语言的一颗语法糖，根据布尔常量值的真假，编译器将会把分支中不成立的代码块消除掉</p>
+<h1 id="后端编译与优化"><a href="#后端编译与优化" class="headerlink" title="后端编译与优化"></a>后端编译与优化</h1><h2 id="即时编译器"><a href="#即时编译器" class="headerlink" title="即时编译器"></a>即时编译器</h2><p>Java程序最初是通过解释器进行解释执行的，当虚拟机发现某个方法或代码块的运行特别频繁时，就会把这些代码认定为”热点代码”。为了提高热点代码的执行效率，在运行时，虚拟机将会把这些代码编译成本地平台的机器码，并进行各种层次的优化，完成这个任务的编译器称为即时编译器JIT</p>
+<h3 id="编译对象与触发条件"><a href="#编译对象与触发条件" class="headerlink" title="编译对象与触发条件"></a>编译对象与触发条件</h3><ul>
+<li><p>热点代码：被多次调用的方法以及被多次执行的循环体（编译器都是编译整个方法）</p>
+</li>
+<li><p>热点探测判定方式：</p>
+</li>
+</ul>
+<ol>
+<li>基于采样的热点探测：虚拟机周期性地检查各个线程的栈顶，如果发现某个方法经常出现在栈顶，那个这个方法就是“热点方法”。<ul>
+<li>优点是实现简单、高效，还可以很容易的获取方法调用关系。</li>
+<li>缺点是不够精确，且容易受到线程阻塞或别的外界因素的印象而扰乱热点探测。</li>
+</ul>
+</li>
+<li>基于计数器的热点探测：虚拟机为每个方法建立计数器，统计方法的执行次数，执行次数超过一定的阈值就认为它是热点方法<ul>
+<li>实现麻烦，需要为每个方法建立并维护计数器，并且不能直接获取到方法的调用关系。</li>
+<li>统计结果精确严谨。</li>
+<li>默认方法调用计数器统计的并不是方法被调用的次数，而是一个相对的执行频率。当超过一定的时间限度，如果方法的调用次数仍不足以让它提交给JIT，那个这个方法的调用计数器就被减少一半，这个过程称为方法调用计数器热度的衰减，而这段时间就称为此方法统计的半衰周期。</li>
+<li>回边计数器，它的作用是统计一个方法中循环体代码执行的次数，建立回边计数器的目的就是为了出发OSR编译</li>
+</ul>
+</li>
+</ol>
+<h2 id="Java与C-C-的编译器对比"><a href="#Java与C-C-的编译器对比" class="headerlink" title="Java与C/C++的编译器对比"></a>Java与C/C++的编译器对比</h2><p>即时编译器运行占用的是用户程序的运行时间，所以不可以随便引入大规模的优化技术；静态编译的时间成本不是主要关注点。</p>
+<p>Java语言是动态的类型安全语言，意味着虚拟机来确保程序不会违反语言语义或访问非结构化内存。动态检查会消耗不少的运行时间。</p>
+<p>虚方法的频率远大于C/C++语言，方法接收者进行多态选择的频率高于C/C++语言。即时编译器的一些优化难度较高，例如方法内联。</p>
+<p>Java语言是可动态扩展的语言，运行时加载新的类可能改变程序类型的继承关系，这使得很多全局优化难以进行，因为编译器无法看到程序的全貌，许多全局优化都只能以激进优化的方式来完成，便以其不得不时刻注意并随着类型的变化而在运行时撤销或者重新进行一些优化。</p>
+<p>C/C++垃圾回收不存在无用对象筛选的过程，效率较高</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%EF%BC%9A%E8%B5%B0%E8%BF%9B%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/808.jpg">
+      <meta itemprop="name" content="Wayne">
+      <meta itemprop="description" content="Keep Moving">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Wayne">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%EF%BC%9A%E8%B5%B0%E8%BF%9B%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="post-title-link" itemprop="url">深入理解Java虚拟机读书笔记第二部分：走进内存管理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-21 10:25:58" itemprop="dateModified" datetime="2020-05-21T10:25:58+08:00">2020-05-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">JVM读书笔记</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Java内存区域与内存溢出异常"><a href="#Java内存区域与内存溢出异常" class="headerlink" title="Java内存区域与内存溢出异常"></a>Java内存区域与内存溢出异常</h1><h2 id="运行时数据区域"><a href="#运行时数据区域" class="headerlink" title="运行时数据区域"></a>运行时数据区域</h2><ul>
+<li><strong>程序计数器</strong></li>
+</ul>
+<ol>
+<li>定义：是一块较小的内存空间，它可以看作是当前线程所执行的字节码的行号指示器。</li>
+<li>作用：为了线程切换后能恢复到正确的执行位置，每条线程都需要有一个独立的程序计数器。</li>
+<li>如果线程执行Java方法，程序计数器记录的是正在执行的虚拟机字节码指令的地址；如果是Native方法，则为空。</li>
+<li>异常：程序计数器区域是唯一一个在Java虚拟机规范中没有规定任何 OutOfMemoryError 情况的区域。</li>
+</ol>
+<ul>
+<li><strong>Java虚拟机栈</strong></li>
+</ul>
+<ol>
+<li>定义：虚拟机栈描述的是 Java 方法执行的内存模型：每个方法在执行的同时都会创建一个栈帧(Stack Frame)用于存储局部变量表、操作数栈、动态链接、方法出口信息。每个方法从调用直至运行完成的过程，就对应着一个栈帧在虚拟机栈中入栈到出栈的过程。</li>
+<li>Java 虚拟机栈也是线程私有的，它的生命周期与线程相同。</li>
+<li>异常：Java 虚拟机规范中对 Java 虚拟机栈规定了两种异常情况： 如果线程请求的栈深度大于虚拟机所允许的深度，将抛出 StackOverFlowError 异常; 如果虚拟机栈可以动态扩展，扩展时如果无法申请到足够的内存，就会抛出 OutOfMemoryError 异常。</li>
+</ol>
+<ul>
+<li><strong>本地方法栈</strong><br>本地方法栈与虚拟机栈所发挥的作用是非常相似的，它们之间的区别不过是虚拟机栈为虚拟机执行 Java 方法（也就是字节码）服务，而本地方法栈则为虚拟机使用到的 Native 方法服务。</li>
+<li><strong>Java堆</strong></li>
+</ul>
+<ol>
+<li>一般来说，Java 堆是 Java 虚拟机所管理的内存中最大的一块，Java 堆是被所有线程共享的一块内存区域，在虚拟机启动时创建。此内存区域的唯一目的就是存放对象实例，几乎所有的对象实例都在这里分配内存。<br>Java Heap 是垃圾收集器管理的主要区域，因此也别称为 GC 堆(Garbage Collected Heap)，收集器基本都采用分代收集算法。</li>
+<li>异常：Java 堆可以处于物理上不连续的空间，只要逻辑上是连续的即可。既可以是固定大小，也可以是可扩展的，主流虚拟机都是按照可扩展来实现。如果在堆中没有内存完成实例分配，并且堆也无法再扩展时，将会抛出 OutOfMemoryError 异常。</li>
+</ol>
+<ul>
+<li><strong>方法区</strong><br>方法区（Method Area）与 Java 堆一样，是各个线程共享的内存区域，它用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等数据。当方法区无法满足内存分配需求时，将抛出 OutOfMemoryError 异常<ul>
+<li>运行时常量池是方法区的一部分。Class 文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池，用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后进入方法区的运行时常量池中存放。</li>
+<li>运行时常量池相对于 Class 文件常量池的另外一个重要特性是具备动态性。<br>当方法区无法满足内存分配需求时，将抛出 OutOfMemoryError 异常</li>
+</ul>
+</li>
+<li><strong>直接内存</strong><br>直接内存并不是虚拟机运行时数据区的一部分，也不是 Java 虚拟机规范中定义的区域。但是这部分内存也被频繁地使用，而且也可能会导致 OutOfMemoryError 异常出现。<br>JDK1.4 新加入了 NIO ，引入了一种基于通道与缓冲区的 IO 方式，它可以使用 Native 函数库直接分配堆外内存，然后通过一个存储在 Java 堆中的 DirectByteBuffer 对象作为这块内存的引用进行操作。因为避免了在 Java 堆和 Native 堆中来回复制数据，有些场景可以显著提升性能。</li>
+</ul>
+<hr>
+<h2 id="HotSpot-虚拟机对象探秘"><a href="#HotSpot-虚拟机对象探秘" class="headerlink" title="HotSpot 虚拟机对象探秘"></a>HotSpot 虚拟机对象探秘</h2><ul>
+<li><strong>对象的创建</strong></li>
+</ul>
+<ol>
+<li>虚拟机遇到一条 new 指令的时候，首先将去检查这个指令的参数是否能在常量池中定位到一个类的符号引用，并且检查这个符号引用代表的类是否已被加载、解析和初始化过。如果没有，那必须先执行相应的类加载过程。</li>
+<li>类加载通过后，接下来虚拟机将为新生对象分配内存。对象所需内存的大小在类加载完成后便可完全确定。<ul>
+<li>指针碰撞：如果堆中内存是绝对规整的，分配内存就仅仅是把那个指针向空闲空间那边挪动一段与对象大小相等的距离。</li>
+<li>空闲列表：如果不规整则需要维护一个“空闲列表”，记录上哪些内存块是可用的。</li>
+<li>并发情况下分配内存：<ol>
+<li>采用 CAS 配上失败重试的方式保证更新操作的原子性。</li>
+<li>分配的动作按照线程划分在不同的空间之中进行，即每个线程在 Java 堆中预先分配一小块内存，称为本地线程分配缓冲，只有 TLAB 用完并分配新的 TLAB 时，才需要同步锁定。</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>对对象进行必要的设置，例如这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码、对象 GC 的分代年龄等信息。这些信息保存在对象头之中。</li>
+<li>从 JVM 视角来看，一个新的对象产生了，但从 Java 程序来看，对象创建才刚刚开始–<init>方法还没有执行</li>
+</ol>
+<ul>
+<li><strong>对象的内存布局</strong></li>
+</ul>
+<ol>
+<li>对象头Header<ul>
+<li>存储对象自身的运行时数据<ol>
+<li>Hashcode</li>
+<li>GC 分代年龄</li>
+<li>锁状态标志</li>
+<li>线程持有的锁</li>
+<li>偏向线程ID</li>
+<li>偏向时间戳</li>
+</ol>
+</li>
+<li>类型指针，即对象指向它的类的指针（并不是所有的虚拟机实现都必须在对象数据上保留类型指针，换句话说，查找对象的元数据信息并不一定要经过对象本身）。</li>
+<li>如果对象是一个数组，对象头中还需要有一块用于记录数组长度的数据。</li>
+</ul>
+</li>
+<li>实例数据<br>存储真正的有效信息，包括从父类继承的</li>
+<li>对齐填充<br>并不是必然存在的，占位符，因为 HotSpot VM 的自动内存管理系统要求对象起始地址必须是<strong>8</strong>字节的整数倍</li>
+</ol>
+<ul>
+<li><strong>对象的访问定位</strong><ol>
+<li>句柄：Java 堆中会划分一块内存作为句柄池，reference 中存储的是对象的句柄地址，句柄中包含了对象的实例数据与类型数据各自的具体地址信息。<ul>
+<li>优点：对象被移动(垃圾收集时移动对象时很普遍的行为)时只会改变句柄中的实例数据指针，而 reference 本身不需要修改。</li>
+<li>缺点：访问对象需要两次寻址，速度慢。</li>
+</ul>
+</li>
+<li>直接指针：Java 堆对象的布局中就必须考虑如何放置访问类型数据的相关信息，reference 中存储的直接就是对象地址。（ HotSpot 使用的是直接指针的方法）</li>
+</ol>
+</li>
+</ul>
+<hr>
+<h1 id="垃圾收集器与内存分配策略"><a href="#垃圾收集器与内存分配策略" class="headerlink" title="垃圾收集器与内存分配策略"></a>垃圾收集器与内存分配策略</h1><h2 id="对象已死？"><a href="#对象已死？" class="headerlink" title="对象已死？"></a>对象已死？</h2><ul>
+<li><strong>引用计数法</strong><br>给对象添加一个引用计数器，有一个地方引用时，计数器值加一，引用失效的时候就减一。任何时刻计数器为0的对象就是不可能再被使用的<ul>
+<li>优点：实现简单，判断效率高</li>
+<li>缺点：Java虚拟机没有采用，是因为它很难解决对象之间相互循环引用的问题</li>
+</ul>
+</li>
+<li><strong>可达性分析算法</strong><br>通过一系列的称为 “GC Roots” 的对象作为起始点，从这些节点开始向下搜索，搜索所走过的路径成为引用链，当一个对象到 GC Roots 没有任何的引用链相连时，则证明此对象是不可用的<ul>
+<li>可作为 GC Roots 的对象[全局性的引用(常量和静态属性)执行上下文(栈帧中的本地变量表)]<ol>
+<li>虚拟机栈(栈帧中的本地变量表)中引用的对象，譬如各个线程被调用的方法堆栈中使用到的参数、局部变量、临时变量等。</li>
+<li>方法区中类静态属性引用的对象，譬如 Java 类的引用类型静态变量。</li>
+<li>方法区中常量引用的对象，譬如字符串常量池（String Table）里的引用。</li>
+<li>本地方法栈中 JNI (一般来说的 Native 方法)引用的对象</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><strong>再谈引用</strong><ol>
+<li>强引用：在程序代码中普遍存在的，类似 Object obj = new Object(); 只要强引用还存在，垃圾收集器永远不会回收掉被引用的对象。</li>
+<li>软引用：用来描述一些还有用但是非必需的对象。在系统将要发生内存溢出异常之前，将会把软引用列进回收范围之中进行第二次回收。如果这次回收还没有足够的内存，才会抛出内存溢出异常。</li>
+<li>弱引用：也是描述非必需对象的，比软引用更弱一些。下一次垃圾回收就会回收掉只被弱引用关联的对象。</li>
+<li>虚引用：一个对象是否有虚引用的存在，完全不会对其生存时间构成影响，也无法通过虚引用取得一个对象实例。为一个对象设置虚引用关联的唯一目的就是能在这个对象被收集器回收时收到一个系统通知.</li>
+</ol>
+</li>
+<li><strong>生存还是死亡</strong><br>可达性分析算法中不可达的对象需要经过两次标记过程：<ol>
+<li>第一次标记并进行一次筛选，筛选的条件是此对象是否有必要执行 finalize() 方法，当对象没有覆盖 finalize() 方法，或者 finalize() 方法已经被虚拟机调用过，则视为“没有必要执行”。</li>
+<li>判定为有必要执行 finalize() 方法，会将这个对象放入一个叫做 F-Queue 的队列，并在稍后自动创建一个低优先级的 Finalizer 线程去执行，如果对象在 finalize() 方法中拯救自己，就会被移除“即将回收”集合，否则回收。</li>
+</ol>
+</li>
+<li><strong>回收方法区</strong><ol>
+<li>废弃常量</li>
+<li>无用的类<ul>
+<li>该类所有的实例已经被回收,也就是 Java 堆中不存在该类及其任何派生子类的实例</li>
+<li>加载该类的类加载器已经被回收。(很难判断)</li>
+<li>该类对应的 java.lang.Class 对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法。</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+<hr>
+<h2 id="垃圾收集算法"><a href="#垃圾收集算法" class="headerlink" title="垃圾收集算法"></a>垃圾收集算法</h2><ul>
+<li><strong>标记-删除算法</strong><br>缺点：<ol>
+<li>执行效率不稳定，如果 Java 堆中包含大量对象，而且其中大部分是需要被回收的，这时必须进行大量标记和清除的动作，导致标记和清除两个过程的执行效率都随对象数量增长而降低；</li>
+<li>内存空间的碎片化问题，标记、清除之后会产生大量不连续的内存碎片，空间碎片太多可能会导致当以后在程序运行过程中需要分配较大对象时无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作。</li>
+</ol>
+</li>
+<li><strong>标记-复制算法</strong><ol>
+<li>使用一半的内存空间，每次将存活的对象复制到空的另一半然后清空。</li>
+<li>新生代中的对象 98% 很快消亡，所以没必要浪费一半的空间。把内存空间分成一个 Eden(80%) 和两个 survivor(10%) ,每次使用 Eden 和 一个survivor 空间，剩下一个 survivor 用来复制</li>
+<li>没有办法保证每次回收都有不多于10%的对象存活，当 survivor 空间不够用时，需要依赖其他内存(老年代)进行分配担保。</li>
+</ol>
+</li>
+<li><strong>标记-整理算法</strong><br>针对老年代复制算法的效率变低。采用“标记-整理”算法，标记之后，后续步骤不是直接对可回收对象进行清理，而是让所有存活的对象都向一端移动，然后清理掉边界以外的内存。<br>如果移动存活对象，尤其是在老年代这种每次回收都有大量对象存活区域，移动存活对象并更新所有引用这些对象的地方将会是一种极为负重的操作，需要“Stop The World” </li>
+</ul>
+<hr>
+<h2 id="HotSpot-的算法细节实现"><a href="#HotSpot-的算法细节实现" class="headerlink" title="HotSpot 的算法细节实现"></a>HotSpot 的算法细节实现</h2><h3 id="枚举根节点"><a href="#枚举根节点" class="headerlink" title="枚举根节点"></a>枚举根节点</h3><ol>
+<li>GC 停顿<br>在进行可达性分析的时候，必须在一个能确保一致性的快照中进行。“一致性”指的是在整个分析期间整个执行系统看起来就像被冻结在某个时间点上，不可以出现分析过程中对象引用关系还在不断变化的情况。</li>
+<li>准确式 GC<br>执行系统停顿下来后并不需要一个不漏地检查完所有的执行上下文和全局变量的引用位置。<br>HotSpot 采用 OopMap 的数据结构来记录对象引用的位置。在类加载完成的时候，HotSpot 就把对象内什么偏移量上是什么类型的数据计算出来，在 JIT 编译过程中，也会在特定的位置记录下栈和寄存器中哪些位置是引用。在 OopMap 的协助下，HotSpot 可以快速且准确的完成 GC 。</li>
+</ol>
+<h3 id="安全点"><a href="#安全点" class="headerlink" title="安全点"></a>安全点</h3><ol>
+<li>引用变化非常频繁，如果为每一条指令都生成对应的 OopMap ，GC 的空间成本太高。</li>
+<li>HotSpot 只是在特定的位置记录了这些信息，叫做 “SafePoint”，SafePoint 的选取不能太少也不能太多。选定是以“是否具有让程序长时间执行的特征”为标准选定的。</li>
+<li>如何在 GC 发生时让所有的线程停下来<ul>
+<li>抢先式中断：首先把所有线程全部中断，然后发现有线程不在安全点上，则恢复线程让它跑到安全点上，几乎没有虚拟机采用这个方式来响应 GC 事件。</li>
+<li>主动式中断：设置一个标志，各个线程主动的去轮询这个标志，发现中断标志为真的时候就自己中断挂起</li>
+</ul>
+</li>
+</ol>
+<h3 id="安全区域"><a href="#安全区域" class="headerlink" title="安全区域"></a>安全区域</h3><p>程序执行的时候可以根据安全点进行中断，但是没有获得CPU的程序就需要安全区域来解决，安全区域是指能够确保在某一段代码片段之中，引用关系不会发生变化，因此，在这个区域中任意地方开始垃圾收集都是安全的。</p>
+<h3 id="记忆集与卡表"><a href="#记忆集与卡表" class="headerlink" title="记忆集与卡表"></a>记忆集与卡表</h3><p>记忆集是一种用于记录从非收集区域指向收集区域的指针集合的抽象数据结构。<br>卡表最简单的形式可以只是一个字节数组。</p>
+<p><a href="https://tech.meituan.com/2017/12/29/jvm-optimize.html" target="_blank" rel="noopener">从实际案例聊聊Java应用的GC优化</a><br>老年代中引用新生代，解决的方案是使用卡表，而不是每次 Minor GC 的时候扫描老年代。<br>新生代引用老年代，解决方案是老年代回收前，先对新生代进行一次 Minor GC 。</p>
+<h3 id="写屏障"><a href="#写屏障" class="headerlink" title="写屏障"></a>写屏障</h3><p>在 HotSpot 虚拟机里是通过写屏障（Write Barrier）技术<strong>维护卡表状态</strong>的。<br>写屏障可以看作在虚拟机层面对“引用类型字段赋值”这个动作的 AOP 切面，在引用对象赋值时会产生一个环形（Around）通知，供程序执行额外的动作，也就是说赋值的前后都在写屏障的覆盖范畴内。在赋值前的部分的写屏障叫作写前屏障（Pre-Write Barrier），在赋值后的则叫作写后屏障（Post-Write Barrier）</p>
+<h3 id="并发的可达性分析"><a href="#并发的可达性分析" class="headerlink" title="并发的可达性分析"></a>并发的可达性分析</h3><h4 id="三色标记法"><a href="#三色标记法" class="headerlink" title="三色标记法"></a>三色标记法</h4><ul>
+<li>白色：表示对象尚未被垃圾收集器访问过。显然在可达性分析刚刚开始的阶段，所有的对象都是白色的，若在分析结束的阶段，仍然是白色的对象，即代表不可达。</li>
+<li>黑色：表示对象已经被垃圾收集器访问过，且这个对象的所有引用都已经扫描过。黑色的对象代表已经扫描过，它是安全存活的，如果有其他对象引用指向了黑色对象，无须重新扫描一遍。黑色对象不可能直接（不经过灰色对象）指向某个白色对象。</li>
+<li>灰色：表示对象已经被垃圾收集器访问过，但这个对象上至少存在一个引用还没有被扫描过。</li>
+</ul>
+<ul>
+<li>因为用户线程与收集器是并发工作。收集器在对象图上标记颜色，同时用户线程在修改引用关系——即修改对象图的结构，这样可能出现两种后果：<pre><code>1. 把原本消亡的对象错误标记为存活，产生了一点逃过本次收集的浮动垃圾而已，下次收集清理掉就好。</code></pre><ol start="2">
+<li>把原本存活的对象错误标记为已消亡，这就是非常致命的后果了，程序肯定会因此发生错误。</li>
+</ol>
+</li>
+<li>导致“对象消失”的问题的两个条件：<pre><code>1. 赋值器插入了一条或多条从黑色对象到白色对象的新引用；</code></pre><ol start="2">
+<li>赋值器删除了全部从灰色对象到该白色对象的直接或间接引用。</li>
+</ol>
+</li>
+<li>两种解决方案：增量更新（Incremental Update）和原始快照（Snapshot At The Beginning，SATB）。<br>（CMS 采用增量更新，G1 采用原始快照）  <ol>
+<li>增量更新要破坏的是第一个条件，当黑色对象插入新的指向白色对象的引用关系时，就将这个新插入的引用记录下来，等并发扫描结束之后，再将这些记录过的引用关系中的黑色对象为根，重新扫描一次。这可以简化理解为，黑色对象一旦新插入了指向白色对象的引用之后，它就变回灰色对象了。</li>
+<li>原始快照要破坏的是第二个条件，当灰色对象要删除指向白色对象的引用关系时，就将这个要删除的引用记录下来，在并发扫描结束之后，再将这些记录过的引用关系中的灰色对象为根，重新扫描一次。这也可以简化理解为，无论引用关系删除与否，都会按照刚刚开始扫描那一刻的对象图快照来进行搜索。</li>
+</ol>
+</li>
+</ul>
+<hr>
+<h2 id="经典垃圾收集器"><a href="#经典垃圾收集器" class="headerlink" title="经典垃圾收集器"></a>经典垃圾收集器</h2><ol>
+<li><strong>Serial 收集器</strong></li>
+</ol>
+<ul>
+<li>单线程，并不仅仅说明它只会使用一个 CPU 或一条收集线程去完成垃圾收集工作，更重要的是在它收集垃圾时，必须暂停其他所有的工作线程。</li>
+<li>新生代采用复制算法，老年代采用标记整理算法，是虚拟机运行在 Client 模式下的默认新生代收集器</li>
+</ul>
+<ol start="2">
+<li><strong>ParNew 收集器</strong></li>
+</ol>
+<ul>
+<li>Serial 收集器的多线程版本</li>
+<li>目前只有它与 CMS 收集器配合工作，CMS 作为老年代的收集器，ParNew 作为新生代的收集器。</li>
+</ul>
+<ol start="3">
+<li><strong>Parallel Scavenge</strong></li>
+</ol>
+<ul>
+<li>采用复制算法，并行的多线程新生代收集器，其关注点和其他收集器不同，CMS 收集器关注点是尽可能缩短垃圾收集时用户线程的停顿时间，Parallel Scavenge关注点是达到一个可控制的吞吐量。</li>
+<li>停顿时间短适合与用户交互，高吞度量则可以高效率地利用 CPU 时间，适合在后台运算。</li>
+</ul>
+<ol start="4">
+<li><strong>Serial Old 收集器</strong></li>
+</ol>
+<ul>
+<li>单线程标记整理算法，主要意义在于给 Client 模式下的虚拟机使用</li>
+<li>JDK1.5 以及之前的版本中与 Parallel Scavenge 收集器搭配使用</li>
+<li>作为 CMS 收集器的后备预案，并发收集发生Concurrent Mode Failure时使用</li>
+</ul>
+<ol start="5">
+<li><strong>Parallel Old收集器</strong></li>
+</ol>
+<ul>
+<li>多线程标记整理算法, JDK1.6 之后开始提供</li>
+<li>搭配 Parallel Scavenge 在注重吞吐量和 CPU 资源敏感的工作场合</li>
+</ul>
+<ol start="6">
+<li><strong>CMS（Concurrent Mark Sweep）收集器</strong></li>
+</ol>
+<ul>
+<li>运行流程<ol>
+<li>初始标记：仅仅标记 GC Roots 能直接关联到的对象，速度很快，需要Stop The World</li>
+<li>并发标记：进行 GC Roots Tracing，相对耗时，但是是和用户线程并发运行</li>
+<li>重新标记<ul>
+<li>修正并发标记期间因用户程序继续运作而导致标记产生变动的那一部分对象的标记记录，比初始标记稍慢，远比并发标记的时间短。</li>
+<li>这个阶段是以新生代中对象为根来判断对象是否存活的</li>
+<li>新生代对象持有老年代中对象的引用，这种情况称为“跨代引用”。因它的存在，Remark阶段必须扫描整个堆来判断对象是否存活</li>
+<li>新生代的部分对象已经不可达，但仍然需要扫描的原因：新生代 GC 和老年代的 GC 是各自分开独立进行的，只有 Minor GC 时才会使用根搜索算法，标记新生代对象是否可达，也就是说虽然一些对象已经不可达，但在 Minor GC 发生前不会被标记为不可达，CMS 也无法辨认哪些对象存活，只能全堆扫描（新生代+老年代）。</li>
+<li>新生代中对象的特点是“朝生夕灭”，这样如果 Remark 前执行一次 Minor GC，大部分对象就会被回收。CMS 就采用了这样的方式，在 Remark 前增加了一个可中断的并发预清理（CMS-concurrent-abortable-preclean），该阶段主要工作仍然是并发标记对象是否存活，只是这个过程可被中断。如果此阶段执行时等到了 Minor GC，那么上述灰色对象将被回收，Remark 阶段需要扫描的对象就少了。除此之外 CMS 为了避免这个阶段没有等到 Minor GC 而陷入无限等待，提供了参数CMSMaxAbortablePrecleanTime，默认为5s，含义是如果可中断的预清理执行超过5s，不管发没发生 Minor GC 都会中止此阶段，进入Remark。</li>
+<li>JVM 是如何避免 Minor GC 时扫描全堆的？卡表的具体策略是将老年代的空间分成大小为512B的若干张卡（card）。卡表本身是单字节数组，数组中的每个元素对应着一张卡，当发生老年代引用新生代时，虚拟机将该卡对应的卡表元素设置为适当的值。卡表被标记为脏（卡表还有另外的作用，标识并发标记阶段哪些块被修改过），之后 Minor GC 时通过扫描卡表就可以很快的识别哪些卡中存在老年代指向新生代的引用。这样虚拟机通过空间换时间的方式，避免了全堆扫描。</li>
+<li>什么时候可能会触发 STW 的 FullGC 呢？<ol>
+<li>Perm空间不足；</li>
+<li>CMS GC 时出现 promotionfailed 和 concurrentmodefailure（发生的原因一般是 CMS 正在进行，但是由于老年代空间不足，需要尽快回收老年代里面的不再被使用的对象，这时停止所有的线程，同时终止 CMS ，直接进行 SerialOld GC）；</li>
+<li>统计得到的 YoungGC 晋升到老年代的平均大小大于老年代的剩余空间</li>
+<li>主动触发 Full GC（执行jmap-histo:live [pid]）来避免碎片问题。</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>并发清除：可以和用户线程并发运行</li>
+</ol>
+</li>
+<li>CMS 的缺点<ol>
+<li>CMS 收集器对 CPU 资源非常敏感</li>
+<li>CMS 收集器无法处理浮动垃圾，可能出现 Concurrent Mode Failure 而导致另一次Full GC 的发生<ul>
+<li>浮动垃圾：CMS 在并发清除阶段，此刻并发运行的用户线程产生的垃圾只能下一次 GC 的时候回收</li>
+<li>也是因为在垃圾收集阶段用户线程在需要运行，所以需要预留一部分空间提供并发收集时的程序运作使用</li>
+<li>预留的内存无法满足程序需求就会出现 CMF ，此刻需要临时启用 Serial Old 重新进行老年代的垃圾收集</li>
+</ul>
+</li>
+<li>标记清除算法容易产生空间碎片导致大对象没有足够的空间分配，不得不提前触发一次 Full GC。</li>
+</ol>
+</li>
+</ul>
+<ol start="7">
+<li><strong>G1收集器</strong></li>
+</ol>
+<ul>
+<li><strong>Mixed GC</strong><br>G1 可以面向堆内存任何部分来组成回收集（Collection Set，一般简称CSet）进行回收，衡量标准不再是它属于哪个分代，而是哪块内存中存放的垃圾数量最多，回收收益最大，这就是 G1 收集器的 Mixed GC 模式。</li>
+<li><strong>Region</strong><br>G1把连续的 Java 堆划分为多个大小相等的独立区域（Region），每一个 Region 都可以根据需要，扮演新生代的 Eden 空间、Survivor 空间，或者老年代空间。</li>
+<li><strong>Why Garbage First ？</strong></li>
+</ul>
+<ol>
+<li>G1 收集器之所以能建立可预测的停顿时间模型，是因为它将 Region 作为单次回收的最小单元，即每次收集到的内存空间都是 Region 大小的整数倍，这样可以有计划地避免在整个 Java 堆中进行全区域的垃圾收集。</li>
+<li>更具体的处理思路是让 G1 收集器去跟踪各个 Region 里面的垃圾堆积的“价值”大小，价值即回收所获得的空间大小以及回收所需时间的经验值，然后在后台维护一个优先级列表，每次根据用户设定允许的收集停顿时间（使用参数-XX：MaxGCPauseMillis指定，默认值是200毫秒），优先处理回收价值收益最大的那些Region，这也就是“Garbage First”名字的由来。</li>
+</ol>
+<ul>
+<li><strong>Region里面存在的跨Region引用对象如何解决？</strong><br>使用记忆集避免全堆作为GC Roots扫描，但在G1收集器上记忆集的应用其实要复杂很多，它的每个Region都维护有自己的记忆集（哈希表），这些记忆集会记录下别的Region指向自己的指针，并标记这些指针分别在哪些卡页的范围之内。</li>
+<li><strong>并发标记阶段如何保证收集线程与用户线程互不干扰地运行？</strong><ol>
+<li>解决的是用户线程改变对象引用关系时，必须保证其不能打破原本的对象图结构，导致标记结果出现错误。解决方案是原始快照。</li>
+<li>垃圾收集对用户线程的影响还体现在回收过程中新创建对象的内存分配上，程序要继续运行就肯定会持续有新对象被创建，G1 为每一个 Region 设计了两个名为 TAMS（Top at Mark Start）的指针，把 Region 中的一部分空间划分出来用于并发回收过程中的新对象分配，并发回收时新分配的对象地址都必须要在这两个指针位置以上。G1 收集器默认在这个地址以上的对象是被隐式标记过的，即默认它们是存活的，不纳入回收范围。</li>
+</ol>
+</li>
+<li><strong>G1收集器的运作过程</strong></li>
+</ul>
+<ol>
+<li>初始标记<br>仅仅只是标记一下 GC Roots 能直接关联到的对象，并且修改 TAMS 指针的值，让下一阶段用户线程并发运行时，能正确地在可用的 Region 中分配新对象。这个阶段需要停顿线程，但耗时很短，而且是借用进行Minor GC 的时候同步完成的，所以 G1 收集器在这个阶段实际并没有额外的停顿。</li>
+<li>并发标记<br>从GC Root开始对堆中对象进行可达性分析，递归扫描整个堆里的对象图，找出要回收的对象，这阶段耗时较长，但可与用户程序并发执行。当对象图扫描完成以后，还要重新处理SATB记录下的在并发时有引用变动的对象。</li>
+<li>最终标记<br>对用户线程做另一个短暂的暂停，用于处理并发阶段结束后仍遗留下来的最后那少量的SATB记录。</li>
+<li>筛选回收<br>负责更新 Region 的统计数据，对各个 Region 的回收价值和成本进行排序，根据用户所期望的停顿时间来制定回收计划，可以自由选择任意多个 Region 构成回收集，然后把决定回收的那一部分 Region 的存活对象复制到空的 Region 中，再清理掉整个旧 Region 的全部空间。这里的操作涉及存活对象的移动，是必须暂停用户线程，由多条收集器线程并行完成的。</li>
+</ol>
+<ul>
+<li><strong>G1的美中不足</strong><br>在用户程序运行过程中，G1无论是为了垃圾收集产生的内存占用（Footprint）还是程序运行时的额外执行负载（Overload）都要比CMS要高。</li>
+</ul>
+<hr>
+<h2 id="内存分配与回收策略"><a href="#内存分配与回收策略" class="headerlink" title="内存分配与回收策略"></a>内存分配与回收策略</h2><ul>
+<li><p><strong>对象优先在Eden分配</strong><br>1Eden2Survivor，其中1Eden1Survivor用来分配，剩下的一个Survivor用来GC的时候复制。同时老年代区域为新生代区域担保。<br>当Eden区没有足够的空间进行分配，虚拟机会进行一次Minor GC</p>
+</li>
+<li><p><strong>大对象直接进入老年代</strong></p>
+<p>-XX:PretenureSizeThreshold,令大于这个设置值的对象直接在老年代分配。<br>目的就是避免在Eden区及两个Survivor区之间来回复制，产生大量的内存复制操作。</p>
+</li>
+<li><p><strong>长期存活的对象将进入老年代</strong><br>虚拟机给每个对象定义了一个对象年龄计数器。如果对象在Eden出生并经过第一次Minor GC后仍然存活，并且能被Survivor容纳的话，将被移动到Survivor空间中，并且对象的年龄设为1，对象在Survivor区中每“熬过”一次Minor GC，年龄就增加一岁。–XX:MaxTenuringThreshold</p>
+</li>
+<li><p><strong>动态对象年龄判定</strong><br>并不是永远地要求对象的年龄必须达到MaxTenuringThreshold才能晋升老年代，如果在Survivor空间中相同年龄所有对象的大小超过Survivor空间的一半，那么年龄大于等于该年龄的对象就可以直接进入老年代</p>
+</li>
+<li><p><strong>空间分配担保</strong></p>
+</li>
+</ul>
+<ol>
+<li><p>发生 Minor GC 之前，虚拟机会检查老年代最大可用的连续空间是否大于新生代所有对象总空间，如果成立，那么 Minor GC 是绝对安全的。</p>
+</li>
+<li><p>HandlePromotionFailure 设置值是否允许担保失败：</p>
+<ul>
+<li>如果允许，会继续检查老年代最大可用的连续空间是否大于历次晋升到老年代对象的平均大小，如果大于，则尝试进行一次 Minor GC，尽管这个 GC 是有风险的。</li>
+<li>出现担保失败，就只好在失败后进行一次 Full GC</li>
+<li>如果小于，或者 HandlePromotionFailure 设置不允许冒险，则进行一次 Full GC</li>
+</ul>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/JVM/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%AC%AC%E4%B8%89%E9%83%A8%E5%88%86%EF%BC%9A%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%89%A7%E8%A1%8C%E5%AD%90%E7%B3%BB%E7%BB%9F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1457,207 +1967,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Java%20Concurrent/AQS/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Java%20Concurrent/AQS/" class="post-title-link" itemprop="url">AQS</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-21 10:31:10" itemprop="dateModified" datetime="2020-05-21T10:31:10+08:00">2020-05-21</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E8%89%BA%E6%9C%AF%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">Java并发编程的艺术读书笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><a href="https://segmentfault.com/a/1190000017372067" target="_blank" rel="noopener">AQS</a></p>
-<p>AbstractQueuedSynchronizer</p>
-<p>Sync extends AbstractQueuedSynchronizer</p>
-<p>Sync 有两个主要的实现类 NofairSync，FailSync</p>
-<h2 id="NofairSync-lock"><a href="#NofairSync-lock" class="headerlink" title="NofairSync.lock()"></a>NofairSync.lock()</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (compareAndSetState(<span class="number">0</span>, <span class="number">1</span>)) <span class="comment">//通过cas操作来修改state状态，表示争抢锁的操作</span></span><br><span class="line">		setExclusiveOwnerThread(Thread.currentThread());<span class="comment">//设置当前获得锁状态的线程</span></span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		acquire(<span class="number">1</span>); <span class="comment">//尝试去获取锁</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">acquire</span><span class="params">(<span class="keyword">int</span> arg)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (!tryAcquire(arg) &amp;&amp; acquireQueued(addWaiter(Node.EXCLUSIVE), arg))</span><br><span class="line">		selfInterrupt();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">tryAcquire</span><span class="params">(<span class="keyword">int</span> acquires)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> nonfairTryAcquire(acquires);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">nonfairTryAcquire</span><span class="params">(<span class="keyword">int</span> acquires)</span> </span>&#123;</span><br><span class="line">	<span class="comment">//获得当前执行的线程</span></span><br><span class="line">	<span class="keyword">final</span> Thread current = Thread.currentThread();</span><br><span class="line">	<span class="keyword">int</span> c = getState(); <span class="comment">//获得state的值</span></span><br><span class="line">	<span class="keyword">if</span> (c == <span class="number">0</span>) &#123; <span class="comment">//state=0说明当前是无锁状态</span></span><br><span class="line">		<span class="comment">//通过cas操作来替换state的值改为1</span></span><br><span class="line">		<span class="keyword">if</span> (compareAndSetState(<span class="number">0</span>, acquires)) &#123;</span><br><span class="line">			<span class="comment">//保存当前获得锁的线程</span></span><br><span class="line">			setExclusiveOwnerThread(current);</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//这段逻辑就很简单了。如果是同一个线程来获得锁，则直接增加重入次数</span></span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (current == getExclusiveOwnerThread()) &#123;</span><br><span class="line">		<span class="keyword">int</span> nextc = c + acquires; <span class="comment">//增加重入次数</span></span><br><span class="line">		<span class="keyword">if</span> (nextc &lt; <span class="number">0</span>) <span class="comment">// overflow</span></span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"Maximum lock count exceeded"</span>);</span><br><span class="line">		setState(nextc);</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> Node <span class="title">enq</span><span class="params">(<span class="keyword">final</span> Node node)</span> </span>&#123;</span><br><span class="line">	<span class="comment">//自旋</span></span><br><span class="line">	<span class="keyword">for</span> (;;) &#123;</span><br><span class="line">		Node t = tail; <span class="comment">//如果是第一次添加到队列，那么tail=null</span></span><br><span class="line">		<span class="keyword">if</span> (t == <span class="keyword">null</span>) &#123; <span class="comment">// Must initialize</span></span><br><span class="line">			<span class="comment">//CAS的方式创建一个空的Node作为头结点</span></span><br><span class="line">			<span class="keyword">if</span> (compareAndSetHead(<span class="keyword">new</span> Node()))</span><br><span class="line">			<span class="comment">//此时队列中只一个头结点，所以tail也指向它</span></span><br><span class="line">			tail = head;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">//进行第二次循环时，tail不为null，进入else区域。将当前线程的Node结点的prev指向tail，然后使用CAS将tail指向Node</span></span><br><span class="line">			node.prev = t;</span><br><span class="line">			<span class="keyword">if</span> (compareAndSetTail(t, node)) &#123;</span><br><span class="line">			<span class="comment">//t此时指向tail,所以可以CAS成功，将tail重新指向Node。此时t为更新前的tail的值，即指向空的头结点，t.next=node，就将头结点的后续结点指向Node，返回头结点</span></span><br><span class="line">				t.next = node;</span><br><span class="line">				<span class="keyword">return</span> t;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Node <span class="title">addWaiter</span><span class="params">(Node mode)</span> </span>&#123; <span class="comment">//mode=Node.EXCLUSIVE</span></span><br><span class="line">	<span class="comment">//将当前线程封装成Node，并且mode为独占锁</span></span><br><span class="line">	Node node = <span class="keyword">new</span> Node(Thread.currentThread(), mode);</span><br><span class="line">	<span class="comment">// Try the fast path of enq; backup to full enq on failure</span></span><br><span class="line">	<span class="comment">// tail是AQS的中表示同步队列队尾的属性，刚开始为null，所以进行enq(node)方法</span></span><br><span class="line">	Node pred = tail;</span><br><span class="line">	<span class="keyword">if</span> (pred != <span class="keyword">null</span>) &#123; <span class="comment">//tail不为空的情况，说明队列中存在节点数据</span></span><br><span class="line">		node.prev = pred; <span class="comment">//讲当前线程的Node的prev节点指向tail</span></span><br><span class="line">		<span class="keyword">if</span> (compareAndSetTail(pred, node)) &#123;<span class="comment">//通过cas讲node添加到AQS队列</span></span><br><span class="line">			pred.next = node;<span class="comment">//cas成功，把旧的tail的next指针指向新的tail</span></span><br><span class="line">			<span class="keyword">return</span> node;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	enq(node); <span class="comment">//tail=null，将node添加到同步队列中</span></span><br><span class="line">	<span class="keyword">return</span> node;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">acquireQueued</span><span class="params">(<span class="keyword">final</span> Node node, <span class="keyword">int</span> arg)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span> failed = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">boolean</span> interrupted = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">            <span class="keyword">final</span> Node p = node.predecessor();<span class="comment">// 获取prev节点,若为null即刻抛出NullPointException</span></span><br><span class="line">            <span class="keyword">if</span> (p == head &amp;&amp; tryAcquire(arg)) &#123;<span class="comment">// 如果前驱为head才有资格进行锁的抢夺</span></span><br><span class="line">                setHead(node); <span class="comment">// 获取锁成功后就不需要再进行同步操作了,获取锁成功的线程作为新的head节点</span></span><br><span class="line"><span class="comment">//凡是head节点,head.thread与head.prev永远为null, 但是head.next不为null</span></span><br><span class="line">                p.next = <span class="keyword">null</span>; <span class="comment">// help GC</span></span><br><span class="line">                failed = <span class="keyword">false</span>; <span class="comment">//获取锁成功</span></span><br><span class="line">                <span class="keyword">return</span> interrupted;</span><br><span class="line">            &#125;</span><br><span class="line"><span class="comment">//如果获取锁失败，则根据节点的waitStatus决定是否需要挂起线程</span></span><br><span class="line">            <span class="keyword">if</span> (shouldParkAfterFailedAcquire(p, node) &amp;&amp;</span><br><span class="line">                parkAndCheckInterrupt())<span class="comment">// 若前面为true,则执行挂起,待下次唤醒的时候检测中断的标志</span></span><br><span class="line">                interrupted = <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (failed) <span class="comment">// 如果抛出异常则取消锁的获取,进行出队(sync queue)操作</span></span><br><span class="line">            cancelAcquire(node);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">shouldParkAfterFailedAcquire</span><span class="params">(Node pred, Node node)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> ws = pred.waitStatus; <span class="comment">//前继节点的状态</span></span><br><span class="line">    <span class="keyword">if</span> (ws == Node.SIGNAL)<span class="comment">//如果是SIGNAL状态，意味着当前线程需要被unpark唤醒</span></span><br><span class="line">               <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line"><span class="comment">//如果前节点的状态大于0，即为CANCELLED状态时，则会从前节点开始逐步循环找到一个没有被“CANCELLED”节点设置为当前节点的前节点，返回false。在下次循环执行shouldParkAfterFailedAcquire时，返回true。这个操作实际是把队列中CANCELLED的节点剔除掉。</span></span><br><span class="line">    <span class="keyword">if</span> (ws &gt; <span class="number">0</span>) &#123;<span class="comment">// 如果前继节点是“取消”状态，则设置 “当前节点”的 “当前前继节点” 为 “‘原前继节点'的前继节点”。</span></span><br><span class="line">       </span><br><span class="line">        <span class="keyword">do</span> &#123;</span><br><span class="line">            node.prev = pred = pred.prev;</span><br><span class="line">        &#125; <span class="keyword">while</span> (pred.waitStatus &gt; <span class="number">0</span>);</span><br><span class="line">        pred.next = node;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">// 如果前继节点为“0”或者“共享锁”状态，则设置前继节点为SIGNAL状态。</span></span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         * waitStatus must be 0 or PROPAGATE.  Indicate that we</span></span><br><span class="line"><span class="comment">         * need a signal, but don't park yet.  Caller will need to</span></span><br><span class="line"><span class="comment">         * retry to make sure it cannot acquire before parking.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        compareAndSetWaitStatus(pred, ws, Node.SIGNAL);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">parkAndCheckInterrupt</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        LockSupport.park(<span class="keyword">this</span>);</span><br><span class="line">        <span class="keyword">return</span> Thread.interrupted();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="ReentrantLock-unlock"><a href="#ReentrantLock-unlock" class="headerlink" title="ReentrantLock.unlock"></a>ReentrantLock.unlock</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">release</span><span class="params">(<span class="keyword">int</span> arg)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (tryRelease(arg)) &#123;</span><br><span class="line">        Node h = head;</span><br><span class="line">        <span class="keyword">if</span> (h != <span class="keyword">null</span> &amp;&amp; h.waitStatus != <span class="number">0</span>)</span><br><span class="line">            unparkSuccessor(h);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">tryRelease</span><span class="params">(<span class="keyword">int</span> releases)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> c = getState() - releases; <span class="comment">// 这里是将锁的数量减1</span></span><br><span class="line">    <span class="keyword">if</span> (Thread.currentThread() != getExclusiveOwnerThread())<span class="comment">// 如果释放的线程和获取锁的线程不是同一个，抛出非法监视器状态异常</span></span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalMonitorStateException();</span><br><span class="line">    <span class="keyword">boolean</span> free = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">if</span> (c == <span class="number">0</span>) &#123; </span><br><span class="line"><span class="comment">// 由于重入的关系，不是每次释放锁c都等于0，</span></span><br><span class="line">    <span class="comment">// 直到最后一次释放锁时，才会把当前线程释放</span></span><br><span class="line">        free = <span class="keyword">true</span>;</span><br><span class="line">        setExclusiveOwnerThread(<span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    setState(c);</span><br><span class="line">    <span class="keyword">return</span> free;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">unparkSuccessor</span><span class="params">(Node node)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> ws = node.waitStatus;</span><br><span class="line">    <span class="keyword">if</span> (ws &lt; <span class="number">0</span>)</span><br><span class="line">        compareAndSetWaitStatus(node, ws, <span class="number">0</span>);</span><br><span class="line">    Node s = node.next;</span><br><span class="line">    <span class="keyword">if</span> (s == <span class="keyword">null</span> || s.waitStatus &gt; <span class="number">0</span>) &#123;<span class="comment">//判断后继节点是否为空或者是否是取消状态,</span></span><br><span class="line">        s = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">for</span> (Node t = tail; t != <span class="keyword">null</span> &amp;&amp; t != node; t = t.prev)</span><br><span class="line">            <span class="keyword">if</span> (t.waitStatus &lt;= <span class="number">0</span>) <span class="comment">//然后从队列尾部向前遍历找到最前面的一个waitStatus小于0的节点, 至于为什么从尾部开始向前遍历，因为在doAcquireInterruptibly.cancelAcquire方法的处理过程中只设置了next的变化，没有设置prev的变化，在最后有这样一行代码：node.next = node，如果这时执行了unparkSuccessor方法，并且向后遍历的话，就成了死循环了，所以这时只有prev是稳定的</span></span><br><span class="line">                s = t;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//内部首先会发生的动作是获取head节点的next节点，如果获取到的节点不为空，则直接通过：“LockSupport.unpark()”方法来释放对应的被挂起的线程，这样一来将会有一个节点唤醒后继续进入循环进一步尝试tryAcquire()方法来获取锁</span></span><br><span class="line">    <span class="keyword">if</span> (s != <span class="keyword">null</span>)</span><br><span class="line">        LockSupport.unpark(s.thread); <span class="comment">//释放许可</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://wayne-98.github.io/2020/05/10/Internet/%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/808.jpg">
-      <meta itemprop="name" content="Wayne">
-      <meta itemprop="description" content="Keep Moving">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Wayne">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/05/10/Internet/%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93%E5%8E%9F%E7%90%86/" class="post-title-link" itemprop="url">可靠传输原理</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-05-10 21:39:10" itemprop="dateCreated datePublished" datetime="2020-05-10T21:39:10+08:00">2020-05-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-21 10:27:04" itemprop="dateModified" datetime="2020-05-21T10:27:04+08:00">2020-05-21</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C-%E8%87%AA%E9%A1%B6%E5%90%91%E4%B8%8B%E6%96%B9%E6%B3%95%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">计算机网络:自顶向下方法读书笔记</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="可靠传输原理"><a href="#可靠传输原理" class="headerlink" title="可靠传输原理"></a>可靠传输原理</h2><h3 id="流水线可靠数据传输协议"><a href="#流水线可靠数据传输协议" class="headerlink" title="流水线可靠数据传输协议"></a>流水线可靠数据传输协议</h3><ul>
-<li>增加序号范围</li>
-<li>协议的发送方和接收方两端需要缓存分组。(发送方最低限度应当能缓冲那些已经发送但是没有被确认的分组，接收方需要缓存那些已正确接收的分组)</li>
-</ul>
-<h3 id="回退N步-GBN-滑动窗口协议"><a href="#回退N步-GBN-滑动窗口协议" class="headerlink" title="回退N步(GBN)滑动窗口协议"></a>回退N步(GBN)滑动窗口协议</h3><ul>
-<li>GBN 发送方需要响应的三种类型的事件：<ol>
-<li>上层的调用: 发送方需要检查发送窗口是否已满，既是否有 N 个已发送但未被确认的分组。</li>
-<li>收到一个 ACK: GBN 协议中，对序号为N的分组的确认采取<strong>累积确认</strong>的方式，表明接收方已正确接收到序号为 N 的以前且包括 N 在内的所有的分组</li>
-<li>超时事件: 如果出现超时，发送方重传所有已发送但还未被确认过的分组。(只采用了一个定时器，在 base 处)</li>
-</ol>
-</li>
-<li>GBN 接收方：<br>如果一个序号为 N 的分组被正确接收，并且按序(既上一次交付给上层的数据是序号为 N - 1 的分组),则接收方为分组 N 发送一个 ACK ，并将该分组中的数据部分交付给上层。在所有其他情况下，接收方丢弃该分组，并为最近按序接收的分组重新发送 ACK 。<br>(接收方不需要缓存任何失序分组。因为发送方会重传所有已发送但还未被确认过的分组)</li>
-</ul>
-<h3 id="选择重传-SR"><a href="#选择重传-SR" class="headerlink" title="选择重传(SR)"></a>选择重传(SR)</h3><p>当窗口长度和时延带宽积都很大的时候，在流水线中会有很多分组更是如此。单个分组的差错就能够引起 GBN 重传大量分组，很多分组根本没必要重传。<br>选择重传协议通过让发送方仅重传那些它怀疑在接收方出错的分组而避免了不必要的重传。</p>
-<ul>
-<li>SR 发送方的事件和动作：</li>
-</ul>
-<ol>
-<li>从上层收到数据：发送方需要检查发送窗口是否已满，既是否有N个已发送但未被确认的分组。</li>
-<li>收到 ACK : 如果收到 ACK ，倘若该分组序号在窗口内，则 SR 发送方将那个被确认的分组标记为已接受。如果该分组的序号等于 send_base ，则窗口基序号向前移动到具有最小序号的未确认分组处。</li>
-<li>超时事件：每个分组都必须拥有其自己的逻辑定时器。</li>
-</ol>
-<ul>
-<li>SR接收方的事件和动作：</li>
-</ul>
-<ol>
-<li>序号在 [ rcv_base, rcv_base + N - 1 ] 内的分组被正确接受。在此情况下，收到的分组落在接收方的窗口内，一个选择 ACK 被回送给发送方。如果该分组以前没收到过，则缓存该分组。如果该分组的序号等于接受窗口的基序号，则该分组以及以前缓存的序号连续的分组交付给上层。然后接受窗口按向前移动分组的编号向上交付这些分组。</li>
-<li>序号在 [ rcv_base - N, rcv_base - 1 ] 内的分组被正确接收到。在此情况下，必须产生一个 ACK ，即使该分组是接收方以前已确认过的分组。</li>
-<li>其他情况，忽略该分组。</li>
-</ol>
-<ul>
-<li>窗口长度必须小于等于序号空间大小的一半</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1729,14 +2038,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">63</span>
+          <span class="site-state-item-count">64</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">14</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
