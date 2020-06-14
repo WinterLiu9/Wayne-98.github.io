@@ -611,10 +611,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-06-06 13:22:57 / 修改时间：13:23:35" itemprop="dateCreated datePublished" datetime="2020-06-06T13:22:57+08:00">2020-06-06</time>
+              <time title="创建时间：2020-06-06 13:22:57" itemprop="dateCreated datePublished" datetime="2020-06-06T13:22:57+08:00">2020-06-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-06-11 13:12:28" itemprop="dateModified" datetime="2020-06-11T13:12:28+08:00">2020-06-11</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -677,6 +683,18 @@
 <li><p>低8位我们描述完了，那么高16位的时钟是用来干嘛的呢？目前我的理解是用来衰减低8位的计数器的，就是根据这个时钟与全局时钟进行比较，如果过了一定时间（做差）就会对计数器进行衰减。</p>
 </li>
 </ul>
+<h2 id="淘汰策略的选择"><a href="#淘汰策略的选择" class="headerlink" title="淘汰策略的选择"></a>淘汰策略的选择</h2><ol>
+<li><p>在Redis中，数据有一部分访问频率较高，其余部分访问频率较低，或者无法预测数据的使用频率时，设置allkeys-lru是比较合适的。</p>
+</li>
+<li><p>如果所有数据访问概率大致相等时，可以选择allkeys-random。</p>
+</li>
+<li><p>如果研发者需要通过设置不同的ttl来判断数据过期的先后顺序，此时可以选择volatile-ttl策略。</p>
+</li>
+<li><p>如果希望一些数据能长期被保存，而一些数据可以被淘汰掉时，选择volatile-lru或volatile-random都是比较不错的。</p>
+</li>
+<li><p>由于设置expire会消耗额外的内存，如果计划避免Redis内存在此项上的浪费，可以选用allkeys-lru 策略，这样就可以不再设置过期时间，高效利用内存了。</p>
+</li>
+</ol>
 
       
     </div>
